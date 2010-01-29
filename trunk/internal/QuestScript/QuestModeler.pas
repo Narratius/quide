@@ -149,9 +149,11 @@ Type
  TdcVariable = class;
  TdcScript = class(TqmBase)
  private
+  f_Author: String;
   f_Description: TStrings;
   f_Locations: TObjectList;
   f_Variables: TObjectList;
+  f_Version: string;
   function pm_GetLocations(Index: Integer): TdcLocation;
   function pm_GetLocationsCount: Integer;
   function pm_GetObjectsCount: Integer;
@@ -170,13 +172,16 @@ Type
   procedure LoadFromStream(aStream: TStream);
   procedure Locations2Strings(aStrings: TStrings);
   function NewLocation(aCaption: String): TdcLocation;
+  procedure NewVariable;
   procedure SaveToStream(aStream: TStream);
+  property Author: String read f_Author write f_Author;
   property Description: TStrings read f_Description write pm_SetDescription;
   property Locations[Index: Integer]: TdcLocation read pm_GetLocations;
   property LocationsCount: Integer read pm_GetLocationsCount;
   property ObjectsCount: Integer read pm_GetObjectsCount;
   property Variables[Index: Integer]: TdcVariable read pm_GetVariables;
   property VariablesCount: Integer read pm_GetVariablesCount;
+  property Version: string read f_Version write f_Version;
  end;
 
  TqmObject = class(TqmBase)
@@ -197,7 +202,7 @@ function StringToActionType(aStr: String): TdcActionType;
 implementation
 
 Uses
- SysUtils, XMLDoc, StrUtils;
+ SysUtils, XMLDoc, StrUtils, Variants;
 
 
 procedure TqmBase.Assign(Source: TPersistent);
@@ -578,49 +583,49 @@ procedure TdcScript.LoadFromStream(aStream: TStream);
 var
  l_XML: IXMLDocument;
  i, l_Count: Integer;
+ l_Node, l_C: IXMLNode;
 begin
  l_XML:= TXMLDocument.Create(nil);
  try
   l_XMl.Active:= True;
   l_XML.LoadFromStream(aStream);
-{  with l_XML.AddChild('Quide') do
+  with l_XML.ChildNodes.FindNode('Quide') do
   begin
-   SetAttribute('Version', '1.0');
-   SetAttribute('Date', DateToStr(Date));
+   if HasAttribute('Version') then
+    Version:= GetAttribute('Version');
    // Описание квеста
-   l_Node:= AddChild('Meta');
-   l_Node.AddChild('Title').Text:= Caption;
-   l_Node.AddChild('Author').Text:= '';
-   l_node.AddChild('Description').Text:= Description.text;
+   l_Node:= ChildNodes.FindNode('Meta');
+   if l_Node <> nil then
+   begin
+    if l_Node.ChildValues['Title'] <> Null then
+     Caption:= l_Node['Title'];
+    if l_Node.ChildValues['Author'] <> Null then
+     Author:= l_Node['Author'];
+    if l_Node.ChildValues['Description'] <> Null then
+     Description.Text:= l_Node['Description'];
+   end;
    // Переменные
-   l_Node:= AddChild('Variables');
-   l_Node.SetAttribute('Count', VariablesCount);
-   if VariablesCount > 0 then
-    for i:= 0 to Pred(VariablesCount) do
-     Variables[i].Save(l_Node.AddChild('Variable'));
+   l_Node:= ChildNodes.FindNode('Variables');
+   if l_Node <> nil then
+   begin
+    // Прочитать переменные
+    //for i:= 0 to Pred(l_Node.ChildNodes.Count) do
+    // NewVariable();
+   end;
    // Локации
-   l_Node:= AddChild('Locations');
-   l_Node.SetAttribute('Count', LocationsCount);
-   if LocationsCount > 0 then
-    for i:= 0 to Pred(LocationsCount) do
-     Locations[i].Save(l_Node.AddChild('Location'));
+   l_Node:= ChildNodes.FindNode('Locations');
+   if l_Node <> nil then
+   begin
+    for i:= 0 to Pred(l_node.ChildNodes.Count) do
+     NewLocation(l_Node.ChildNodes.Get(i)['Caption']).Load(l_Node.ChildNodes.Get(i));
+   end;
    // Инвентарь
-   l_Node:= AddChild('Inventory');
-   l_Node.SetAttribute('Count', ObjectsCount);
+   l_Node:= ChildNodes.FindNode('Inventory');
+   if l_Node <> nil then
+   begin
+    // Прочитать элементы инвентаря
+   end; 
   end;
-}
- //Читается всякая ерунда...
-  with l_XML.ChildNodes.FindNode('ModelSummary') do
-  begin
-   Caption:= GetAttribute('Caption');
-   Description.Text:= GetAttribute('Description');
-   l_Count:= GetAttribute('Locations');
-   for i:= 0 to Pred(l_Count) do
-    NewLocation(ChildNodes.Get(i)['Caption']);
-   for i:= 0 to Pred(l_Count) do
-    Locations[i].Load(ChildNodes.Get(i));
-  end;
-
  finally
   l_XML:= nil;
  end;
@@ -647,6 +652,11 @@ begin
    Result.Caption:= aCaption;
   f_Locations.Add(Result);
  end;
+end;
+
+procedure TdcScript.NewVariable;
+begin
+  // TODO -cMM: TdcScript.NewVariable default body inserted
 end;
 
 function TdcScript.pm_GetLocations(Index: Integer): TdcLocation;
