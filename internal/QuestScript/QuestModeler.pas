@@ -733,7 +733,7 @@ begin
    // Описание квеста
    l_Node:= AddChild('Meta');
    l_Node.AddChild('Title').Text:= Caption;
-   l_Node.AddChild('Author').Text:= '';
+   l_Node.AddChild('Author').Text:= Author;
    l_node.AddChild('Description').Text:= Description.text;
    // Переменные
    l_Node:= AddChild('Variables');
