@@ -133,6 +133,8 @@ type
     N12: TMenuItem;
     N14: TMenuItem;
     AlignLeft1: TMenuItem;
+    ScriptVariables: TAction;
+    N15: TMenuItem;
     procedure Delete1Click(Sender: TObject);
     procedure DisableDesigning1Click(Sender: TObject);
     procedure PopupMenu1Popup(Sender: TObject);
@@ -1727,15 +1729,17 @@ end;
 
 procedure TQuestEditorForm.ScriptDescriptionExecute(Sender: TObject);
 var
- l_C: String;
+ l_C, l_A: String;
  l_D: TStrings;
 begin
  // Ввод и редактирование описание квеста
  l_C:= f_Model.Caption;
+ l_A:= f_Model.Author;
  l_D:= f_Model.Description;
- if EditScriptDetails(l_C, l_D) then
+ if EditScriptDetails(l_C, l_A, l_D) then
  begin
   f_Model.Caption:= l_C;
+  f_Model.Author:= l_A;
   UpdateCaption;
   Changed:= True;
  end; // EditScriptDetails(l_C, l_D)

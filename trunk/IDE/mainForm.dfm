@@ -224,6 +224,9 @@ object QuestEditorForm: TQuestEditorForm
       object N12: TMenuItem
         Action = ScriptInventory
       end
+      object N15: TMenuItem
+        Action = ScriptVariables
+      end
       object N14: TMenuItem
         Caption = '-'
       end
@@ -483,6 +486,10 @@ object QuestEditorForm: TQuestEditorForm
     object ScriptCheck: TAction
       Category = 'Script'
       Caption = #1055#1088#1086#1074#1077#1088#1080#1090#1100
+    end
+    object ScriptVariables: TAction
+      Category = 'Script'
+      Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1099#1077'...'
     end
   end
   object OpenPictureDialog1: TOpenPictureDialog
