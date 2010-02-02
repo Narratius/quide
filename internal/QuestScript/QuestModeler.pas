@@ -19,7 +19,6 @@ Type
   destructor Destroy; override;
   procedure Assign(Source: TPersistent); override;
   function Clone(aModel: TdcScript): Pointer;
-  procedure GenerateCode(aElement: IXMLNode); virtual;
   procedure Save(Element: IXMLNode); virtual;
   procedure Load(Element: IXMLNode); virtual;
   property Caption: string read f_Caption write f_Caption;
@@ -45,6 +44,7 @@ Type
   procedure Assign(Source: TPersistent); override;
   function Edit: Boolean; virtual;
   procedure Load(Element: IXMLNode); override;
+  class function Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
   procedure Save(Element: IXMLNode); override;
   property ActionList: TObjectList
    read f_ActionList
@@ -152,6 +152,7 @@ Type
   f_Author: String;
   f_Description: TStrings;
   f_Locations: TObjectList;
+  f_StartLocation: string;
   f_Variables: TObjectList;
   f_Version: string;
   function pm_GetLocations(Index: Integer): TdcLocation;
@@ -160,6 +161,7 @@ Type
   function pm_GetVariables(Index: Integer): TdcVariable;
   function pm_GetVariablesCount: Integer;
   procedure pm_SetDescription(aValue: TStrings);
+  procedure pm_SetStartLocation(const Value: string);
  protected
   function CreateLocation: TdcLocation; virtual;
  public
@@ -179,6 +181,7 @@ Type
   property Locations[Index: Integer]: TdcLocation read pm_GetLocations;
   property LocationsCount: Integer read pm_GetLocationsCount;
   property ObjectsCount: Integer read pm_GetObjectsCount;
+  property StartLocation: string read f_StartLocation write pm_SetStartLocation;
   property Variables[Index: Integer]: TdcVariable read pm_GetVariables;
   property VariablesCount: Integer read pm_GetVariablesCount;
   property Version: string read f_Version write f_Version;
@@ -238,16 +241,11 @@ begin
  TqmBase(Result).Assign(Self);
 end;
 
-procedure TqmBase.GenerateCode(aElement: IXMLNode);
-begin
- // TODO -cMM: TqmData.GenerateCode default body inserted
-end;
-
 procedure TqmBase.Load(Element: IXMLNode);
 begin
- Caption:= Element['Caption'];
- //if Element.HasAttribute('Caption') then
- // Caption:= Element.Attributes['Caption'];
+ //Caption:= Element['Caption'];
+ if Element.HasAttribute('Caption') then
+  Caption:= Element.Attributes['Caption'];
 end;
 
 procedure TqmBase.pm_SetChanged(const Value: Boolean);
@@ -400,16 +398,33 @@ end;
 procedure TdcLocation.Load(Element: IXMLNode);
 var
  l_Count, i, j: Integer;
- l_E: IXMLNode;
+ l_Node, l_E, l_a: IXMLNode;
 begin
  inherited;
- for j:= 0 to Element.ChildNodes.Count - 1 do
+ l_Node:= Element.ChildNodes.FindNode('Actions');
+ for i:= 0 to l_Node.ChildNodes.Count - 1 do
  begin
-  l_E:= Element.ChildNodes.Get(j);
-  l_Count:= l_E.GetAttribute('Count');
-  for i:= 0 to Pred(l_Count) do
-   AddAction(TdcAction.Make(l_E.ChildNodes.Get(i), Model));
- end;
+  l_E:= l_Node.ChildNodes.Get(i);
+  AddAction(TdcAction.Make(l_E, Model));
+ end; // for i
+ l_Node:= Element.ChildNodes.FindNode('Buttons');
+ for i:= 0 to l_Node.ChildNodes.Count - 1 do
+ begin
+  l_E:= l_Node.ChildNodes.Get(i);
+  AddAction(TdcAction.Make(l_E, Model));
+ end; // for i
+
+end;
+
+class function TdcLocation.Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
+begin
+ Result:= nil;
+ if aElement.HasAttribute('Caption') then
+  Result:= aModel.CheckLocation(aElement.GetAttribute('Caption'))
+ else
+  Result:= aModel.NewLocation('');
+ if Result <> nil then
+  Result.Load(aElement);
 end;
 
 function TdcLocation.pm_GetActions(Index: Integer): TdcAction;
@@ -459,14 +474,12 @@ begin
  inherited;
  with Element.AddChild('Actions') do
  begin
-  SetAttribute('Count', ActionsCount-ButtonsCount);
   for i:= 0 to Pred(ActionsCount) do
    if Actions[i].ActionType <> atButton then
     Actions[i].Save(AddChild('Action'));
  end; // with Element.AddChild('Actions')
  with Element.AddChild('Buttons') do
  begin
-  SetAttribute('Count', ButtonsCount);
   for i:= 0 to Pred(ButtonsCount) do
    Buttons[i].Save(AddChild('Button'));
  end; // with Element.AddChild('Buttons')
@@ -584,10 +597,13 @@ var
  l_XML: IXMLDocument;
  i, l_Count: Integer;
  l_Node, l_C: IXMLNode;
+ l_Loc: TdcLocation;
 begin
  l_XML:= TXMLDocument.Create(nil);
  try
   l_XMl.Active:= True;
+  l_XML.Options:= l_XML.Options + [doNodeAutoCreate, doAttrNull];
+  l_XML.Encoding:= 'Windows-1251';  
   l_XML.LoadFromStream(aStream);
   with l_XML.ChildNodes.FindNode('Quide') do
   begin
@@ -617,7 +633,10 @@ begin
    if l_Node <> nil then
    begin
     for i:= 0 to Pred(l_node.ChildNodes.Count) do
-     NewLocation(l_Node.ChildNodes.Get(i)['Caption']).Load(l_Node.ChildNodes.Get(i));
+    begin
+     l_C:= l_Node.ChildNodes.Get(i);
+     TdcLocation.Make(l_C, Self);
+    end;
    end;
    // Инвентарь
    l_Node:= ChildNodes.FindNode('Inventory');
@@ -691,6 +710,11 @@ begin
  f_Description.Assign(aValue);
 end;
 
+procedure TdcScript.pm_SetStartLocation(const Value: string);
+begin
+  f_StartLocation := Value;
+end;
+
 procedure TdcScript.SaveToStream(aStream: TStream);
 var
  l_XML: IXMLDocument;
@@ -700,6 +724,8 @@ begin
  l_XML:= TXMLDocument.Create(nil);
  try
   l_XMl.Active:= True;
+  l_XML.Options:= l_XML.Options + [doNodeAutoIndent];
+  l_XML.Encoding:= 'Windows-1251';
   with l_XML.AddChild('Quide') do
   begin
    SetAttribute('Version', '1.0');
@@ -711,19 +737,17 @@ begin
    l_node.AddChild('Description').Text:= Description.text;
    // Переменные
    l_Node:= AddChild('Variables');
-   l_Node.SetAttribute('Count', VariablesCount);
    if VariablesCount > 0 then
     for i:= 0 to Pred(VariablesCount) do
      Variables[i].Save(l_Node.AddChild('Variable'));
    // Локации
    l_Node:= AddChild('Locations');
-   l_Node.SetAttribute('Count', LocationsCount);
+   l_Node.SetAttribute('Start', StartLocation); 
    if LocationsCount > 0 then
     for i:= 0 to Pred(LocationsCount) do
      Locations[i].Save(l_Node.AddChild('Location'));
    // Инвентарь
    l_Node:= AddChild('Inventory');
-   l_Node.SetAttribute('Count', ObjectsCount);
   end;
   l_XML.SaveToStream(aStream);
  finally
