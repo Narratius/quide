@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<Quide Version="1.0" Date="01.02.2010">
+  <Meta>
+    <Title>Проверка</Title>
+    <Author>Narratius</Author>
+    <Description>Проверка Квиды
+</Description>
+  </Meta>
+  <Variables/>
+  <Locations Start="">
+    <Location Caption="Начало">
+      <Actions>
+        <Action Caption="Текст1" Type="text">
+          <Description>Начальная локация в игре
+</Description>
+        </Action>
+      </Actions>
+      <Buttons>
+        <Button Caption="Играть" Type="button" Target="Игра"/>
+        <Button Caption="Выход" Type="button" Target="Выход"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Игра">
+      <Actions>
+        <Action Caption="Текст1" Type="text">
+          <Description>Ну вот, вы и сыграли. Спасибо!
+</Description>
+        </Action>
+      </Actions>
+      <Buttons>
+        <Button Caption="Выход" Type="button" Target="Выход"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Выход">
+      <Actions/>
+      <Buttons/>
+    </Location>
+  </Locations>
+  <Inventory/>
+</Quide>
