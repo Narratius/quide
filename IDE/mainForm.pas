@@ -221,6 +221,7 @@ type
     function CreateLocation: TdoLocation;
     function DragListObj(index: integer): PDragListRec;
     function FindConnectorFor(aFrom, aTo: TdcLocation): TConnector;
+    procedure FindGenerators;
     function FindLocation(aLocation: TdcLocation): TdoLocation;
     function GetNewLocPosition: TPoint;
     function isOrphant(aLocation: TdcLocation): Boolean;
@@ -244,7 +245,8 @@ var
 implementation
 
 uses
- guiLocEditDlg, guiScriptDetailsDlg, StrUtils;
+ guiLocEditDlg, guiScriptDetailsDlg, guiTypes,
+ StrUtils;
 
 
 
@@ -1570,6 +1572,11 @@ begin
      Result:= TConnector(Controls[i]);
      break;
     end;
+end;
+
+procedure TQuestEditorForm.FindGenerators;
+begin
+ // бежим по папке в поисках ini-файлов, открываем их, проверяем в них наличие раздела Generator
 end;
 
 function TQuestEditorForm.FindLocation(aLocation: TdcLocation): TdoLocation;
