@@ -6,7 +6,8 @@ uses
   dobFileStorage in 'dobFileStorage.pas',
   dobTextActionEdit in 'dobTextActionEdit.pas' {dobTextFrame: TFrame},
   dobButtonAction in 'dobButtonAction.pas' {ButtonFrame: TFrame},
-  guiScriptDetailsDlg in 'guiScriptDetailsDlg.pas' {ScriptDetailsDlg};
+  guiScriptDetailsDlg in 'guiScriptDetailsDlg.pas' {ScriptDetailsDlg},
+  guiTypes in 'guiTypes.pas';
 
 {$R *.res}
 
