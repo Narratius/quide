@@ -16,11 +16,17 @@ type
   property Generator: string read f_Generator write f_Generator;
  end;
 
+ TGeneratorCollection = class(TCollection)
+ end;
+
+
+
 implementation
 
 function TGeneratorInfo.Generate(aSourceFile: String): Boolean;
 begin
  Result:= False;
 end;
-              ComCtrls
+
+
 end.

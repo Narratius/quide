@@ -193,6 +193,9 @@ object QuestEditorForm: TQuestEditorForm
       object Save1: TMenuItem
         Action = FileSaveAs
       end
+      object itemGenerate: TMenuItem
+        Caption = #1043#1077#1085#1077#1088#1072#1094#1080#1103
+      end
       object N2: TMenuItem
         Caption = '-'
       end
