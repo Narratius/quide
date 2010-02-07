@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DrawObjects1, DrawObjects2, Menus, ComCtrls, Printers,
   Types, ClipBrd, ExtCtrls, ActnList, ActnMan, IniFiles,
-  ExtDlgs, dobQM, QuestModeler, dobFileStorage, ImgList, XPStyleActnCtrls;
+  ExtDlgs, dobQM, QuestModeler, dobFileStorage, ImgList, XPStyleActnCtrls, guiTypes;
 
 type
   TDragListRec = record
@@ -135,6 +135,7 @@ type
     AlignLeft1: TMenuItem;
     ScriptVariables: TAction;
     N15: TMenuItem;
+    itemGenerate: TMenuItem;
     procedure Delete1Click(Sender: TObject);
     procedure DisableDesigning1Click(Sender: TObject);
     procedure PopupMenu1Popup(Sender: TObject);
@@ -192,6 +193,7 @@ type
     fPastingFromClipboard: boolean;
     fCustomColors: TStringList;
     DragList: TList;
+    f_Generators: TGeneratorCollection;
     f_Model: TdoModel;
     startDragPt: TPoint;
     procedure DrawFocusRec(Rec: TRect);
@@ -217,12 +219,14 @@ type
     procedure CheckNewObjects;
     function CheckObject(aObj: TDrawObject): Boolean;
     procedure ClearConnectors(aFrom: TdoLocation);
+    procedure ClearGenerators;
     procedure CreateConnector(aFrom, aTo: TdcLocation; aIsButton: Boolean = True);
     function CreateLocation: TdoLocation;
     function DragListObj(index: integer): PDragListRec;
     function FindConnectorFor(aFrom, aTo: TdcLocation): TConnector;
     procedure FindGenerators;
     function FindLocation(aLocation: TdcLocation): TdoLocation;
+    procedure GenerateGame(Sender: TObject);
     function GetNewLocPosition: TPoint;
     function isOrphant(aLocation: TdcLocation): Boolean;
     procedure NewModel;
@@ -245,8 +249,8 @@ var
 implementation
 
 uses
- guiLocEditDlg, guiScriptDetailsDlg, guiTypes,
- StrUtils;
+ guiLocEditDlg, guiScriptDetailsDlg,
+ StrUtils, ShellAPI;
 
 
 
@@ -340,11 +344,13 @@ begin
    OpenObjects(paramstr(1))
   else
    NewModel;
+  FindGenerators
 end;
 //------------------------------------------------------------------------------
 
 procedure TQuestEditorForm.FormDestroy(Sender: TObject);
 begin
+ ClearGenerators;
   ClearDragList;
   DragList.Free;
   fCustomColors.Free;
@@ -1499,6 +1505,11 @@ begin
  end;
 end;
 
+procedure TQuestEditorForm.ClearGenerators;
+begin
+  f_Generators.Free;
+end;
+
 procedure TQuestEditorForm.CreateConnector(aFrom, aTo: TdcLocation; aIsButton: Boolean = True);
 var
  drawObj: {TBezier;//}TLine;
@@ -1575,8 +1586,42 @@ begin
 end;
 
 procedure TQuestEditorForm.FindGenerators;
+var
+ l_SR: TSearchRec;
+ l_Item: TGeneratorInfo;
+ l_Ini: TIniFile;
+ l_Folder: String;
+ l_MenuItem: TMenuItem;
 begin
  // бежим по папке в поисках ini-файлов, открываем их, проверяем в них наличие раздела Generator
+ f_Generators:= TGeneratorCollection.Create(TGeneratorInfo);
+ l_Folder:= ExtractFileDir(Application.ExeName);
+ if FindFirst(l_Folder+'\*.ini', faAnyFile, l_SR) = 0 then
+ begin
+   repeat
+    if l_SR.Name[1] <> '.' then
+    begin
+     l_Ini:= TIniFile.Create(l_Folder + '\' + l_SR.Name);
+     try
+      if l_Ini.SectionExists('Generator') then
+      begin
+       l_Item:= TGeneratorInfo(f_Generators.Add);
+       l_Item.Caption:= l_Ini.ReadString('Generator', 'Format', '');
+       l_Item.Generator:= l_Folder + '\' + l_Ini.ReadString('Generator', 'exe', '');
+       l_MenuItem:= TMenuItem.Create(MainMenu1);
+       l_MenuItem.Caption:= l_Item.Caption;
+       l_MenuItem.Tag:= l_Item.Index;
+       l_MenuItem.OnClick:= GenerateGame;
+       l_MenuItem.Enabled:= FileExists(l_Item.Generator);
+       itemGenerate.Add(l_MenuItem);
+      end;
+     finally
+      l_Ini.Free;
+     end;
+    end;
+   until FindNext(l_SR) <> 0;
+   FindClose(l_sr);
+ end;
 end;
 
 function TQuestEditorForm.FindLocation(aLocation: TdcLocation): TdoLocation;
@@ -1658,6 +1703,14 @@ begin
     //Escape key will cancel any impending rubberband selection ...
     if Assigned(SelectionShape) then FreeAndNil(SelectionShape);
   end;
+end;
+
+procedure TQuestEditorForm.GenerateGame(Sender: TObject);
+var
+ l_Gen: TGeneratorInfo;
+begin
+ l_Gen:= TGeneratorInfo(f_Generators.Items[(Sender as TMenuItem).Tag]);
+ ShellExecute(Handle, 'open', PChar(l_Gen.Generator), nil, nil, sw_shownormal);
 end;
 
 function TQuestEditorForm.GetNewLocPosition: TPoint;
