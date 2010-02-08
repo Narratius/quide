@@ -3,8 +3,8 @@ object ScriptDetailsDlg: TScriptDetailsDlg
   Top = 129
   BorderStyle = bsDialog
   Caption = #1054#1087#1080#1089#1072#1085#1080#1077' '#1089#1094#1077#1085#1072#1088#1080#1103
-  ClientHeight = 271
-  ClientWidth = 488
+  ClientHeight = 315
+  ClientWidth = 545
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object ScriptDetailsDlg: TScriptDetailsDlg
   object Bevel1: TBevel
     Left = 8
     Top = 8
-    Width = 385
-    Height = 257
+    Width = 441
+    Height = 297
     Shape = bsFrame
   end
   object Label1: TLabel
@@ -46,8 +46,16 @@ object ScriptDetailsDlg: TScriptDetailsDlg
     Caption = #1040#1074#1090#1086#1088
     FocusControl = editAuthor
   end
+  object Label4: TLabel
+    Left = 16
+    Top = 256
+    Width = 118
+    Height = 17
+    Caption = #1053#1072#1095#1072#1083#1100#1085#1072#1103' '#1083#1086#1082#1072#1094#1080#1103
+    FocusControl = comboStartLocation
+  end
   object OKBtn: TButton
-    Left = 404
+    Left = 460
     Top = 8
     Width = 75
     Height = 25
@@ -57,7 +65,7 @@ object ScriptDetailsDlg: TScriptDetailsDlg
     TabOrder = 3
   end
   object CancelBtn: TButton
-    Left = 404
+    Left = 460
     Top = 38
     Width = 75
     Height = 25
@@ -69,14 +77,14 @@ object ScriptDetailsDlg: TScriptDetailsDlg
   object editCaption: TEdit
     Left = 16
     Top = 32
-    Width = 369
+    Width = 425
     Height = 25
     TabOrder = 0
   end
   object memoDescription: TMemo
     Left = 16
     Top = 112
-    Width = 369
+    Width = 425
     Height = 145
     Lines.Strings = (
       '')
@@ -85,8 +93,17 @@ object ScriptDetailsDlg: TScriptDetailsDlg
   object editAuthor: TEdit
     Left = 16
     Top = 72
-    Width = 369
+    Width = 425
     Height = 25
     TabOrder = 1
+  end
+  object comboStartLocation: TComboBox
+    Left = 16
+    Top = 272
+    Width = 425
+    Height = 25
+    Style = csDropDownList
+    ItemHeight = 17
+    TabOrder = 5
   end
 end

@@ -16,13 +16,15 @@ type
     memoDescription: TMemo;
     Label3: TLabel;
     editAuthor: TEdit;
+    Label4: TLabel;
+    comboStartLocation: TComboBox;
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-function EditScriptDetails(var aCaption, aAuthor: String; var aDescription: TStrings): Boolean;
+function EditScriptDetails(aScript: TdcScript): Boolean;
 
 var
   ScriptDetailsDlg: TScriptDetailsDlg;
@@ -32,19 +34,22 @@ implementation
 
 {$R *.dfm}
 
-function EditScriptDetails(var aCaption, aAuthor: String; var aDescription: TStrings): Boolean;
+function EditScriptDetails(aScript: TdcScript): Boolean;
 begin
  with TScriptDetailsDlg.Create(Application) do
  try
-  editCaption.Text:= aCaption;
-  editAuthor.Text:= aAuthor;
-  memoDescription.Lines:= aDescription;
+  editCaption.Text:= aScript.Caption;
+  editAuthor.Text:= aScript.Author;
+  memoDescription.Lines:= aScript.Description;
+  aScript.GetLocationsNames(comboStartLocation.Items);
+  comboStartLocation.ItemIndex:= comboStartLocation.Items.IndexOf(aScript.StartLocation);
   Result:= IsPositiveResult(ShowModal);
   if Result then
   begin
-   aCaption:= editCaption.Text;
-   aAuthor:= editAuthor.Text;
-   aDescription.Assign(memoDescription.Lines);
+   aScript.Caption:= editCaption.Text;
+   aScript.Author:= editAuthor.Text;
+   aScript.Description.Assign(memoDescription.Lines);
+   aScript.StartLocation:= comboStartLocation.Text;
   end;
  finally
   Free;

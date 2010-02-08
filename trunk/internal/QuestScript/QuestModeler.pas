@@ -152,9 +152,11 @@ Type
   f_Author: String;
   f_Description: TStrings;
   f_Locations: TObjectList;
+  f_NotValidConditions: string;
   f_StartLocation: string;
   f_Variables: TObjectList;
   f_Version: string;
+  function pm_GetIsValid: Boolean;
   function pm_GetLocations(Index: Integer): TdcLocation;
   function pm_GetLocationsCount: Integer;
   function pm_GetObjectsCount: Integer;
@@ -171,6 +173,7 @@ Type
   function CheckLocation(aCaption: String): TdcLocation;
   function FindLocation(const aCaption: String): TdcLocation;
   function GenerateCaption: string;
+  procedure GetLocationsNames(aStrings: TStrings);
   procedure LoadFromStream(aStream: TStream);
   procedure Locations2Strings(aStrings: TStrings);
   function NewLocation(aCaption: String): TdcLocation;
@@ -178,8 +181,10 @@ Type
   procedure SaveToStream(aStream: TStream);
   property Author: String read f_Author write f_Author;
   property Description: TStrings read f_Description write pm_SetDescription;
+  property IsValid: Boolean read pm_GetIsValid;
   property Locations[Index: Integer]: TdcLocation read pm_GetLocations;
   property LocationsCount: Integer read pm_GetLocationsCount;
+  property NotValidConditions: string read f_NotValidConditions;
   property ObjectsCount: Integer read pm_GetObjectsCount;
   property StartLocation: string read f_StartLocation write pm_SetStartLocation;
   property Variables[Index: Integer]: TdcVariable read pm_GetVariables;
@@ -592,6 +597,15 @@ begin
  Result:= Result + IntToStr(l_Number);
 end;
 
+procedure TdcScript.GetLocationsNames(aStrings: TStrings);
+var
+ i: Integer;
+begin
+ aStrings.Clear;
+ for i:= 0 to Pred(LocationsCount) do
+  aStrings.Add(Locations[i].Caption);
+end;
+
 procedure TdcScript.LoadFromStream(aStream: TStream);
 var
  l_XML: IXMLDocument;
@@ -632,6 +646,8 @@ begin
    l_Node:= ChildNodes.FindNode('Locations');
    if l_Node <> nil then
    begin
+    if l_Node.HasAttribute('Start') then
+     StartLocation:= l_Node.GetAttribute('Start');
     for i:= 0 to Pred(l_node.ChildNodes.Count) do
     begin
      l_C:= l_Node.ChildNodes.Get(i);
@@ -676,6 +692,14 @@ end;
 procedure TdcScript.NewVariable;
 begin
   // TODO -cMM: TdcScript.NewVariable default body inserted
+end;
+
+function TdcScript.pm_GetIsValid: Boolean;
+begin
+ f_NotValidConditions:= '';
+ if StartLocation = '' then
+  f_NotValidConditions:= 'Не указана начальная локация';
+ Result:= f_NotValidConditions = '';
 end;
 
 function TdcScript.pm_GetLocations(Index: Integer): TdcLocation;
@@ -742,7 +766,7 @@ begin
      Variables[i].Save(l_Node.AddChild('Variable'));
    // Локации
    l_Node:= AddChild('Locations');
-   l_Node.SetAttribute('Start', StartLocation); 
+   l_Node.SetAttribute('Start', StartLocation);
    if LocationsCount > 0 then
     for i:= 0 to Pred(LocationsCount) do
      Locations[i].Save(l_Node.AddChild('Location'));
