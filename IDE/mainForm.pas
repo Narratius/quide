@@ -250,28 +250,13 @@ implementation
 
 uses
  guiLocEditDlg, guiScriptDetailsDlg,
- StrUtils, ShellAPI;
+ StrUtils, ShellAPI, Math;
 
 
 
 {$R *.dfm}
 {$R winxp.res}
 
-//------------------------------------------------------------------------------
-// Miscellaneous functions ...
-//------------------------------------------------------------------------------
-
-function min(val1, val2: integer): integer;
-begin
-  if val2 < val1 then result := val2 else result := val1;
-end;
-//------------------------------------------------------------------------------
-
-function max(val1, val2: integer): integer;
-begin
-  if val2 > val1 then result := val2 else result := val1;
-end;
-//------------------------------------------------------------------------------
 
 function ScreenToPrinterX(pxl: integer): integer;
 begin
@@ -1708,9 +1693,58 @@ end;
 procedure TQuestEditorForm.GenerateGame(Sender: TObject);
 var
  l_Gen: TGeneratorInfo;
+ l_Stream: TStream;
+ l_FileName: String;
+ l_Result: Integer;
+ l_Msg: String;
 begin
- l_Gen:= TGeneratorInfo(f_Generators.Items[(Sender as TMenuItem).Tag]);
- ShellExecute(Handle, 'open', PChar(l_Gen.Generator), nil, nil, sw_shownormal);
+ if f_Model.IsValid then
+ begin
+  l_Gen:= TGeneratorInfo(f_Generators.Items[(Sender as TMenuItem).Tag]);
+  ActSaveClick(Sender);
+  if SaveDialog1.FileName = '' then
+   MessageDlg('Перед генерацией игры необходимо сохранить сценарий', mtError, [mbCancel], 0)
+  else
+  begin
+   l_FileName:= ChangeFileExt(SaveDialog1.FileName, '.temp');
+   l_Stream:= TFileStream.Create(l_FileName, fmCreate);
+   try
+    f_Model.SaveToStream(l_Stream);
+   finally
+    l_Stream.Free;
+   end;
+   //l_Result:= ShellExecute(Application.Handle, 'open', PChar(l_Gen.Generator), PChar(l_FileName), nil, sw_shownormal);
+   l_Result:= WinExec32AndWait(l_Gen.Generator+' '+l_FileName, SW_HIDE);
+   if l_Result <> 0 then
+   begin
+    case l_Result of
+     ERROR_FILE_NOT_FOUND: l_Msg:= 'The specified file was not found.';
+     ERROR_PATH_NOT_FOUND: l_Msg:= 'The specified path was not found.';
+     ERROR_BAD_FORMAT: l_Msg:= 'The .EXE file is invalid (non-Win32 .EXE or error in .EXE image).';
+     SE_ERR_ACCESSDENIED: l_Msg:= '	The operating system denied access to the specified file.';
+     SE_ERR_ASSOCINCOMPLETE: l_Msg:= '	The filename association is incomplete or invalid.';
+     SE_ERR_DDEBUSY: l_Msg:= '	The DDE transaction could not be completed because other DDE transactions were being processed.';
+     SE_ERR_DDEFAIL: l_Msg:= '	The DDE transaction failed.';
+     SE_ERR_DDETIMEOUT: l_Msg:= '	The DDE transaction could not be completed because the request timed out.';
+     SE_ERR_DLLNOTFOUND: l_Msg:= '	The specified dynamic-link library was not found.';
+     //SE_ERR_FNF: l_Msg:= '	The specified file was not found.';
+     SE_ERR_NOASSOC: l_Msg:= '	There is no application associated with the given filename extension.';
+     SE_ERR_OOM: l_Msg:= '	There was not enough memory to complete the operation.';
+     //SE_ERR_PNF: l_Msg:= '	The specified path was not found.';
+     SE_ERR_SHARE: l_Msg:= '	A sharing violation occurred.';
+    else
+     l_Msg:= IntToStr(l_Result)
+    end;
+    MessageDlg('Генерация игры завершилась с ошибкой: '+l_Msg, mtError, [mbCancel], 0);
+   end
+   else
+    MessageDlg('Генерация игры завершилась успешно', mtError, [mbOk], 0);
+   DeleteFile(l_FileName);
+  end;
+ end
+ else
+  MessageDlg('Сценарий не готов для генерации игры. Проверьте условия:'#10+
+             f_Model.NotValidConditions , mtError, [mbCancel], 0)
 end;
 
 function TQuestEditorForm.GetNewLocPosition: TPoint;
@@ -1788,18 +1822,10 @@ end;
 //------------------------------------------------------------------------------
 
 procedure TQuestEditorForm.ScriptDescriptionExecute(Sender: TObject);
-var
- l_C, l_A: String;
- l_D: TStrings;
 begin
  // Ввод и редактирование описание квеста
- l_C:= f_Model.Caption;
- l_A:= f_Model.Author;
- l_D:= f_Model.Description;
- if EditScriptDetails(l_C, l_A, l_D) then
+ if EditScriptDetails(f_Model) then
  begin
-  f_Model.Caption:= l_C;
-  f_Model.Author:= l_A;
   UpdateCaption;
   Changed:= True;
  end; // EditScriptDetails(l_C, l_D)
