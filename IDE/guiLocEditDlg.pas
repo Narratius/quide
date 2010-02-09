@@ -67,6 +67,7 @@ type
     procedure OKBtnClick(Sender: TObject);
     procedure TextActionExecute(Sender: TObject);
     procedure treeActionsChange(Sender: TObject; Node: TTreeNode);
+    procedure VariableActionExecute(Sender: TObject);
   private
     { Public declarations }
     f_Location: TdcLocation;
@@ -172,9 +173,6 @@ var
 begin
  l_Node:= TTreeNode.Create(treeActions.Items);
  treeActions.Items.AddChildObject(nil, aAction.Caption, aAction);
- (*
- ActionListBox.Items.AddObject(aAction.Caption, aAction);
- *)
  if aAction is TdcTextAction then
  begin
   l_Frame:= TDobTextFrame.Create(nil);
@@ -187,6 +185,14 @@ begin
   TGotoActionFrame(l_Frame).Model:= f_Location.Model;
   if TdcGotoAction(aAction).Location <> nil then
    TGotoActionFrame(l_Frame).GotoLocation:= TdcGotoAction(aAction).Location.Caption;
+ end
+ else
+ if aAction is TdcVariableAction then
+ begin
+  l_Frame:= TVarActionFrame.Create(nil);
+  TVarActionFrame(l_Frame).Model:= f_Location.Model;
+  if TdcVariableAction(aAction).Variable <> nil then
+   TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
  l_Frame.Parent:= EditPanel;
@@ -412,6 +418,11 @@ begin
   EditPanel.Controls[treeActions.selected.Index].Show;
  end; // f_Location
 
+end;
+
+procedure TLocationDlg.VariableActionExecute(Sender: TObject);
+begin
+ AddAction(TdcVariableAction);
 end;
 
 end.

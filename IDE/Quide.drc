@@ -8,93 +8,96 @@
   resources were bound to the produced executable.
 */
 
-#define XMLConst_SNoRefresh 65200
-#define XMLConst_SMissingFileName 65201
-#define XMLConst_SLine 65202
-#define ComConst_SOleError 65203
-#define ComConst_SNoMethod 65204
-#define ComConst_SVarNotObject 65205
-#define ComConst_STooManyParams 65206
-#define ZLibConst_sError 65216
-#define XMLConst_SDuplicateRegistration 65217
-#define XMLConst_SNoMatchingDOMVendor 65218
-#define XMLConst_SNoDOMNodeEx 65219
-#define XMLConst_SDOMNotSupported 65220
-#define XMLConst_SNodeExpected 65221
-#define XMLConst_SMSDOMNotInstalled 65222
-#define XMLConst_SNotActive 65223
-#define XMLConst_SNodeNotFound 65224
-#define XMLConst_SMissingNode 65225
-#define XMLConst_SNoAttributes 65226
-#define XMLConst_SInvalidNodeType 65227
-#define XMLConst_SMismatchedRegItems 65228
-#define XMLConst_SNotSingleTextNode 65229
-#define XMLConst_SNoDOMParseOptions 65230
-#define XMLConst_SNodeReadOnly 65231
-#define ExtCtrls_clNameInactiveCaption 65232
-#define ExtCtrls_clNameInactiveCaptionText 65233
-#define ExtCtrls_clNameInfoBk 65234
-#define ExtCtrls_clNameInfoText 65235
-#define ExtCtrls_clNameMenu 65236
-#define ExtCtrls_clNameMenuText 65237
-#define ExtCtrls_clNameNone 65238
-#define ExtCtrls_clNameScrollBar 65239
-#define ExtCtrls_clName3DDkShadow 65240
-#define ExtCtrls_clName3DLight 65241
-#define ExtCtrls_clNameWindow 65242
-#define ExtCtrls_clNameWindowFrame 65243
-#define ExtCtrls_clNameWindowText 65244
-#define ComStrs_sInvalidComCtl32 65245
-#define WinHelpViewer_hNoKeyword 65246
-#define ZLibConst_sInvalidStreamOp 65247
-#define ExtCtrls_clNameCream 65248
-#define ExtCtrls_clNameMedGray 65249
-#define ExtCtrls_clNameActiveBorder 65250
-#define ExtCtrls_clNameActiveCaption 65251
-#define ExtCtrls_clNameAppWorkSpace 65252
-#define ExtCtrls_clNameBackground 65253
-#define ExtCtrls_clNameBtnFace 65254
-#define ExtCtrls_clNameBtnHighlight 65255
-#define ExtCtrls_clNameBtnShadow 65256
-#define ExtCtrls_clNameBtnText 65257
-#define ExtCtrls_clNameCaptionText 65258
-#define ExtCtrls_clNameDefault 65259
-#define ExtCtrls_clNameGrayText 65260
-#define ExtCtrls_clNameHighlight 65261
-#define ExtCtrls_clNameHighlightText 65262
-#define ExtCtrls_clNameInactiveBorder 65263
-#define ExtCtrls_clNameGreen 65264
-#define ExtCtrls_clNameOlive 65265
-#define ExtCtrls_clNameNavy 65266
-#define ExtCtrls_clNamePurple 65267
-#define ExtCtrls_clNameTeal 65268
-#define ExtCtrls_clNameGray 65269
-#define ExtCtrls_clNameSilver 65270
-#define ExtCtrls_clNameRed 65271
-#define ExtCtrls_clNameLime 65272
-#define ExtCtrls_clNameYellow 65273
-#define ExtCtrls_clNameBlue 65274
-#define ExtCtrls_clNameFuchsia 65275
-#define ExtCtrls_clNameAqua 65276
-#define ExtCtrls_clNameWhite 65277
-#define ExtCtrls_clNameMoneyGreen 65278
-#define ExtCtrls_clNameSkyBlue 65279
-#define Consts_SResetActionToolBar 65280
-#define Consts_SSeparator 65281
-#define Consts_SCirularReferencesNotAllowed 65282
-#define Consts_SCannotHideActionBand 65283
-#define Consts_SErrorSettingCount 65284
-#define Consts_SListBoxMustBeVirtual 65285
-#define Consts_SUnableToSaveSettings 65286
-#define Consts_SRestoreDefaultSchedule 65287
-#define Consts_SNoGetItemEventHandler 65288
-#define Consts_SActionBarStyleMissing 65289
-#define HelpIntfs_hNoTableOfContents 65290
-#define HelpIntfs_hNothingFound 65291
-#define HelpIntfs_hNoContext 65292
-#define HelpIntfs_hNoTopics 65293
-#define ExtCtrls_clNameBlack 65294
-#define ExtCtrls_clNameMaroon 65295
+#define XMLConst_SNotSingleTextNode 65200
+#define XMLConst_SNoDOMParseOptions 65201
+#define XMLConst_SNodeReadOnly 65202
+#define XMLConst_SNoRefresh 65203
+#define XMLConst_SMissingFileName 65204
+#define XMLConst_SLine 65205
+#define ComConst_SOleError 65206
+#define ComConst_SNoMethod 65207
+#define ComConst_SVarNotObject 65208
+#define ComConst_STooManyParams 65209
+#define ComStrs_sInvalidComCtl32 65216
+#define WinHelpViewer_hNoKeyword 65217
+#define ZLibConst_sInvalidStreamOp 65218
+#define ZLibConst_sError 65219
+#define XMLConst_SDuplicateRegistration 65220
+#define XMLConst_SNoMatchingDOMVendor 65221
+#define XMLConst_SNoDOMNodeEx 65222
+#define XMLConst_SDOMNotSupported 65223
+#define XMLConst_SNodeExpected 65224
+#define XMLConst_SMSDOMNotInstalled 65225
+#define XMLConst_SNotActive 65226
+#define XMLConst_SNodeNotFound 65227
+#define XMLConst_SMissingNode 65228
+#define XMLConst_SNoAttributes 65229
+#define XMLConst_SInvalidNodeType 65230
+#define XMLConst_SMismatchedRegItems 65231
+#define ExtCtrls_clNameInactiveBorder 65232
+#define ExtCtrls_clNameInactiveCaption 65233
+#define ExtCtrls_clNameInactiveCaptionText 65234
+#define ExtCtrls_clNameInfoBk 65235
+#define ExtCtrls_clNameInfoText 65236
+#define ExtCtrls_clNameMenu 65237
+#define ExtCtrls_clNameMenuText 65238
+#define ExtCtrls_clNameNone 65239
+#define ExtCtrls_clNameScrollBar 65240
+#define ExtCtrls_clName3DDkShadow 65241
+#define ExtCtrls_clName3DLight 65242
+#define ExtCtrls_clNameWindow 65243
+#define ExtCtrls_clNameWindowFrame 65244
+#define ExtCtrls_clNameWindowText 65245
+#define ComStrs_sInvalidIndex 65246
+#define ComStrs_sInsertError 65247
+#define ExtCtrls_clNameSkyBlue 65248
+#define ExtCtrls_clNameCream 65249
+#define ExtCtrls_clNameMedGray 65250
+#define ExtCtrls_clNameActiveBorder 65251
+#define ExtCtrls_clNameActiveCaption 65252
+#define ExtCtrls_clNameAppWorkSpace 65253
+#define ExtCtrls_clNameBackground 65254
+#define ExtCtrls_clNameBtnFace 65255
+#define ExtCtrls_clNameBtnHighlight 65256
+#define ExtCtrls_clNameBtnShadow 65257
+#define ExtCtrls_clNameBtnText 65258
+#define ExtCtrls_clNameCaptionText 65259
+#define ExtCtrls_clNameDefault 65260
+#define ExtCtrls_clNameGrayText 65261
+#define ExtCtrls_clNameHighlight 65262
+#define ExtCtrls_clNameHighlightText 65263
+#define ExtCtrls_clNameMaroon 65264
+#define ExtCtrls_clNameGreen 65265
+#define ExtCtrls_clNameOlive 65266
+#define ExtCtrls_clNameNavy 65267
+#define ExtCtrls_clNamePurple 65268
+#define ExtCtrls_clNameTeal 65269
+#define ExtCtrls_clNameGray 65270
+#define ExtCtrls_clNameSilver 65271
+#define ExtCtrls_clNameRed 65272
+#define ExtCtrls_clNameLime 65273
+#define ExtCtrls_clNameYellow 65274
+#define ExtCtrls_clNameBlue 65275
+#define ExtCtrls_clNameFuchsia 65276
+#define ExtCtrls_clNameAqua 65277
+#define ExtCtrls_clNameWhite 65278
+#define ExtCtrls_clNameMoneyGreen 65279
+#define Consts_SAddRemoveButtons 65280
+#define Consts_SResetActionToolBar 65281
+#define Consts_SSeparator 65282
+#define Consts_SCirularReferencesNotAllowed 65283
+#define Consts_SCannotHideActionBand 65284
+#define Consts_SErrorSettingCount 65285
+#define Consts_SListBoxMustBeVirtual 65286
+#define Consts_SUnableToSaveSettings 65287
+#define Consts_SRestoreDefaultSchedule 65288
+#define Consts_SNoGetItemEventHandler 65289
+#define Consts_SActionBarStyleMissing 65290
+#define HelpIntfs_hNoTableOfContents 65291
+#define HelpIntfs_hNothingFound 65292
+#define HelpIntfs_hNoContext 65293
+#define HelpIntfs_hNoTopics 65294
+#define ExtCtrls_clNameBlack 65295
 #define Consts_SPictureLabel 65296
 #define Consts_SPictureDesc 65297
 #define Consts_SPreviewLabel 65298
@@ -102,15 +105,15 @@
 #define Consts_SDockTreeRemoveError 65300
 #define Consts_SDockZoneNotFound 65301
 #define Consts_SDockZoneHasNoCtl 65302
-#define Consts_SAssignSubItemError 65303
-#define Consts_SDeleteItemWithSubItems 65304
-#define Consts_SDeleteNotAllowed 65305
-#define Consts_SMoveNotAllowed 65306
-#define Consts_SMoreButtons 65307
-#define Consts_SExpand 65308
-#define Consts_SErrorLoadingFile 65309
-#define Consts_SNoName 65310
-#define Consts_SAddRemoveButtons 65311
+#define Consts_SMultiSelectRequired 65303
+#define Consts_SAssignSubItemError 65304
+#define Consts_SDeleteItemWithSubItems 65305
+#define Consts_SDeleteNotAllowed 65306
+#define Consts_SMoveNotAllowed 65307
+#define Consts_SMoreButtons 65308
+#define Consts_SExpand 65309
+#define Consts_SErrorLoadingFile 65310
+#define Consts_SNoName 65311
 #define Consts_SmkcDown 65312
 #define Consts_SmkcIns 65313
 #define Consts_SmkcDel 65314
@@ -337,6 +340,9 @@
 #define SysConst_SDivByZero 65535
 STRINGTABLE
 BEGIN
+	XMLConst_SNotSingleTextNode,	"Element does not contain a single text node"
+	XMLConst_SNoDOMParseOptions,	"DOM Implementation does not support IDOMParseOptions"
+	XMLConst_SNodeReadOnly,	"Node is readonly"
 	XMLConst_SNoRefresh,	"Refresh is only supported if the FileName or XML properties are set"
 	XMLConst_SMissingFileName,	"FileName cannot be blank"
 	XMLConst_SLine,	"Line"
@@ -344,6 +350,9 @@ BEGIN
 	ComConst_SNoMethod,	"Method '%s' not supported by automation object"
 	ComConst_SVarNotObject,	"Variant does not reference an automation object"
 	ComConst_STooManyParams,	"Dispatch methods do not support more than 64 parameters"
+	ComStrs_sInvalidComCtl32,	"This control requires version 4.70 or greater of COMCTL32.DLL"
+	WinHelpViewer_hNoKeyword,	"No help keyword specified."
+	ZLibConst_sInvalidStreamOp,	"Invalid stream operation"
 	ZLibConst_sError,	"Error"
 	XMLConst_SDuplicateRegistration,	"\"%s\" DOMImplementation already registered"
 	XMLConst_SNoMatchingDOMVendor,	"No matching DOM Vendor: \"%s\""
@@ -357,9 +366,7 @@ BEGIN
 	XMLConst_SNoAttributes,	"Attributes are not supported on this node type"
 	XMLConst_SInvalidNodeType,	"Invalid node type"
 	XMLConst_SMismatchedRegItems,	"Mismatched paramaters to RegisterChildNodes"
-	XMLConst_SNotSingleTextNode,	"Element does not contain a single text node"
-	XMLConst_SNoDOMParseOptions,	"DOM Implementation does not support IDOMParseOptions"
-	XMLConst_SNodeReadOnly,	"Node is readonly"
+	ExtCtrls_clNameInactiveBorder,	"Inactive Border"
 	ExtCtrls_clNameInactiveCaption,	"Inactive Caption"
 	ExtCtrls_clNameInactiveCaptionText,	"Inactive Caption Text"
 	ExtCtrls_clNameInfoBk,	"Info Background"
@@ -373,9 +380,9 @@ BEGIN
 	ExtCtrls_clNameWindow,	"Window Background"
 	ExtCtrls_clNameWindowFrame,	"Window Frame"
 	ExtCtrls_clNameWindowText,	"Window Text"
-	ComStrs_sInvalidComCtl32,	"This control requires version 4.70 or greater of COMCTL32.DLL"
-	WinHelpViewer_hNoKeyword,	"No help keyword specified."
-	ZLibConst_sInvalidStreamOp,	"Invalid stream operation"
+	ComStrs_sInvalidIndex,	"Invalid index"
+	ComStrs_sInsertError,	"Unable to insert an item"
+	ExtCtrls_clNameSkyBlue,	"Sky Blue"
 	ExtCtrls_clNameCream,	"Cream"
 	ExtCtrls_clNameMedGray,	"Medium Gray"
 	ExtCtrls_clNameActiveBorder,	"Active Border"
@@ -391,7 +398,7 @@ BEGIN
 	ExtCtrls_clNameGrayText,	"Gray Text"
 	ExtCtrls_clNameHighlight,	"Highlight Background"
 	ExtCtrls_clNameHighlightText,	"Highlight Text"
-	ExtCtrls_clNameInactiveBorder,	"Inactive Border"
+	ExtCtrls_clNameMaroon,	"Maroon"
 	ExtCtrls_clNameGreen,	"Green"
 	ExtCtrls_clNameOlive,	"Olive"
 	ExtCtrls_clNameNavy,	"Navy"
@@ -407,7 +414,7 @@ BEGIN
 	ExtCtrls_clNameAqua,	"Aqua"
 	ExtCtrls_clNameWhite,	"White"
 	ExtCtrls_clNameMoneyGreen,	"Money Green"
-	ExtCtrls_clNameSkyBlue,	"Sky Blue"
+	Consts_SAddRemoveButtons,	"&Add or Remove Buttons"
 	Consts_SResetActionToolBar,	"Reset Toolbar"
 	Consts_SSeparator,	"Separator"
 	Consts_SCirularReferencesNotAllowed,	"Circular references not allowed"
@@ -423,7 +430,6 @@ BEGIN
 	HelpIntfs_hNoContext,	"No context-sensitive help installed"
 	HelpIntfs_hNoTopics,	"No topic-based help system installed"
 	ExtCtrls_clNameBlack,	"Black"
-	ExtCtrls_clNameMaroon,	"Maroon"
 	Consts_SPictureLabel,	"Picture:"
 	Consts_SPictureDesc,	" (%dx%d)"
 	Consts_SPreviewLabel,	"Preview"
@@ -431,6 +437,7 @@ BEGIN
 	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
 	Consts_SDockZoneNotFound,	" - Dock zone not found"
 	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
+	Consts_SMultiSelectRequired,	"Multiselect mode must be on for this feature"
 	Consts_SAssignSubItemError,	"Cannot assign a subitem to an actionbar when one of it's parent's is already assigned to an actionbar"
 	Consts_SDeleteItemWithSubItems,	"Item %s has subitems, delete anyway?"
 	Consts_SDeleteNotAllowed,	"You are not allowed to delete this item"
@@ -439,7 +446,6 @@ BEGIN
 	Consts_SExpand,	"Expand"
 	Consts_SErrorLoadingFile,	"Error loading previously saved settings file: %s\rWould you like to delete it?"
 	Consts_SNoName,	"(No Name)"
-	Consts_SAddRemoveButtons,	"&Add or Remove Buttons"
 	Consts_SmkcDown,	"Down"
 	Consts_SmkcIns,	"Ins"
 	Consts_SmkcDel,	"Del"

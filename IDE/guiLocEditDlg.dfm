@@ -275,6 +275,7 @@ object LocationDlg: TLocationDlg
     object VariableAction: TAction
       Category = #1044#1077#1081#1089#1090#1074#1080#1103
       Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1072#1103
+      OnExecute = VariableActionExecute
     end
     object LogicalAction: TAction
       Category = #1044#1077#1081#1089#1090#1074#1080#1103
