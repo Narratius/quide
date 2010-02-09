@@ -18,7 +18,7 @@ object LocationDlg: TLocationDlg
   OnDestroy = FormDestroy
   DesignSize = (
     726
-    482)
+    484)
   PixelsPerInch = 96
   TextHeight = 17
   object Bevel1: TBevel

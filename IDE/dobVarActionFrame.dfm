@@ -12,7 +12,7 @@ object VarActionFrame: TVarActionFrame
   TabOrder = 0
   object Label1: TLabel
     Left = 8
-    Top = 16
+    Top = 8
     Width = 75
     Height = 17
     Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1072#1103
@@ -41,5 +41,6 @@ object VarActionFrame: TVarActionFrame
     Height = 25
     Caption = #1044#1086#1073#1072#1074#1080#1090#1100
     TabOrder = 1
+    OnClick = Button1Click
   end
 end
