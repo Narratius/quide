@@ -15,7 +15,6 @@ type
     Label1: TLabel;
     editCaption: TEdit;
     ActionsPanel: TPanel;
-    ActionListBox: TListBox;
     EditPanel: TPanel;
     ToolBar1: TToolBar;
     Label3: TLabel;
@@ -53,6 +52,7 @@ type
     ButtonDelete: TAction;
     ButtonUp: TAction;
     ButtonDown: TAction;
+    treeActions: TTreeView;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ActionListBoxClick(Sender: TObject);
@@ -66,6 +66,7 @@ type
     procedure MoveUpActionExecute(Sender: TObject);
     procedure OKBtnClick(Sender: TObject);
     procedure TextActionExecute(Sender: TObject);
+    procedure treeActionsChange(Sender: TObject; Node: TTreeNode);
   private
     { Public declarations }
     f_Location: TdcLocation;
@@ -73,9 +74,9 @@ type
     procedure AddAction2ListBox(aAction: TdcAction);
     procedure AddButton2ListBox(aAction: TdcAction);
     procedure ClearEditFrame;
-    procedure GetActionData(Index: Integer; aList: TStrings);
-    procedure IndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
+    procedure GetButtonData(Index: Integer; aList: TStrings);
     procedure ButtonsIndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
+    procedure GetActionData;
     procedure OnCaptionEdit(Sender: TObject);
     procedure pm_SetLocation(const Value: TdcLocation);
     procedure RefreshList;
@@ -120,8 +121,8 @@ end;
 
 procedure TLocationDlg.FormCreate(Sender: TObject);
 begin
- ActionListBox.OnChange:= ActionListBoxClick;
- ActionListBox.OnItemIndexChange:= IndexChange;
+ //ActionListBox.OnChange:= ActionListBoxClick;
+ //ActionListBox.OnItemIndexChange:= IndexChange;
  ButtonsListBox.OnChange:= ButtonsListBoxClick;
  ButtonsListBox.OnItemIndexChange:= ButtonsIndexChange;
 end;
@@ -130,13 +131,13 @@ procedure TLocationDlg.ActionListBoxClick(Sender: TObject);
 var
  l_Frame: TFrame;
 begin
- MoveUpAction.Enabled:= ActionListBox.ItemIndex > 0;
- MOveDownAction.Enabled:= ActionListBox.ItemIndex < Pred(ActionListBox.Items.Count);
- DelAction.Enabled:= ActionListBox.ItemIndex <> -1;
+ MoveUpAction.Enabled:= treeActions.Items.Count > 0;//ActionListBox.ItemIndex > 0;
+ MOveDownAction.Enabled:= treeActions.Selected.Index < Pred(treeActions.Items.Count);//ActionListBox.ItemIndex < Pred(ActionListBox.Items.Count);
+ DelAction.Enabled:= treeActions.Selected <> nil;
  // Синхронизация с редактированием
- if (f_Location <> nil) and (ActionListBox.ItemIndex <> -1) then
+ if (f_Location <> nil) and (treeActions.selected <> nil) then
  begin
-  EditPanel.Controls[ActionListBox.ItemIndex].Show;
+  EditPanel.Controls[treeActions.selected.Index].Show;
  end; // f_Location
 end;
 
@@ -145,20 +146,20 @@ var
  l_S: String;
 begin
  // Редактирование названия
- l_S:= ActionListBox.ActiveString;
+ l_S:= treeActions.Selected.Text;
  if InputQuery('название действия', 'Введите название', l_S) then
  begin
-  ActionListBox.ActiveString:= l_S;
-  TdcAction(ActionListBox.ActiveObject).Caption:= l_S;
+  treeActions.Selected.Text:= l_S;
+  TdcAction(treeActions.Selected.Data).Caption:= l_S;
  end;
 end;
 
 procedure TLocationDlg.AddAction(aAction: TdcActionClass);
 var
  l_A: TdcAction;
+ l_LocName: string;
 begin
- if ActionListBox.ItemIndex <> -1 then
-  GetActionData(ActionListBox.ItemIndex, ActionListBox.Items);
+ GetActionData;
  l_A:= aAction.Create(f_Location.Model);
  f_Location.AddAction(l_A);
  AddAction2ListBox(l_A);
@@ -167,8 +168,13 @@ end;
 procedure TLocationDlg.AddAction2ListBox(aAction: TdcAction);
 var
  l_Frame: TFrame;
+ l_Node: TTreeNode;
 begin
+ l_Node:= TTreeNode.Create(treeActions.Items);
+ treeActions.Items.AddChildObject(nil, aAction.Caption, aAction);
+ (*
  ActionListBox.Items.AddObject(aAction.Caption, aAction);
+ *)
  if aAction is TdcTextAction then
  begin
   l_Frame:= TDobTextFrame.Create(nil);
@@ -210,7 +216,7 @@ var
  l_A: TdcAction;
 begin
  if ButtonsListBox.ItemIndex <> -1 then
-  GetActionData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
+  GetButtonData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
  l_A:= TdcButtonAction.Create(f_Location.Model);
  f_Location.AddAction(l_A);
  AddButton2ListBox(l_A);
@@ -240,9 +246,9 @@ end;
 
 procedure TLocationDlg.DelButtonClick(Sender: TObject);
 begin
- if IsPositiveResult(MessageDlg('Вы уверены, что хотите удалить действие '+ (Location.Actions[ActionListBox.ItemIndex] as TdcAction).Caption, mtConfirmation, [mbYes, mbNo], 0)) then
+ if IsPositiveResult(MessageDlg('Вы уверены, что хотите удалить действие '+ treeActions.Selected.Text, mtConfirmation, [mbYes, mbNo], 0)) then
  begin
-  Location.ActionList.Delete(ActionListBox.ItemIndex);
+  Location.ActionList.Delete(treeActions.Selected.Index);
   RefreshList;
  end;
 end;
@@ -252,7 +258,7 @@ begin
  f_Location.Caption:= editCaption.Text;
 end;
 
-procedure TLocationDlg.GetActionData(Index: Integer; aList: TStrings);
+procedure TLocationDlg.GetButtonData(Index: Integer; aList: TStrings);
 var
  l_LocName: String;
  l_A: TdcAction;
@@ -286,21 +292,32 @@ begin
  AddAction(TdcGotoAction);
 end;
 
-procedure TLocationDlg.IndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
-begin
- // Нужно забрать данные из текущего элемента
- if OldIndex <> -1 then
- begin
-  GetActionData(OldIndex, ActionListBox.Items);
- end;
-end;
-
 procedure TLocationDlg.ButtonsIndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
 begin
  // Нужно забрать данные из текущего элемента
  if OldIndex <> -1 then
  begin
-  GetActionData(OldIndex, ButtonsListBox.Items);
+  GetButtonData(OldIndex, ButtonsListBox.Items);
+ end;
+end;
+
+procedure TLocationDlg.GetActionData;
+var
+ l_A: TdcAction;
+ l_LocName: string;
+begin
+ if treeActions.Selected <> nil then
+ begin
+  l_A:= TdcAction(treeActions.Selected.Data);
+  case l_A.ActionType of
+   atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[treeActions.Selected.Index] as TdobTextFrame).TextMemo.Lines;
+   atGoto:
+    begin
+     l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
+     TdcGotoAction(l_A).Location:= f_Location.Model.FindLocation(l_LocName);
+     treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
+    end;
+  end;
  end;
 end;
 
@@ -309,9 +326,10 @@ var
  l_Index: Integer;
 begin
  // Переместить действие вниз
- l_Index:= Succ(ActionListBox.ItemIndex);
- Location.ActionList.Move(ActionListBox.ItemIndex, l_Index);
+ l_Index:= Succ(treeActions.Selected.Index);
+ Location.ActionList.Move(treeActions.Selected.Index, l_Index);
  RefreshList;
+ // Установить подсветку
 end;
 
 procedure TLocationDlg.MoveUpActionExecute(Sender: TObject);
@@ -319,18 +337,17 @@ var
  l_Index: Integer;
 begin
  // Переместить действие вверх
- l_Index:= Pred(ActionListBox.ItemIndex);
- Location.ActionList.Move(l_Index, ActionListBox.ItemIndex);
+ l_Index:= Pred(treeActions.Selected.Index);
+ Location.ActionList.Move(l_Index, treeActions.Selected.Index);
  RefreshList;
- ActionListBox.ItemIndex:= l_Index;
+ //ActionListBox.ItemIndex:= l_Index;
 end;
 
 procedure TLocationDlg.OKBtnClick(Sender: TObject);
 begin
- if ActionListBox.ItemIndex <> -1 then
-  GetActionData(ActionListBox.ItemIndex, ActionListBox.Items);
+ GetActionData;
  if ButtonsListBox.ItemIndex <> -1 then
-  GetActionData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
+  GetButtonData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
 end;
 
 procedure TLocationDlg.OnCaptionEdit(Sender: TObject);
@@ -351,7 +368,8 @@ var
   I: Integer;
   l_C: TControl;
 begin
- ActionListBox.Items.Clear;
+ treeActions.Items.Clear;
+ ButtonsListBox.Items.Clear;
  while EditPanel.ControlCount > 0 do
  begin
   l_C:= EditPanel.Controls[0];
@@ -362,20 +380,38 @@ begin
  begin
   if Location.Actions[i].ActionType = atButton then
   begin
-  if ButtonsListBox.Items.IndexOf(Location.Actions[i].Caption) = -1 then
+  //if ButtonsListBox.Items.IndexOf(Location.Actions[i].Caption) = -1 then
    AddButton2ListBox(Location.Actions[i]);
   end
   else
-  if ActionListBox.Items.IndexOf(Location.Actions[i].Caption) = -1 then
+  //if ActionListBox.Items.IndexOf(Location.Actions[i].Caption) = -1 then
    AddAction2ListBox(Location.Actions[i]);
  end;
- ActionListBox.ItemIndex:= 0;
+ //ActionListBox.ItemIndex:= 0;
  ButtonsListBox.ItemIndex:= 0;
 end;
 
 procedure TLocationDlg.TextActionExecute(Sender: TObject);
 begin
  AddAction(TdcTextAction);
+end;
+
+procedure TLocationDlg.treeActionsChange(Sender: TObject; Node: TTreeNode);
+var
+ l_Frame: TFrame;
+begin
+// TTreeView(Sender).Selected - старый узел
+// Node - новый узел
+ GetActionData;
+ MoveUpAction.Enabled:= treeActions.Items.Count > 0;//ActionListBox.ItemIndex > 0;
+ MOveDownAction.Enabled:= treeActions.Selected.Index < Pred(treeActions.Items.Count);//ActionListBox.ItemIndex < Pred(ActionListBox.Items.Count);
+ DelAction.Enabled:= treeActions.Selected <> nil;
+ // Синхронизация с редактированием
+ if (f_Location <> nil) and (treeActions.selected <> nil) then
+ begin
+  EditPanel.Controls[treeActions.selected.Index].Show;
+ end; // f_Location
+
 end;
 
 end.

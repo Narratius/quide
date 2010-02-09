@@ -18,7 +18,7 @@ object LocationDlg: TLocationDlg
   OnDestroy = FormDestroy
   DesignSize = (
     726
-    484)
+    482)
   PixelsPerInch = 96
   TextHeight = 17
   object Bevel1: TBevel
@@ -78,25 +78,13 @@ object LocationDlg: TLocationDlg
     DesignSize = (
       612
       273)
-    object ActionListBox: TListBox
-      Left = 8
-      Top = 40
-      Width = 129
-      Height = 225
-      Anchors = [akLeft, akTop, akBottom]
-      Columns = 1
-      ItemHeight = 17
-      TabOrder = 0
-      OnClick = ActionListBoxClick
-      OnDblClick = ActionListBoxDblClick
-    end
     object EditPanel: TPanel
       Left = 144
       Top = 40
       Width = 460
       Height = 225
       Anchors = [akLeft, akTop, akRight, akBottom]
-      TabOrder = 1
+      TabOrder = 0
     end
     object ToolBar1: TToolBar
       Left = 1
@@ -106,7 +94,7 @@ object LocationDlg: TLocationDlg
       Caption = 'ActionEditToolbar'
       Flat = True
       Images = ImageList1
-      TabOrder = 2
+      TabOrder = 1
       object Label3: TLabel
         Left = 0
         Top = 0
@@ -138,6 +126,15 @@ object LocationDlg: TLocationDlg
         Top = 0
         Action = MoveDownAction
       end
+    end
+    object treeActions: TTreeView
+      Left = 8
+      Top = 40
+      Width = 129
+      Height = 225
+      Indent = 19
+      TabOrder = 2
+      OnChange = treeActionsChange
     end
   end
   object Panel1: TPanel
