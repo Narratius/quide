@@ -8,6 +8,7 @@ uses
 
 Type
  TdcScript = class;
+ TdcVariable = class;
  TqmBase = class(TPersistent)
  private
   f_Caption: string;
@@ -19,8 +20,8 @@ Type
   destructor Destroy; override;
   procedure Assign(Source: TPersistent); override;
   function Clone(aModel: TdcScript): Pointer;
-  procedure Save(Element: IXMLNode); virtual;
   procedure Load(Element: IXMLNode); virtual;
+  procedure Save(Element: IXMLNode); virtual;
   property Caption: string read f_Caption write f_Caption;
   property Changed: Boolean read f_Changed write pm_SetChanged;
   property Model: TdcScript read f_Model write f_Model;
@@ -31,6 +32,7 @@ Type
  TdcLocation = class(TqmBase)
  private
   f_ActionList: TObjectList;
+  f_Hint: String;
   procedure GenerateCaption(aAction: TdcAction);
   function pm_GetActions(Index: Integer): TdcAction;
   function pm_GetActionsCount: Integer;
@@ -53,6 +55,7 @@ Type
   property ActionsCount: Integer read pm_GetActionsCount;
   property Buttons[Index: Integer]: TdcButtonAction read pm_GetButtons;
   property ButtonsCount: Integer read pm_GetButtonsCount;
+  property Hint: String read f_Hint write f_Hint;
  end;
 
  TdcInventory = class(TqmBase)
@@ -121,8 +124,15 @@ Type
  { Действие с переменными }
  TdcVariableAction = class(TdcAction)
 
+ private
+  f_Value: String;
+  f_Variable: TdcVariable;
+  property Value: String read f_Value write f_Value;
+  property Variable: TdcVariable read f_Variable write f_Variable;
  public
   constructor Create(aModel: TdcScript); override;
+  procedure Load(Element: IXMLNode); override;
+  procedure Save(Element: IXMLNode); override;
  end;
 
  { Переход на локацию }
@@ -146,7 +156,7 @@ Type
    constructor Create(aModel: TdcScript); override;
  end;
 
- TdcVariable = class;
+
  TdcScript = class(TqmBase)
  private
   f_Author: String;
@@ -171,13 +181,14 @@ Type
   destructor Destroy; override;
   procedure Assign(Source: TPersistent); override;
   function CheckLocation(aCaption: String): TdcLocation;
+  function CheckVariable(const aCaption: String): TdcVariable;
   function FindLocation(const aCaption: String): TdcLocation;
   function GenerateCaption: string;
   procedure GetLocationsNames(aStrings: TStrings);
   procedure LoadFromStream(aStream: TStream);
   procedure Locations2Strings(aStrings: TStrings);
   function NewLocation(aCaption: String): TdcLocation;
-  procedure NewVariable;
+  function NewVariable(const aCaption: String): TdcVariable;
   procedure SaveToStream(aStream: TStream);
   property Author: String read f_Author write f_Author;
   property Description: TStrings read f_Description write pm_SetDescription;
@@ -195,7 +206,21 @@ Type
  TqmObject = class(TqmBase)
  end;
 
+ TdcVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
  TdcVariable = class(TqmBase)
+ private
+  f_Enum: TStrings;
+  f_Value: string;
+  f_VarType: TdcVariableType;
+  procedure pm_SetEnum(const Value: TStrings);
+  property Value: string read f_Value write f_Value;
+  property VarType: TdcVariableType read f_VarType write f_VarType;
+ public
+  constructor Create(aModel: TdcScript); override;
+  destructor Destroy; override;
+  procedure Load(Element: IXMLNode); override;
+  procedure Save(Element: IXMLNode); override;
+  property Enum: TStrings read f_Enum write pm_SetEnum;
  end;
 
 procedure CloneActions(aSource: TObjectList; var aDestination: TObjectList;
@@ -211,6 +236,31 @@ implementation
 
 Uses
  SysUtils, XMLDoc, StrUtils, Variants;
+
+
+function VarType2String(aVarType: TdcVariableType): String;
+begin
+ case aVarType of
+  vtNumeric : Result:= 'Numeric';
+  vtText    : Result:= 'Text';
+  vtBoolean : Result:= 'Boolean';
+  vtEnum    : Result:= 'Enum';
+ end;
+end;
+
+function String2VarType(const aVarType: String): TdcvariableType;
+begin
+ if AnsiSameText('Numeric', aVarType) then
+  Result:= vtNumeric
+ else
+  if AnsiSameText('Boolean', aVarType) then
+   Result:= vtBoolean
+  else
+   if AnsiSametext('Enum', aVarType) then
+    Result:= vtEnum
+   else
+    Result:= vtText;
+end;
 
 
 procedure TqmBase.Assign(Source: TPersistent);
@@ -418,7 +468,8 @@ begin
   l_E:= l_Node.ChildNodes.Get(i);
   AddAction(TdcAction.Make(l_E, Model));
  end; // for i
-
+ if Element.HasAttribute('Hint') then
+  Hint:= element.GetAttribute('Hint');
 end;
 
 class function TdcLocation.Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
@@ -488,6 +539,7 @@ begin
   for i:= 0 to Pred(ButtonsCount) do
    Buttons[i].Save(AddChild('Button'));
  end; // with Element.AddChild('Buttons')
+ Element.SetAttribute('Hint', Hint);
 end;
 
 constructor TdcGotoAction.Create(aModel: TdcScript);
@@ -574,6 +626,13 @@ begin
  Result := FindLocation(aCaption);
  if Result = nil then
   Result:= NewLocation(aCaption);
+end;
+
+function TdcScript.CheckVariable(const aCaption: String): TdcVariable;
+begin
+ Result := FindInList(f_Variables, aCaption) as TdcVariable;
+ if Result = nil then
+  Result:= NewVariable(aCaption);
 end;
 
 function TdcScript.CreateLocation: TdcLocation;
@@ -689,9 +748,11 @@ begin
  end;
 end;
 
-procedure TdcScript.NewVariable;
+function TdcScript.NewVariable(const aCaption: String): TdcVariable;
 begin
-  // TODO -cMM: TdcScript.NewVariable default body inserted
+ Result:= TdcVariable.Create(self);
+ Result.Caption:= aCaption;
+ f_Variables.Add(Result);
 end;
 
 function TdcScript.pm_GetIsValid: Boolean;
@@ -866,10 +927,76 @@ begin
  ActionType:= atVariable;
 end;
 
+procedure TdcVariableAction.Load(Element: IXMLNode);
+begin
+ inherited;
+ if Element.HasAttribute('Variable') then
+ begin
+  Variable:= f_Model.CheckVariable(element.GetAttribute('Variable'));
+  if (Variable <> nil) and Element.HasAttribute('Value') then
+   Value:= Element.GetAttribute('Value');
+ end;
+end;
+
+procedure TdcVariableAction.Save(Element: IXMLNode);
+begin
+ inherited;
+ Element.setAttribute('Variable', Variable.Caption);
+ Element.SetAttribute('Value', Value);
+end;
+
 constructor TdcButtonAction.Create(aModel: TdcScript);
 begin
  inherited;
  ActionType:= atButton;
+end;
+
+constructor TdcVariable.Create(aModel: TdcScript);
+begin
+ inherited;
+ f_Enum:= TStringList.Create;
+end;
+
+destructor TdcVariable.Destroy;
+begin
+ f_Enum.Free;
+ inherited;
+end;
+
+procedure TdcVariable.Load(Element: IXMLNode);
+var
+ i: Integer;
+begin
+ inherited;
+ if Element.HasAttribute('Value') then
+  Value:= Element.GetAttribute('Value');
+ if Element.HasAttribute('Type') then
+  VarType:= String2VarType(element.GetAttribute('Type'));
+ if VarType = vtEnum then
+ begin
+  f_Enum.Clear;
+  for i:= 0 to Pred(Element.ChildNodes.FindNode('Enum').ChildNodes.Count) do
+   f_Enum.Add(Element.ChildNodes.FindNode('Enum').ChildValues[i]);
+ end;
+end;
+
+procedure TdcVariable.pm_SetEnum(const Value: TStrings);
+begin
+ f_Enum.Assign(Value);
+end;
+
+procedure TdcVariable.Save(Element: IXMLNode);
+var
+ i: Integer;
+begin
+ inherited;
+ Element.SetAttribute('Value', Value);
+ Element.AddChild('Type').Text:= varType2String(VarType);
+ if VarType = vtEnum then
+ begin
+  with Element.AddChild('Enum') do
+   AddChild('Value').Text:= f_Enum[i];
+ end;
 end;
 
 end.
