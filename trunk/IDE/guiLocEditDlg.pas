@@ -97,7 +97,8 @@ implementation
 
 Uses
  StrUtils, Contnrs,
- guiActionListDlg, guiActionEditDlg, Dialogs, dobTextActionEdit, dobGotoAction, dobButtonAction;
+ guiActionListDlg, guiActionEditDlg, Dialogs, dobTextActionEdit, dobGotoAction, dobButtonAction,
+ dobVarActionFrame;
 
 function EditLocation(aLocation: TdcLocation; theModel: TdcScript): Boolean;
 var
@@ -190,7 +191,6 @@ begin
  if aAction is TdcVariableAction then
  begin
   l_Frame:= TVarActionFrame.Create(nil);
-  TVarActionFrame(l_Frame).Model:= f_Location.Model;
   if TdcVariableAction(aAction).Variable <> nil then
    TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
  end;

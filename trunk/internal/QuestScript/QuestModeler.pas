@@ -127,12 +127,12 @@ Type
  private
   f_Value: String;
   f_Variable: TdcVariable;
-  property Value: String read f_Value write f_Value;
-  property Variable: TdcVariable read f_Variable write f_Variable;
  public
   constructor Create(aModel: TdcScript); override;
   procedure Load(Element: IXMLNode); override;
   procedure Save(Element: IXMLNode); override;
+  property Value: String read f_Value write f_Value;
+  property Variable: TdcVariable read f_Variable write f_Variable;
  end;
 
  { Переход на локацию }
@@ -941,8 +941,11 @@ end;
 procedure TdcVariableAction.Save(Element: IXMLNode);
 begin
  inherited;
- Element.setAttribute('Variable', Variable.Caption);
- Element.SetAttribute('Value', Value);
+ if Variable <> nil then
+ begin
+  Element.setAttribute('Variable', Variable.Caption);
+  Element.SetAttribute('Value', Value);
+ end; 
 end;
 
 constructor TdcButtonAction.Create(aModel: TdcScript);

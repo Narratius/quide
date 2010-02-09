@@ -1,10 +1,10 @@
-object OKRightDlg: TOKRightDlg
+object VariableEditDlg: TVariableEditDlg
   Left = 227
   Top = 108
   BorderStyle = bsDialog
-  Caption = 'Dialog'
-  ClientHeight = 284
-  ClientWidth = 594
+  Caption = #1053#1086#1074#1072#1103' '#1087#1077#1088#1077#1084#1077#1085#1085#1072#1103
+  ClientHeight = 117
+  ClientWidth = 519
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object OKRightDlg: TOKRightDlg
     Left = 8
     Top = 8
     Width = 417
-    Height = 273
+    Height = 105
     Shape = bsFrame
   end
   object Label1: TLabel
@@ -36,8 +36,15 @@ object OKRightDlg: TOKRightDlg
     Height = 17
     Caption = #1058#1080#1087
   end
+  object Label3: TLabel
+    Left = 16
+    Top = 80
+    Width = 56
+    Height = 17
+    Caption = #1047#1085#1072#1095#1077#1085#1080#1077
+  end
   object OKBtn: TButton
-    Left = 492
+    Left = 436
     Top = 8
     Width = 75
     Height = 25
@@ -47,7 +54,7 @@ object OKRightDlg: TOKRightDlg
     TabOrder = 0
   end
   object CancelBtn: TButton
-    Left = 492
+    Left = 436
     Top = 38
     Width = 75
     Height = 25
@@ -59,18 +66,20 @@ object OKRightDlg: TOKRightDlg
   object EditCaption: TEdit
     Left = 80
     Top = 16
-    Width = 233
+    Width = 225
     Height = 25
     TabOrder = 2
+    OnChange = EditCaptionChange
   end
   object ComboType: TComboBox
-    Left = 72
-    Top = 56
-    Width = 233
+    Left = 80
+    Top = 48
+    Width = 225
     Height = 25
     Style = csDropDownList
     ItemHeight = 17
     TabOrder = 3
+    OnChange = ComboTypeChange
     Items.Strings = (
       #1063#1080#1089#1083#1086#1074#1086#1081
       #1058#1077#1082#1089#1090#1086#1074#1099#1081
@@ -79,7 +88,7 @@ object OKRightDlg: TOKRightDlg
   end
   object butDefineEnum: TButton
     Left = 311
-    Top = 56
+    Top = 48
     Width = 105
     Height = 25
     Caption = #1054#1087#1088#1077#1076#1077#1083#1080#1090#1100
