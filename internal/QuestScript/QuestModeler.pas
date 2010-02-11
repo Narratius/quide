@@ -213,14 +213,14 @@ Type
   f_Value: string;
   f_VarType: TdcVariableType;
   procedure pm_SetEnum(const Value: TStrings);
-  property Value: string read f_Value write f_Value;
-  property VarType: TdcVariableType read f_VarType write f_VarType;
  public
   constructor Create(aModel: TdcScript); override;
   destructor Destroy; override;
   procedure Load(Element: IXMLNode); override;
   procedure Save(Element: IXMLNode); override;
   property Enum: TStrings read f_Enum write pm_SetEnum;
+  property Value: string read f_Value write f_Value;
+  property VarType: TdcVariableType read f_VarType write f_VarType;
  end;
 
 procedure CloneActions(aSource: TObjectList; var aDestination: TObjectList;

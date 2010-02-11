@@ -15,10 +15,12 @@ type
     procedure Button1Click(Sender: TObject);
     procedure ComboVariablesChange(Sender: TObject);
   private
+    f_Control: TWinControl;
     f_Script: TdcScript;
     f_Variable: TdcVariable;
     procedure pm_SetScript(const Value: TdcScript);
     procedure pm_SetVariable(const Value: TdcVariable);
+    procedure UpdateVariableList;
     { Private declarations }
   public
     property Script: TdcScript read f_Script write pm_SetScript;
@@ -36,26 +38,69 @@ uses
 procedure TVarActionFrame.Button1Click(Sender: TObject);
 begin
  // Вызвать окно добавления переменных
+ if VariableEditDialog(Script) then
+ begin
+  UpdateVariableList;
+  ComboVariables.ItemIndex:= Pred(Script.VariablesCount);
+ end;
 end;
 
 procedure TVarActionFrame.ComboVariablesChange(Sender: TObject);
 begin
+ Variable:= Script.Variables[ComboVariables.ItemIndex];
  // В зависимости от типа выбранной переменной устанавливаем элемент редактирования
+ f_Control.Free;
+ case Variable.VarType of
+  vtNumeric,
+  vtText:
+   begin
+    f_Control:= TEdit.Create(nil);
+    InsertControl(f_Control);
+    TEdit(f_Control).Text:= Variable.Value;
+   end;
+  vtBoolean,
+  vtEnum:
+   begin
+    f_Control:= TComboBox.Create(nil);
+    InsertControl(f_Control);
+    with TComboBox(f_Control) do
+    begin
+     Style:= csDropDownList;
+     if Variable.VarType = vtBoolean then
+     begin
+      Items.Add('Истина');
+      Items.Add('Ложь');
+     end
+     else
+     begin
+     end;
+     ItemIndex:= Items.IndexOf(Variable.Value);
+    end; // with TComboBox
+   end; // vtBoolean, vtEnum
+ end; // case VarType
+ f_Control.Left:= ComboVariables.Left;
+ f_Control.Top:= 40;
+ f_Control.Width:= ComboVariables.Width;
 end;
 
 procedure TVarActionFrame.pm_SetScript(const Value: TdcScript);
-var
- i: Integer;
 begin
  f_Script := Value;
- comboVariables.Items.Clear;
- for i:= 0 to Pred(f_Script.VariablesCount) do
-  comboVariables.Items.Add(f_Script.Variables[i].Caption);
+ UpdateVariableList;
 end;
 
 procedure TVarActionFrame.pm_SetVariable(const Value: TdcVariable);
 begin
  f_Variable := Value;
+end;
+
+procedure TVarActionFrame.UpdateVariableList;
+var
+  i: Integer;
+begin
+  comboVariables.Items.Clear;
+  for i:= 0 to Pred(f_Script.VariablesCount) do
+   comboVariables.Items.Add(f_Script.Variables[i].Caption);
 end;
 
 end.
