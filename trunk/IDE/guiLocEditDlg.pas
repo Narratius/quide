@@ -193,6 +193,7 @@ begin
   l_Frame:= TVarActionFrame.Create(nil);
   if TdcVariableAction(aAction).Variable <> nil then
    TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
+  TVarActionFrame(l_Frame).Script:= Location.Model;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
  l_Frame.Parent:= EditPanel;

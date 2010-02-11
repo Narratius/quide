@@ -19,7 +19,7 @@ object VarActionFrame: TVarActionFrame
   end
   object Label2: TLabel
     Left = 8
-    Top = 48
+    Top = 40
     Width = 56
     Height = 17
     Caption = #1047#1085#1072#1095#1077#1085#1080#1077
