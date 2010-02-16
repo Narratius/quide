@@ -17,13 +17,16 @@ type
   private
     f_Control: TWinControl;
     f_Script: TdcScript;
+    f_Value: string;
     f_Variable: TdcVariable;
+    function pm_GetValue: string;
     procedure pm_SetScript(const Value: TdcScript);
     procedure pm_SetVariable(const Value: TdcVariable);
     procedure UpdateVariableList;
     { Private declarations }
   public
     property Script: TdcScript read f_Script write pm_SetScript;
+    property Value: string read pm_GetValue write f_Value;
     property Variable: TdcVariable read f_Variable write pm_SetVariable;
     { Public declarations }
   end;
@@ -73,6 +76,7 @@ begin
      end
      else
      begin
+      Items:= Variable.Enum;
      end;
      ItemIndex:= Items.IndexOf(Variable.Value);
     end; // with TComboBox
@@ -81,6 +85,25 @@ begin
  f_Control.Left:= ComboVariables.Left;
  f_Control.Top:= 40;
  f_Control.Width:= ComboVariables.Width;
+end;
+
+function TVarActionFrame.pm_GetValue: string;
+begin
+ if Variable <> nil then
+  case Variable.VarType of
+  vtNumeric,
+  vtText:
+   Begin
+    Result:= TEdit(f_Control).Text
+   end;
+  vtBoolean,
+  vtEnum:
+   begin
+    Result:= TComboBox(f_Control).Items[TComboBox(f_Control).ItemIndex];
+   end;
+  end
+ else
+  Result:= '';
 end;
 
 procedure TVarActionFrame.pm_SetScript(const Value: TdcScript);
