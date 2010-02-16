@@ -24,7 +24,7 @@ object QuestEditorForm: TQuestEditorForm
   TextHeight = 17
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 439
+    Top = 441
     Width = 735
     Height = 19
     Panels = <
@@ -44,7 +44,7 @@ object QuestEditorForm: TQuestEditorForm
     Left = 0
     Top = 0
     Width = 735
-    Height = 439
+    Height = 441
     Align = alClient
     TabOrder = 1
     OnClick = ModelBoxClick
@@ -55,7 +55,7 @@ object QuestEditorForm: TQuestEditorForm
       Left = 0
       Top = 0
       Width = 731
-      Height = 435
+      Height = 437
       Align = alClient
       Visible = False
       OnMouseDown = ModelBoxMouseDown
@@ -493,6 +493,7 @@ object QuestEditorForm: TQuestEditorForm
     object ScriptVariables: TAction
       Category = 'Script'
       Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1099#1077'...'
+      OnExecute = ScriptVariablesExecute
     end
   end
   object OpenPictureDialog1: TOpenPictureDialog

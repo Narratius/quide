@@ -186,6 +186,7 @@ type
     procedure Properties1Click(Sender: TObject);
     procedure ScriptNewLocationExecute(Sender: TObject);
     procedure ScriptDescriptionExecute(Sender: TObject);
+    procedure ScriptVariablesExecute(Sender: TObject);
   private
     popupPt: TPoint;
     tmpLine: TLine;
@@ -250,7 +251,7 @@ implementation
 
 uses
  guiLocEditDlg, guiScriptDetailsDlg,
- StrUtils, ShellAPI, Math;
+ StrUtils, ShellAPI, Math, guiLocEditDlgEx;
 
 
 
@@ -1779,6 +1780,8 @@ end;
 procedure TQuestEditorForm.LocationEdit(sender: TObject);
 begin
  if Sender is TdoLocation then
+  EditLocationEx(TdoLocation(Sender).Data)
+ (*
   if EditLocation(TdoLocation(Sender).Data, f_Model) then
   begin
    Changed:= True;
@@ -1787,6 +1790,7 @@ begin
    ClearConnectors(TdoLocation(Sender));
    CheckNewObjects;
   end; // EditLocation(TdoLocation(Sender).Data)
+ *)
 end;
 
 function TQuestEditorForm.pm_GetChanged: Boolean;
@@ -1835,6 +1839,11 @@ procedure TQuestEditorForm.pm_SetChanged(const Value: Boolean);
 begin
  f_Model.Changed := Value;
  StatusBar1.Panels[1].Text:= IfThen(Value, '*', '');
+end;
+
+procedure TQuestEditorForm.ScriptVariablesExecute(Sender: TObject);
+begin
+ // Редактирование списка переменныхope
 end;
 
 procedure TQuestEditorForm.UpdateCaption;

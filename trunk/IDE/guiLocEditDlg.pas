@@ -130,8 +130,6 @@ begin
 end;
 
 procedure TLocationDlg.ActionListBoxClick(Sender: TObject);
-var
- l_Frame: TFrame;
 begin
  MoveUpAction.Enabled:= treeActions.Items.Count > 0;//ActionListBox.ItemIndex > 0;
  MOveDownAction.Enabled:= treeActions.Selected.Index < Pred(treeActions.Items.Count);//ActionListBox.ItemIndex < Pred(ActionListBox.Items.Count);
@@ -193,6 +191,7 @@ begin
   l_Frame:= TVarActionFrame.Create(nil);
   if TdcVariableAction(aAction).Variable <> nil then
    TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
+  TVarActionFrame(l_Frame).Value:= TdcVariableAction(aAction).Value;
   TVarActionFrame(l_Frame).Script:= Location.Model;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
@@ -323,6 +322,12 @@ begin
      l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
      TdcGotoAction(l_A).Location:= f_Location.Model.FindLocation(l_LocName);
      treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
+    end;
+   atVariable:
+    with TdcVariableAction(l_A) do
+    begin
+     Variable:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Variable;
+     Value:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Value;
     end;
   end;
  end;
