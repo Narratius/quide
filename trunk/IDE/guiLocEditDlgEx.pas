@@ -8,20 +8,6 @@ uses
 
 type
   TLocationEditExDlg = class(TForm)
-    PopupMenu1: TPopupMenu;
-    ActionList1: TActionList;
-    AddText: TAction;
-    AddVarAction: TAction;
-    AddLogic: TAction;
-    AddButton: TAction;
-    AddInventory: TAction;
-    EditPanel: TPanel;
-    N1: TMenuItem;
-    N2: TMenuItem;
-    N3: TMenuItem;
-    N4: TMenuItem;
-    N5: TMenuItem;
-    N6: TMenuItem;
     procedure AddTextExecute(Sender: TObject);
   private
     f_Location: TdcLocation;
@@ -95,6 +81,7 @@ begin
     TVarActionFrame(l_Frame).Script:= Location.Model;
    end;
  end; // case
+ (*
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
  if EditPanel.ControlCount > 0 then
   l_Frame.Top:= EditPanel.Controls[Pred(EditPanel.ControlCount)].Top + EditPanel.Controls[Pred(EditPanel.ControlCount)].Height
@@ -102,6 +89,7 @@ begin
   l_Frame.Top:= 1;
  l_Frame.Width:= EditPanel.ClientWidth;
  l_Frame.Parent:= EditPanel;
+ *)
 end;
 
 procedure TLocationEditExDlg.CreateButton(anButton: TdcButtonAction);
@@ -128,6 +116,7 @@ var
   I: Integer;
   l_C: TControl;
 begin
+ (*
  while EditPanel.ControlCount > 0 do
  begin
   l_C:= EditPanel.Controls[0];
@@ -143,6 +132,7 @@ begin
   else
    CreateAction(Location.Actions[i]);
  end;
+ *)
 end;
 
 end.

@@ -11,7 +11,8 @@ uses
   dobVarActionFrame in 'dobVarActionFrame.pas' {VarActionFrame: TFrame},
   guiVariableEditDlg in 'guiVariableEditDlg.pas' {VariableEditDlg},
   guiVariablesListDlg in 'guiVariablesListDlg.pas' {VariablesListDlg},
-  guiLocEditDlgEx in 'guiLocEditDlgEx.pas' {LocationEditExDlg};
+  guiLocEditDlgEx in 'guiLocEditDlgEx.pas' {LocationEditExDlg},
+  guiLocationFrame in 'guiLocationFrame.pas' {Frame1: TFrame};
 
 {$R *.res}
 
