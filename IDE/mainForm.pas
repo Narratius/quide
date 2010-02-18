@@ -251,7 +251,7 @@ implementation
 
 uses
  guiLocEditDlg, guiScriptDetailsDlg,
- StrUtils, ShellAPI, Math, guiLocEditDlgEx;
+ StrUtils, ShellAPI, Math{, guiLocEditDlgEx};
 
 
 
@@ -1780,8 +1780,8 @@ end;
 procedure TQuestEditorForm.LocationEdit(sender: TObject);
 begin
  if Sender is TdoLocation then
-  EditLocationEx(TdoLocation(Sender).Data)
- (*
+ // EditLocationEx(TdoLocation(Sender).Data)
+
   if EditLocation(TdoLocation(Sender).Data, f_Model) then
   begin
    Changed:= True;
@@ -1790,7 +1790,7 @@ begin
    ClearConnectors(TdoLocation(Sender));
    CheckNewObjects;
   end; // EditLocation(TdoLocation(Sender).Data)
- *)
+ 
 end;
 
 function TQuestEditorForm.pm_GetChanged: Boolean;

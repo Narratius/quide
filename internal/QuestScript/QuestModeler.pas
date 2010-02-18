@@ -236,7 +236,7 @@ function StringToActionType(aStr: String): TdcActionType;
 implementation
 
 Uses
- SysUtils, XMLDoc, StrUtils, Variants;
+ SysUtils, XMLDoc, StrUtils, Variants, TypInfo;
 
 
 function VarType2String(aVarType: TdcVariableType): String;
@@ -358,40 +358,12 @@ end;
 
 function ActionTypeToStr(aType: TdcActionType): string;
 begin
- case aType of
-  atNone : Result:= 'none';
-  atGoto : Result:= 'goto';
-  atInventory: Result:= 'inv';
-  atLogic: Result:= 'logic';
-  atText: Result:= 'text';
-  atVariable: Result:= 'var';
-  atButton: Result:= 'button';
- end;
+ Result:= GetEnumName(TypeInfo(TdcActionType), Ord(aType));
 end;
 
 function StringToActionType(aStr: String): TdcActionType;
 begin
- Result := atNone;
- if AnsiCompareText(aStr, 'none') = 0 then
-  Result:= atNone
- else
- if AnsiCompareText(aStr, 'goto') = 0 then
-  Result:= atGoto
- else
- if AnsiCompareText(aStr, 'inv') = 0 then
-  Result:= atInventory
- else
- if AnsiCompareText(aStr, 'logic') = 0 then
-  Result:= atLogic
- else
- if AnsiCompareText(aStr, 'text') = 0 then
-  Result:= atText
- else
- if AnsiCompareText(aStr, 'var') = 0 then
-  Result:= atVariable
- else
- if AnsiCompareText(aStr, 'button') = 0 then
-  Result:= atButton
+ Result := TdcActionType(GetEnumValue(TypeInfo(TdcActionType), aStr));
 end;
 
 constructor TdcLocation.Create(aModel: TdcScript);
