@@ -129,7 +129,6 @@ Type
   f_Variable: TdcVariable;
  public
   constructor Create(aModel: TdcScript); override;
-  procedure Assign(Source: TPersistent); override;
   procedure Load(Element: IXMLNode); override;
   procedure Save(Element: IXMLNode); override;
   property Value: String read f_Value write f_Value;
@@ -355,7 +354,7 @@ begin
    break;
  end;
 end;
-
+(*
 function ActionTypeToStr(aType: TdcActionType): string;
 begin
  Result:= GetEnumName(TypeInfo(TdcActionType), Ord(aType));
@@ -365,7 +364,44 @@ function StringToActionType(aStr: String): TdcActionType;
 begin
  Result := TdcActionType(GetEnumValue(TypeInfo(TdcActionType), aStr));
 end;
+*)
+function ActionTypeToStr(aType: TdcActionType): string;
+begin
+ case aType of
+  atNone : Result:= 'none';
+  atGoto : Result:= 'goto';
+  atInventory: Result:= 'inv';
+  atLogic: Result:= 'logic';
+  atText: Result:= 'text';
+  atVariable: Result:= 'var';
+  atButton: Result:= 'button';
+ end;
+end;
 
+function StringToActionType(aStr: String): TdcActionType;
+begin
+ Result := atNone;
+ if AnsiCompareText(aStr, 'none') = 0 then
+  Result:= atNone
+ else
+ if AnsiCompareText(aStr, 'goto') = 0 then
+  Result:= atGoto
+ else
+ if AnsiCompareText(aStr, 'inv') = 0 then
+  Result:= atInventory
+ else
+ if AnsiCompareText(aStr, 'logic') = 0 then
+  Result:= atLogic
+ else
+ if AnsiCompareText(aStr, 'text') = 0 then
+  Result:= atText
+ else
+ if AnsiCompareText(aStr, 'var') = 0 then
+  Result:= atVariable
+ else
+ if AnsiCompareText(aStr, 'button') = 0 then
+  Result:= atButton
+end;
 constructor TdcLocation.Create(aModel: TdcScript);
 begin
  inherited;
@@ -425,8 +461,8 @@ end;
 
 procedure TdcLocation.Load(Element: IXMLNode);
 var
- i: Integer;
- l_Node, l_E: IXMLNode;
+ l_Count, i, j: Integer;
+ l_Node, l_E, l_a: IXMLNode;
 begin
  inherited;
  l_Node:= Element.ChildNodes.FindNode('Actions');
@@ -447,6 +483,7 @@ end;
 
 class function TdcLocation.Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
 begin
+ Result:= nil;
  if aElement.HasAttribute('Caption') then
   Result:= aModel.CheckLocation(aElement.GetAttribute('Caption'))
  else
@@ -497,6 +534,7 @@ end;
 procedure TdcLocation.Save(Element: IXMLNode);
 var
  i: Integer;
+ l_Node: IXMLNode;
 begin
  inherited;
  with Element.AddChild('Actions') do
@@ -641,6 +679,7 @@ var
  l_XML: IXMLDocument;
  i, l_Count: Integer;
  l_Node, l_C: IXMLNode;
+ l_Loc: TdcLocation;
 begin
  l_XML:= TXMLDocument.Create(nil);
  try
@@ -774,7 +813,7 @@ procedure TdcScript.SaveToStream(aStream: TStream);
 var
  l_XML: IXMLDocument;
  i: Integer;
- l_Node: IXMLNode;
+ l_Node, l_SubNode: IXMLNode;
 begin
  l_XML:= TXMLDocument.Create(nil);
  try
@@ -895,16 +934,6 @@ constructor TdcVariableAction.Create(aModel: TdcScript);
 begin
  inherited;
  ActionType:= atVariable;
-end;
-
-procedure TdcVariableAction.Assign(Source: TPersistent);
-begin
- inherited;
- if Source is TdcVariableAction then
- begin
-  f_Variable:= TdcVariableAction(Source).Variable;
-  f_Value:= TdcVariableAction(Source).Value;
- end;
 end;
 
 procedure TdcVariableAction.Load(Element: IXMLNode);
