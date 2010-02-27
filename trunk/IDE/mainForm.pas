@@ -251,7 +251,7 @@ implementation
 
 uses
  guiLocEditDlg, guiScriptDetailsDlg,
- StrUtils, ShellAPI, Math{, guiLocEditDlgEx};
+ StrUtils, ShellAPI, Math{, guiLocEditDlgEx}, guiVariableEditDlg, guiVariablesListDlg;
 
 
 
@@ -1843,7 +1843,7 @@ end;
 
 procedure TQuestEditorForm.ScriptVariablesExecute(Sender: TObject);
 begin
- // Редактирование списка переменныхope
+ EditVariablesList(f_Model);
 end;
 
 procedure TQuestEditorForm.UpdateCaption;

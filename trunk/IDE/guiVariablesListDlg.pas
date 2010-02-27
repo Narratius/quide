@@ -11,9 +11,12 @@ type
     CancelBtn: TButton;
     Bevel1: TBevel;
     ListVariables: TListBox;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
+    AddButton: TButton;
+    EditButton: TButton;
+    DelButton: TButton;
+    procedure AddButtonClick(Sender: TObject);
+    procedure DelButtonClick(Sender: TObject);
+    procedure EditButtonClick(Sender: TObject);
   private
     f_Script: TdcScript;
     procedure pm_SetScript(const Value: TdcScript);
@@ -34,7 +37,28 @@ implementation
 
 procedure EditVariablesList(aScript: TdcScript);
 begin
-  // TODO -cMM: EditVariablesList default body inserted
+ with TVariablesListDlg.Create(nil) do
+ try
+  Script:= aScript;
+  ShowModal;
+ finally
+  Free;
+ end;
+end;
+
+procedure TVariablesListDlg.AddButtonClick(Sender: TObject);
+begin
+ //
+end;
+
+procedure TVariablesListDlg.DelButtonClick(Sender: TObject);
+begin
+ //
+end;
+
+procedure TVariablesListDlg.EditButtonClick(Sender: TObject);
+begin
+ //
 end;
 
 procedure TVariablesListDlg.pm_SetScript(const Value: TdcScript);
