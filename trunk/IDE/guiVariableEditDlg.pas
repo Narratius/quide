@@ -25,26 +25,42 @@ type
     procedure MakeNumericInput;
     procedure MakeTextInput;
     { Private declarations }
+    function pm_GetValue: String;
+    procedure pm_SetValue(const aValue: String);
   public
-    function GetValue: string;
+    property VarValue: string
+     read pm_GetValue
+     write pm_SetValue;
     { Public declarations }
   end;
 
-function VariableEditDialog(aScript: TdcScript): Boolean;
+function VariableEditDialog(aScript: TdcScript; aIndex: Integer = -1): Boolean;
 
 var
   VariableEditDlg: TVariableEditDlg;
 
-  
+
 
 implementation
 
 {$R *.dfm}
 
-function VariableEditDialog(aScript: TdcScript): Boolean;
+function VariableEditDialog(aScript: TdcScript; aIndex: Integer = -1): Boolean;
 begin
  with TVariableEditDlg.Create(nil) do
  begin
+   if aIndex = -1 then
+   begin
+     editCaption.Text:= '';
+     ComboType.ItemIndex:= -1;
+   end
+   else
+   begin
+     editCaption.Text:= aScript.Variables[aIndex].Caption;
+     ComboType.ItemIndex:= Ord(aScript.Variables[aIndex].VarType);
+     ComboTypeChange(ComboType);
+     VarValue:= aScript.Variables[aIndex].Value;
+   end;
   Result:= IsPositiveResult(ShowModal);
   if Result then
   begin
@@ -56,7 +72,7 @@ begin
      2: VarType:= vtBoolean;
      3: VarType:= vtEnum;
     end;
-    Value:= GetValue;
+    Value:= VarValue;
    end;
   end;
  end
@@ -76,20 +92,11 @@ begin
  f_ValueControl.Left:= 80;
  f_ValueControl.Width:= 225;
  f_ValueControl.Top:= 80;
-
 end;
 
 procedure TVariableEditDlg.EditCaptionChange(Sender: TObject);
 begin
  Caption:= editCaption.Text;
-end;
-
-function TVariableEditDlg.GetValue: string;
-begin
- if ComboType.ItemIndex in [0,1] then
-  Result := TEdit(f_ValueControl).Text
- else
-  Result := TComboBox(f_ValueControl).Items[TComboBox(f_ValueControl).ItemIndex];
 end;
 
 procedure TVariableEditDlg.MakeEnumInput;
@@ -126,6 +133,19 @@ begin
  f_ValueControl:= TEdit.Create(nil);
  InsertControl(f_ValueControl);
  TEdit(f_ValueControl).Text:= '';
+end;
+
+function TVariableEditDlg.pm_GetValue: String;
+begin
+ if ComboType.ItemIndex in [0,1] then
+  Result := TEdit(f_ValueControl).Text
+ else
+  Result := TComboBox(f_ValueControl).Items[TComboBox(f_ValueControl).ItemIndex];
+end;
+
+procedure TVariableEditDlg.pm_SetValue(const aValue: String);
+begin
+//
 end;
 
 end.

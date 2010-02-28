@@ -14,9 +14,9 @@ type
     AddButton: TButton;
     EditButton: TButton;
     DelButton: TButton;
-    procedure AddButtonClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure EditButtonClick(Sender: TObject);
+    procedure AddButtonClick(Sender: TObject);
   private
     f_Script: TdcScript;
     procedure pm_SetScript(const Value: TdcScript);
@@ -33,6 +33,9 @@ var
 
 implementation
 
+Uses
+ guiVAriableEditDlg;
+
 {$R *.dfm}
 
 procedure EditVariablesList(aScript: TdcScript);
@@ -48,7 +51,8 @@ end;
 
 procedure TVariablesListDlg.AddButtonClick(Sender: TObject);
 begin
- //
+ if VariableEditDialog(Script) then
+  ListVariables.Items.Add(Script.Variables[Script.VariablesCount-1].Caption);
 end;
 
 procedure TVariablesListDlg.DelButtonClick(Sender: TObject);
@@ -62,8 +66,13 @@ begin
 end;
 
 procedure TVariablesListDlg.pm_SetScript(const Value: TdcScript);
+var
+ i: Integer;
 begin
-  // TODO -cMM: TVariablesListDlg.pm_SetScript default body inserted
+ f_Script:= Value;
+ ListVariables.Items.Clear;
+ for I := 0 to Script.VariablesCount - 1 do
+  ListVariables.Items.Add(Script.Variables[i].Caption);
 end;
 
 end.
