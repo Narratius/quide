@@ -28,13 +28,16 @@ begin
   try
    ZipFileName:= aFileName;
    // На самом деле, aFilename - Это архив, в котором два потока - объекты и их описание
-   strings := TStringList.Create;
-   try
-    strings.LoadFromStream(ExtractFileToStream(ObjectsPart));
-    DrawObjects1.LoadDrawObjectsFromStrings(strings, theOwner, theParent, PostLoadProc);
-   finally
-    strings.Free;
-   end;
+   if DirEntry[IndexOf(ObjectsPart)]^.UncompressedSize > 0 then
+   begin
+    strings := TStringList.Create;
+    try
+     strings.LoadFromStream(ExtractFileToStream(ObjectsPart));
+     DrawObjects1.LoadDrawObjectsFromStrings(strings, theOwner, theParent, PostLoadProc);
+    finally
+     strings.Free;
+    end;
+   end; 
    theModel.LoadFromStream(ExtractFileToStream(ModelPart));
   finally
    Dll_Load:= False;
