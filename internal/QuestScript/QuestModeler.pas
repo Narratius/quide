@@ -78,12 +78,14 @@ Type
  TdcAction = class(TqmBase)
  private
   f_ActionType: TdcActionType;
+  function pm_GetTagName: String;
  public
   constructor Create(aModel: TdcScript); override;
   procedure Load(Element: IXMLNode); override;
   class function Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
   procedure Save(Element: IXMLNode); override;
   property ActionType: TdcActionType read f_ActionType write f_ActionType;
+  property TagName: String read pm_GetTagName;
  end;
 
  TdcActionClass = class of TdcAction;
@@ -203,7 +205,7 @@ Type
   property Version: string read f_Version write f_Version;
  end;
 
- TqmObject = class(TqmBase)
+ TdcInventoryItem = class(TqmBase)
  end;
 
  TdcVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
@@ -212,6 +214,7 @@ Type
   f_Enum: TStrings;
   f_Value: string;
   f_VarType: TdcVariableType;
+  function pm_GetTagName: String;
   procedure pm_SetEnum(const Value: TStrings);
  public
   constructor Create(aModel: TdcScript); override;
@@ -219,6 +222,7 @@ Type
   procedure Load(Element: IXMLNode); override;
   procedure Save(Element: IXMLNode); override;
   property Enum: TStrings read f_Enum write pm_SetEnum;
+  property TagName: String read pm_GetTagName;
   property Value: string read f_Value write f_Value;
   property VarType: TdcVariableType read f_VarType write f_VarType;
  end;
@@ -541,7 +545,7 @@ begin
  begin
   for i:= 0 to Pred(ActionsCount) do
    if Actions[i].ActionType <> atButton then
-    Actions[i].Save(AddChild('Action'));
+    Actions[i].Save(AddChild(Actions[i].TagName));
  end; // with Element.AddChild('Actions')
  with Element.AddChild('Buttons') do
  begin
@@ -707,8 +711,11 @@ begin
    if l_Node <> nil then
    begin
     // Прочитать переменные
-    //for i:= 0 to Pred(l_Node.ChildNodes.Count) do
-    // NewVariable();
+    for i:= 0 to Pred(l_Node.ChildNodes.Count) do
+    begin
+     l_C:= l_Node.ChildNodes.Get(i);
+     NewVariable('').Load(l_C);
+    end;
    end;
    // Локации
    l_Node:= ChildNodes.FindNode('Locations');
@@ -727,7 +734,12 @@ begin
    if l_Node <> nil then
    begin
     // Прочитать элементы инвентаря
-   end; 
+    for i:= 0 to Pred(l_Node.ChildNodes.Count) do
+    begin
+     l_C:= l_Node.ChildNodes.Get(i);
+     //New('').Load(l_C);
+    end;
+   end;
   end;
  finally
   l_XML:= nil;
@@ -833,7 +845,7 @@ begin
    l_Node:= AddChild('Variables');
    if VariablesCount > 0 then
     for i:= 0 to Pred(VariablesCount) do
-     Variables[i].Save(l_Node.AddChild('Variable'));
+     Variables[i].Save(l_Node.AddChild(Variables[i].TagName));
    // Локации
    l_Node:= AddChild('Locations');
    l_Node.SetAttribute('Start', StartLocation);
@@ -893,19 +905,13 @@ var
  l_Type: string;
 begin
   inherited;
-  if Element.HasAttribute('Type') then
-  begin
-   l_Type:= Element.Attributes['Type'];
-   ActionType:= StringToActionType(l_Type);
-  end;
+  ActionType:= StringToActionType(Element.NodeName);
 end;
 
 class function TdcAction.Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
 begin
  Result:= nil;
- if aElement.HasAttribute('Type') then
- begin
-  case StringToActionType(aElement.Attributes['Type']) of
+  case StringToActionType(aElement.NodeName) of
     atGoto: Result:= TdcGotoAction.Create(aModel);
     atInventory: Result:= TdcInventoryAction.Create(aModel);
     atLogic: Result:= TdcLogicAction.Create(aModel);
@@ -915,13 +921,16 @@ begin
   end;
   if Result <> nil then
    Result.Load(aElement);
- end; // aElement.HasAttribute('Type')
+end;
+
+function TdcAction.pm_GetTagName: String;
+begin
+ Result := ActionTypeToStr(ActionType);
 end;
 
 procedure TdcAction.Save(Element: IXMLNode);
 begin
  inherited;
- Element.SetAttribute('Type', ActionTypeToStr(f_ActionType));
 end;
 
 constructor TdcLogicAction.Create(aModel: TdcScript);
@@ -982,14 +991,18 @@ begin
  inherited;
  if Element.HasAttribute('Value') then
   Value:= Element.GetAttribute('Value');
- if Element.HasAttribute('Type') then
-  VarType:= String2VarType(element.GetAttribute('Type'));
+ VarType:= String2VarType(element.NodeName);
  if VarType = vtEnum then
  begin
   f_Enum.Clear;
   for i:= 0 to Pred(Element.ChildNodes.FindNode('Enum').ChildNodes.Count) do
    f_Enum.Add(Element.ChildNodes.FindNode('Enum').ChildValues[i]);
  end;
+end;
+
+function TdcVariable.pm_GetTagName: String;
+begin
+ Result := varType2String(VarType);
 end;
 
 procedure TdcVariable.pm_SetEnum(const Value: TStrings);
@@ -1003,10 +1016,10 @@ var
 begin
  inherited;
  Element.SetAttribute('Value', Value);
- Element.AddChild('Type').Text:= varType2String(VarType);
  if VarType = vtEnum then
  begin
   with Element.AddChild('Enum') do
+   for i:= 0 to (f_Enum.Count-1) do
    AddChild('Value').Text:= f_Enum[i];
  end;
 end;
