@@ -94,5 +94,6 @@ object VariableEditDlg: TVariableEditDlg
     Caption = #1054#1087#1088#1077#1076#1077#1083#1080#1090#1100
     TabOrder = 4
     Visible = False
+    OnClick = butDefineEnumClick
   end
 end

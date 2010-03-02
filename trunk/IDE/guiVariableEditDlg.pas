@@ -16,6 +16,7 @@ type
     ComboType: TComboBox;
     butDefineEnum: TButton;
     Label3: TLabel;
+    procedure butDefineEnumClick(Sender: TObject);
     procedure ComboTypeChange(Sender: TObject);
     procedure EditCaptionChange(Sender: TObject);
   private
@@ -46,6 +47,8 @@ implementation
 {$R *.dfm}
 
 function VariableEditDialog(aScript: TdcScript; aIndex: Integer = -1): Boolean;
+var
+ l_Var: TdcVariable;
 begin
  with TVariableEditDlg.Create(nil) do
  begin
@@ -56,16 +59,20 @@ begin
    end
    else
    begin
-     editCaption.Text:= aScript.Variables[aIndex].Caption;
-     ComboType.ItemIndex:= Ord(aScript.Variables[aIndex].VarType);
+    l_Var:= aScript.Variables[aIndex];
+     editCaption.Text:= l_Var.Caption;
+     ComboType.ItemIndex:= Ord(l_Var.VarType);
      ComboTypeChange(ComboType);
-     VarValue:= aScript.Variables[aIndex].Value;
+     VarValue:= l_Var.Value;
    end;
   Result:= IsPositiveResult(ShowModal);
   if Result then
   begin
-   with aScript.NewVariable(EditCaption.Text) do
+   if aIndex = -1 then
+    l_Var:= aScript.NewVariable(EditCaption.Text);
+   with l_Var do
    begin
+    Caption:= EditCaption.Text;
     case ComboType.ItemIndex of
      0: VarType:= vtNumeric;
      1: VarType:= vtText;
@@ -78,10 +85,16 @@ begin
  end
 end;
 
+procedure TVariableEditDlg.butDefineEnumClick(Sender: TObject);
+begin
+ // Задать значения перечислимого типа
+end;
+
 procedure TVariableEditDlg.ComboTypeChange(Sender: TObject);
 begin
  // Удалить элемент редактирования
  f_ValueControl.Free;
+ butDefineEnum.Visible:= False;
  // Создать элемент редактирования
  case comboType.ItemIndex of
   0: MakeNumericInput; // Числовой
@@ -107,6 +120,7 @@ begin
  begin
   Style:= csDropDownList;
  end;
+ butDefineEnum.Visible:= true;
 end;
 
 procedure TVariableEditDlg.MakeLogicInput;
@@ -145,7 +159,10 @@ end;
 
 procedure TVariableEditDlg.pm_SetValue(const aValue: String);
 begin
-//
+ if ComboType.ItemIndex in [0,1] then
+  TEdit(f_ValueControl).Text:= aValue
+ else
+  TComboBox(f_ValueControl).ItemIndex:= TComboBox(f_ValueControl).Items.Indexof(aValue);
 end;
 
 end.
