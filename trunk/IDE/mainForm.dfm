@@ -280,14 +280,14 @@ object QuestEditorForm: TQuestEditorForm
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = 'qmf'
-    Filter = #1043#1088#1072#1092#1080#1095#1077#1089#1082#1072#1103' '#1084#1086#1076#1077#1083#1100' '#1080#1075#1088#1099' (*.qmf)|*.qmf'
+    Filter = #1043#1088#1072#1092#1080#1095#1077#1089#1082#1080#1081' '#1089#1094#1077#1085#1072#1088#1080#1081' '#1080#1075#1088#1099' (*.qmf)|*.qmf'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 32
     Top = 128
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'qmf'
-    Filter = #1043#1088#1072#1092#1080#1095#1077#1089#1082#1072#1103' '#1084#1086#1076#1077#1083#1100' '#1080#1075#1088#1099' (*.qmf)|*.qmf'
+    Filter = #1043#1088#1072#1092#1080#1095#1077#1089#1082#1080#1081' '#1089#1094#1077#1085#1072#1088#1080#1081' '#1080#1075#1088#1099' (*.qmf)|*.qmf'
     Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
     Left = 152
     Top = 112
