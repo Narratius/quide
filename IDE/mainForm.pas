@@ -195,7 +195,7 @@ type
     fCustomColors: TStringList;
     DragList: TList;
     f_Generators: TGeneratorCollection;
-    f_Model: TdoModel;
+    f_Script: TdoModel;
     startDragPt: TPoint;
     procedure DrawFocusRec(Rec: TRect);
     procedure ClearAllDrawObjFocuses;
@@ -343,7 +343,7 @@ begin
   SaveIniSettings;
   tmpLine.Free;
   tmpSolid.Free;
-  f_Model.Free;
+  f_Script.Free;
 end;
 
 //------------------------------------------------------------------------------
@@ -1291,7 +1291,7 @@ begin
  //first clear existing objects ...
  New1Click(nil);
  //now load new objects from file ...
- LoadModel(FileName, Self, ModelBox, DrawObjLoaded, f_Model);
+ LoadModel(FileName, Self, ModelBox, DrawObjLoaded, f_Script);
  ClearAllDrawObjFocuses;
  SaveDialog1.FileName := FileName;
  OpenDialog1.FileName := FileName;
@@ -1312,7 +1312,7 @@ end;
 
 procedure TQuestEditorForm.SaveObjects(const Filename: string);
 begin
- SaveModel(FileName, ModelBox, f_Model);
+ SaveModel(FileName, ModelBox, f_Script);
  Changed:= False;
  OpenDialog1.FileName := FileName;
 end;
@@ -1432,13 +1432,13 @@ var
 begin
  // Ќужно:
  //  - пробежатьс€ по всем локаци€м модели и создать недостающие
- for i:= 0 to Pred(f_Model.LocationsCount) do
-  if isOrphant(f_Model.Locations[i]) then
-   CreateLocation.Data:= f_Model.Locations[i];
+ for i:= 0 to Pred(f_Script.LocationsCount) do
+  if isOrphant(f_Script.Locations[i]) then
+   CreateLocation.Data:= f_Script.Locations[i];
  //  - пробежатьс€ по всем действи€м всех локаций и сделать соединени€
- for i:= 0 to Pred(f_Model.LocationsCount) do
+ for i:= 0 to Pred(f_Script.LocationsCount) do
  begin
-  l_LocFrom:= f_Model.Locations[i];
+  l_LocFrom:= f_Script.Locations[i];
   for j:= 0 to Pred(l_LocFrom.ActionsCount) do
   begin
    if l_LocFrom.Actions[j] is TdcGotoAction then
@@ -1699,7 +1699,7 @@ var
  l_Result: Integer;
  l_Msg: String;
 begin
- if f_Model.IsValid then
+ if f_Script.IsValid then
  begin
   l_Gen:= TGeneratorInfo(f_Generators.Items[(Sender as TMenuItem).Tag]);
   ActSaveClick(Sender);
@@ -1710,7 +1710,7 @@ begin
    l_FileName:= ChangeFileExt(SaveDialog1.FileName, '.temp');
    l_Stream:= TFileStream.Create(l_FileName, fmCreate);
    try
-    f_Model.SaveToStream(l_Stream);
+    f_Script.SaveToStream(l_Stream);
    finally
     l_Stream.Free;
    end;
@@ -1745,12 +1745,12 @@ begin
  end
  else
   MessageDlg('—ценарий не готов дл€ генерации игры. ѕроверьте услови€:'#10+
-             f_Model.NotValidConditions , mtError, [mbCancel], 0)
+             f_Script.NotValidConditions , mtError, [mbCancel], 0)
 end;
 
 function TQuestEditorForm.GetNewLocPosition: TPoint;
 begin
- f_Model.GetFreePosition(Result.X, Result.Y);
+ f_Script.GetFreePosition(Result.X, Result.Y);
 end;
 
 procedure TQuestEditorForm.HelpAboutExecute(Sender: TObject);
@@ -1770,10 +1770,10 @@ begin
  with ModelBox do
    for i := controlCount -1 downto 0 do
      if Controls[i] is TDrawObject then Controls[i].free;
- Freeandnil(f_Model);
- f_Model:= TdoModel.Create(nil);
+ Freeandnil(f_Script);
+ f_Script:= TdoModel.Create(nil);
  Changed:= False;
- caption := f_Model.Caption + ' - ' + Application.title;
+ caption := f_Script.Caption + ' - ' + Application.title;
  SaveDialog1.FileName := '';
 end;
 
@@ -1782,7 +1782,7 @@ begin
  if Sender is TdoLocation then
  // EditLocationEx(TdoLocation(Sender).Data)
 
-  if EditLocation(TdoLocation(Sender).Data, f_Model) then
+  if EditLocation(TdoLocation(Sender).Data, f_Script) then
   begin
    Changed:= True;
    TdoLOcation(Sender).Strings.Text:= TdoLocation(Sender).Data.Caption;
@@ -1795,7 +1795,7 @@ end;
 
 function TQuestEditorForm.pm_GetChanged: Boolean;
 begin
-  Result := f_Model.Changed;
+  Result := f_Script.Changed;
 end;
 
 procedure TQuestEditorForm.Properties1Click(Sender: TObject);
@@ -1809,7 +1809,7 @@ var
  l_Loc: TdoLocation;
 begin
  l_Loc:= CreateLocation;
- l_Loc.Data:= f_Model.NewLocation('');
+ l_Loc.Data:= f_Script.NewLocation('');
  LocationEdit(l_Loc);
 end;
 
@@ -1820,7 +1820,7 @@ begin
  with ModelBox do
   for i := 0 to Pred(ControlCount) do
    if (Controls[i] is TdoLocation) then
-    TdoLocation(Controls[i]).Data:= f_Model.FindLocation(TdoLocation(Controls[i]).Strings.Text);
+    TdoLocation(Controls[i]).Data:= f_Script.FindLocation(TdoLocation(Controls[i]).Strings.Text);
 end;
 
 //------------------------------------------------------------------------------
@@ -1828,7 +1828,7 @@ end;
 procedure TQuestEditorForm.ScriptDescriptionExecute(Sender: TObject);
 begin
  // ¬вод и редактирование описание квеста
- if EditScriptDetails(f_Model) then
+ if EditScriptDetails(f_Script) then
  begin
   UpdateCaption;
   Changed:= True;
@@ -1837,19 +1837,19 @@ end;
 
 procedure TQuestEditorForm.pm_SetChanged(const Value: Boolean);
 begin
- f_Model.Changed := Value;
+ f_Script.Changed := Value;
  StatusBar1.Panels[1].Text:= IfThen(Value, '*', '');
 end;
 
 procedure TQuestEditorForm.ScriptVariablesExecute(Sender: TObject);
 begin
- EditVariablesList(f_Model);
+ Changed:= EditVariablesList(f_Script);
 end;
 
 procedure TQuestEditorForm.UpdateCaption;
 begin
- if f_Model.Caption <> '' then
-  caption := f_Model.Caption + ' - ' + Application.title
+ if f_Script.Caption <> '' then
+  caption := f_Script.Caption + ' - ' + Application.title
  else
   caption := ExtractFileName(SaveDialog1.FileName) + ' - ' + Application.title;
 end;
