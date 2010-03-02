@@ -19,8 +19,11 @@ type
     procedure butDefineEnumClick(Sender: TObject);
     procedure ComboTypeChange(Sender: TObject);
     procedure EditCaptionChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     f_ValueControl: TWinControl;
+    f_EnumList: TStrings;
     procedure MakeEnumInput;
     procedure MakeLogicInput;
     procedure MakeNumericInput;
@@ -32,6 +35,9 @@ type
     property VarValue: string
      read pm_GetValue
      write pm_SetValue;
+    property EnumList: TStrings
+     read f_EnumList
+     write f_EnumList;
     { Public declarations }
   end;
 
@@ -45,6 +51,9 @@ var
 implementation
 
 {$R *.dfm}
+
+Uses
+ guiEnumEditDlg;
 
 function VariableEditDialog(aScript: TdcScript; aIndex: Integer = -1): Boolean;
 var
@@ -80,14 +89,16 @@ begin
      3: VarType:= vtEnum;
     end;
     Value:= VarValue;
-   end;
+    Enum.Assign(EnumList);
+   end; // with l_Var
   end;
  end
 end;
 
 procedure TVariableEditDlg.butDefineEnumClick(Sender: TObject);
 begin
- // Задать значения перечислимого типа
+ if EditEnum(f_EnumList) then
+  TComboBox(f_ValueControl).Items:= f_EnumList;
 end;
 
 procedure TVariableEditDlg.ComboTypeChange(Sender: TObject);
@@ -112,6 +123,16 @@ begin
  Caption:= editCaption.Text;
 end;
 
+procedure TVariableEditDlg.FormCreate(Sender: TObject);
+begin
+ f_EnumList:= TStringList.Create;
+end;
+
+procedure TVariableEditDlg.FormDestroy(Sender: TObject);
+begin
+ f_EnumList.Free
+end;
+
 procedure TVariableEditDlg.MakeEnumInput;
 begin
  f_ValueControl:= TComboBox.Create(nil);
@@ -119,6 +140,7 @@ begin
  with TComboBox(f_ValueControl) do
  begin
   Style:= csDropDownList;
+  Items:= f_EnumList;
  end;
  butDefineEnum.Visible:= true;
 end;

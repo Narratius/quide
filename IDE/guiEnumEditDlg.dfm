@@ -1,4 +1,4 @@
-object OKRightDlg: TOKRightDlg
+object EnumEditDlg: TEnumEditDlg
   Left = 227
   Top = 108
   BorderStyle = bsDialog
