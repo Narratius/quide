@@ -13,6 +13,8 @@ object VariableEditDlg: TVariableEditDlg
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 17
   object Bevel1: TBevel
