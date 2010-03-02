@@ -12,7 +12,8 @@ uses
   guiVariableEditDlg in 'guiVariableEditDlg.pas' {VariableEditDlg},
   guiVariablesListDlg in 'guiVariablesListDlg.pas' {VariablesListDlg},
   guiLocEditDlgEx in 'guiLocEditDlgEx.pas' {LocationEditExDlg},
-  guiLocationFrame in 'guiLocationFrame.pas' {Frame1: TFrame};
+  guiLocationFrame in 'guiLocationFrame.pas' {Frame1: TFrame},
+  guiEnumEditDlg in 'guiEnumEditDlg.pas' {OKRightDlg};
 
 {$R *.res}
 
@@ -20,5 +21,6 @@ begin
   Application.Initialize;
   Application.Title := 'Quide 2010';
   Application.CreateForm(TQuestEditorForm, QuestEditorForm);
+  Application.CreateForm(TOKRightDlg, OKRightDlg);
   Application.Run;
 end.

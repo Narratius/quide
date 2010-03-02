@@ -1,10 +1,10 @@
-object VariablesListDlg: TVariablesListDlg
-  Left = 417
-  Top = 271
+object OKRightDlg: TOKRightDlg
+  Left = 227
+  Top = 108
   BorderStyle = bsDialog
-  Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1099#1077
-  ClientHeight = 252
-  ClientWidth = 465
+  Caption = 'Dialog'
+  ClientHeight = 272
+  ClientWidth = 471
   Color = clBtnFace
   ParentFont = True
   OldCreateOrder = True
@@ -14,12 +14,12 @@ object VariablesListDlg: TVariablesListDlg
   object Bevel1: TBevel
     Left = 8
     Top = 8
-    Width = 361
-    Height = 241
+    Width = 369
+    Height = 257
     Shape = bsFrame
   end
   object OKBtn: TButton
-    Left = 380
+    Left = 388
     Top = 8
     Width = 75
     Height = 25
@@ -29,7 +29,7 @@ object VariablesListDlg: TVariablesListDlg
     TabOrder = 0
   end
   object CancelBtn: TButton
-    Left = 380
+    Left = 388
     Top = 38
     Width = 75
     Height = 25
@@ -38,14 +38,14 @@ object VariablesListDlg: TVariablesListDlg
     ModalResult = 2
     TabOrder = 1
   end
-  object ListVariables: TListBox
+  object ListBox1: TListBox
     Left = 16
     Top = 16
-    Width = 265
-    Height = 225
+    Width = 257
+    Height = 241
     ItemHeight = 13
     TabOrder = 2
-    OnDblClick = ListVariablesDblClick
+    OnDblClick = ListBox1DblClick
   end
   object AddButton: TButton
     Left = 288
