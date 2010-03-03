@@ -30,14 +30,13 @@ type
     procedure MakeTextInput;
     { Private declarations }
     function pm_GetValue: String;
+    procedure pm_SetEnumList(const Value: TStrings);
     procedure pm_SetValue(const aValue: String);
   public
     property VarValue: string
      read pm_GetValue
      write pm_SetValue;
-    property EnumList: TStrings
-     read f_EnumList
-     write f_EnumList;
+    property EnumList: TStrings read f_EnumList write pm_SetEnumList;
     { Public declarations }
   end;
 
@@ -70,6 +69,7 @@ begin
    begin
     l_Var:= aScript.Variables[aIndex];
      editCaption.Text:= l_Var.Caption;
+     EnumList:= l_Var.Enum;
      ComboType.ItemIndex:= Ord(l_Var.VarType);
      ComboTypeChange(ComboType);
      VarValue:= l_Var.Value;
@@ -86,10 +86,13 @@ begin
      0: VarType:= vtNumeric;
      1: VarType:= vtText;
      2: VarType:= vtBoolean;
-     3: VarType:= vtEnum;
+     3:
+      begin
+       VarType:= vtEnum;
+       Enum.Assign(EnumList);
+      end;
     end;
     Value:= VarValue;
-    Enum.Assign(EnumList);
    end; // with l_Var
   end;
  end
@@ -177,6 +180,11 @@ begin
   Result := TEdit(f_ValueControl).Text
  else
   Result := TComboBox(f_ValueControl).Items[TComboBox(f_ValueControl).ItemIndex];
+end;
+
+procedure TVariableEditDlg.pm_SetEnumList(const Value: TStrings);
+begin
+ f_EnumList.Assign(Value);
 end;
 
 procedure TVariableEditDlg.pm_SetValue(const aValue: String);

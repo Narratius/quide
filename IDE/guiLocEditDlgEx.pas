@@ -4,10 +4,26 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, QuestModeler, ActnList, Menus, ExtCtrls;
+  Dialogs, QuestModeler, ActnList, Menus, ExtCtrls, StdCtrls;
 
 type
   TLocationEditExDlg = class(TForm)
+    EditPlace: TScrollBox;
+    OKButton: TButton;
+    CancelButton: TButton;
+    ActionList1: TActionList;
+    PopupMenu1: TPopupMenu;
+    TextAction: TAction;
+    ButtonAction: TAction;
+    VarAction: TAction;
+    LogicAction: TAction;
+    GotoAction: TAction;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
     procedure AddTextExecute(Sender: TObject);
   private
     f_Location: TdcLocation;
@@ -76,20 +92,21 @@ begin
    begin
     l_Frame:= TVarActionFrame.Create(nil);
     if TdcVariableAction(anAction).Variable <> nil then
+    begin
      TVarActionFrame(l_Frame).Variable:= TdcVariableAction(anAction).Variable;
-    TVarActionFrame(l_Frame).Value:= TdcVariableAction(anAction).Value;
+     TVarActionFrame(l_Frame).Value:= TdcVariableAction(anAction).Value;
+    end; // TdcVariableAction(anAction).Variable <> nil
     TVarActionFrame(l_Frame).Script:= Location.Model;
    end;
  end; // case
- (*
- l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
- if EditPanel.ControlCount > 0 then
-  l_Frame.Top:= EditPanel.Controls[Pred(EditPanel.ControlCount)].Top + EditPanel.Controls[Pred(EditPanel.ControlCount)].Height
+
+ l_Frame.Name:= 'Frame'+IntToStr(EditPlace.ControlCount);
+ if EditPlace.ControlCount > 0 then
+  l_Frame.Top:= EditPlace.Controls[Pred(EditPlace.ControlCount)].Top + EditPlace.Controls[Pred(EditPlace.ControlCount)].Height
  else
   l_Frame.Top:= 1;
- l_Frame.Width:= EditPanel.ClientWidth;
- l_Frame.Parent:= EditPanel;
- *)
+ l_Frame.Width:= EditPlace.ClientWidth;
+ l_Frame.Parent:= EditPlace;
 end;
 
 procedure TLocationEditExDlg.CreateButton(anButton: TdcButtonAction);
@@ -99,14 +116,13 @@ end;
 
 function TLocationEditExDlg.pm_GetLocation: TdcLocation;
 begin
-  // TODO -cMM: TLocationEditExDlg.pm_GetLocation default body inserted
+  // TODO перебрать элементы и обновить значения действий
   Result := f_Location;
 end;
 
 procedure TLocationEditExDlg.pm_SetLocation(const Value: TdcLocation);
 begin
  f_Location := Value.Clone(Value.Model);
- //editCaption.Text:=
  Caption:= IfThen(f_Location.Caption = '', 'Новая локация', f_Location.Caption);
  RefreshList();
 end;
@@ -116,23 +132,21 @@ var
   I: Integer;
   l_C: TControl;
 begin
- (*
- while EditPanel.ControlCount > 0 do
+
+ while EditPlace.ControlCount > 0 do
  begin
-  l_C:= EditPanel.Controls[0];
-  EditPanel.RemoveControl(l_C);
+  l_C:= EditPlace.Controls[0];
+  EditPlace.RemoveControl(l_C);
   FreeAndNil(l_C);
- end; // while EditPanel.ControlCount > 0
+ end; // while EditPlace.ControlCount > 0
  for I := 0 to Location.ActionsCount - 1 do
  begin
   if Location.Actions[i].ActionType = atButton then
-  begin
-   CreateButton(Location.Actions[i] as TdcButtonAction);
-  end
+   CreateButton(Location.Actions[i] as TdcButtonAction)
   else
    CreateAction(Location.Actions[i]);
  end;
- *)
+
 end;
 
 end.

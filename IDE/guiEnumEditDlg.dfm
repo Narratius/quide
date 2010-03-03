@@ -38,40 +38,13 @@ object EnumEditDlg: TEnumEditDlg
     ModalResult = 2
     TabOrder = 1
   end
-  object ListBox1: TListBox
+  object EnumItems: TMemo
     Left = 16
     Top = 16
-    Width = 257
+    Width = 353
     Height = 241
-    ItemHeight = 13
+    Lines.Strings = (
+      '')
     TabOrder = 2
-    OnDblClick = ListBox1DblClick
-  end
-  object AddButton: TButton
-    Left = 288
-    Top = 16
-    Width = 75
-    Height = 25
-    Caption = #1044#1086#1073#1072#1074#1080#1090#1100
-    TabOrder = 3
-    OnClick = AddButtonClick
-  end
-  object EditButton: TButton
-    Left = 288
-    Top = 48
-    Width = 75
-    Height = 25
-    Caption = #1048#1079#1084#1077#1085#1080#1090#1100
-    TabOrder = 4
-    OnClick = EditButtonClick
-  end
-  object DelButton: TButton
-    Left = 288
-    Top = 80
-    Width = 75
-    Height = 25
-    Caption = #1059#1076#1072#1083#1080#1090#1100
-    TabOrder = 5
-    OnClick = DelButtonClick
   end
 end

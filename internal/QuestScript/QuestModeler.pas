@@ -44,7 +44,6 @@ Type
   destructor Destroy; override;
   procedure AddAction(aAction: TdcAction);
   procedure Assign(Source: TPersistent); override;
-  function Edit: Boolean; virtual;
   procedure Load(Element: IXMLNode); override;
   class function Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
   procedure Save(Element: IXMLNode); override;
@@ -131,6 +130,7 @@ Type
   f_Variable: TdcVariable;
  public
   constructor Create(aModel: TdcScript); override;
+  procedure Assign(Source: TPersistent); override;
   procedure Load(Element: IXMLNode); override;
   procedure Save(Element: IXMLNode); override;
   property Value: String read f_Value write f_Value;
@@ -246,7 +246,7 @@ function VarType2String(aVarType: TdcVariableType): String;
 begin
  case aVarType of
   vtNumeric : Result:= 'Numeric';
-  vtText    : Result:= 'Text';
+  vtText    : Result:= 'String';
   vtBoolean : Result:= 'Boolean';
   vtEnum    : Result:= 'Enum';
  end;
@@ -373,12 +373,12 @@ function ActionTypeToStr(aType: TdcActionType): string;
 begin
  case aType of
   atNone : Result:= 'none';
-  atGoto : Result:= 'goto';
-  atInventory: Result:= 'inv';
-  atLogic: Result:= 'logic';
-  atText: Result:= 'text';
-  atVariable: Result:= 'var';
-  atButton: Result:= 'button';
+  atGoto : Result:= 'Goto';
+  atInventory: Result:= 'Inv';
+  atLogic: Result:= 'Logic';
+  atText: Result:= 'Text';
+  atVariable: Result:= 'Var';
+  atButton: Result:= 'Button';
  end;
 end;
 
@@ -423,12 +423,6 @@ begin
  Assert(aAction <> nil, 'Нельзя добавлять пустое действие');
  GenerateCaption(aAction);
  f_ActionList.Add(aAction);
-end;
-
-function TdcLocation.Edit: Boolean;
-begin
- Result := False;
- // TODO -cMM: TdcLocation.Edit необходимо написать реализацию
 end;
 
 procedure TdcLocation.GenerateCaption(aAction: TdcAction);
@@ -880,7 +874,7 @@ end;
 procedure TdcTextAction.Load(Element: IXMLNode);
 begin
   inherited;
-  f_Description.Text:= Element['Description'];
+  f_Description.Text:= Element.text;
 end;
 
 procedure TdcTextAction.pm_SetDescription(aValue: TStrings);
@@ -891,7 +885,7 @@ end;
 procedure TdcTextAction.Save(Element: IXMLNode);
 begin
  inherited;
- Element.AddChild('Description').Text:= f_Description.Text;
+ Element.Text:= f_Description.Text;
 end;
 
 constructor TdcAction.Create(aModel: TdcScript);
@@ -945,6 +939,16 @@ begin
  ActionType:= atVariable;
 end;
 
+procedure TdcVariableAction.Assign(Source: TPersistent);
+begin
+ inherited;
+ if Source is TdcVariableAction then
+ begin
+  Variable:= TdcVariableAction(Source).Variable;
+  Value:= TdcVariableAction(Source).Value;
+ end;
+end;
+
 procedure TdcVariableAction.Load(Element: IXMLNode);
 begin
  inherited;
@@ -995,8 +999,8 @@ begin
  if VarType = vtEnum then
  begin
   f_Enum.Clear;
-  for i:= 0 to Pred(Element.ChildNodes.FindNode('Enum').ChildNodes.Count) do
-   f_Enum.Add(Element.ChildNodes.FindNode('Enum').ChildValues[i]);
+  for i:= 0 to Pred(Element.ChildNodes.Count) do
+   f_Enum.Add(Element.ChildNodes.Get(i).Text);
  end;
 end;
 
@@ -1018,9 +1022,8 @@ begin
  Element.SetAttribute('Value', Value);
  if VarType = vtEnum then
  begin
-  with Element.AddChild('Enum') do
-   for i:= 0 to (f_Enum.Count-1) do
-   AddChild('Value').Text:= f_Enum[i];
+  for i:= 0 to (f_Enum.Count-1) do
+   Element.AddChild('Item').Text:= f_Enum[i];
  end;
 end;
 
