@@ -21,6 +21,5 @@ begin
   Application.Initialize;
   Application.Title := 'Quide 2010';
   Application.CreateForm(TQuestEditorForm, QuestEditorForm);
-  Application.CreateForm(TOKRightDlg, OKRightDlg);
   Application.Run;
 end.

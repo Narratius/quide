@@ -2,8 +2,8 @@ object VarActionFrame: TVarActionFrame
   Left = 0
   Top = 0
   Width = 392
-  Height = 64
-  Constraints.MinHeight = 64
+  Height = 70
+  Constraints.MinHeight = 70
   Constraints.MinWidth = 392
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

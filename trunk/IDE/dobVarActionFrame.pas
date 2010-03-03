@@ -17,16 +17,17 @@ type
   private
     f_Control: TWinControl;
     f_Script: TdcScript;
-    f_Value: string;
     f_Variable: TdcVariable;
+    procedure ChangeVariableControl;
     function pm_GetValue: string;
     procedure pm_SetScript(const Value: TdcScript);
+    procedure pm_SetValue(const Value: string);
     procedure pm_SetVariable(const Value: TdcVariable);
     procedure UpdateVariableList;
     { Private declarations }
   public
     property Script: TdcScript read f_Script write pm_SetScript;
-    property Value: string read pm_GetValue write f_Value;
+    property Value: string read pm_GetValue write pm_SetValue;
     property Variable: TdcVariable read f_Variable write pm_SetVariable;
     { Public declarations }
   end;
@@ -48,10 +49,8 @@ begin
  end;
 end;
 
-procedure TVarActionFrame.ComboVariablesChange(Sender: TObject);
+procedure TVarActionFrame.ChangeVariableControl;
 begin
- Variable:= Script.Variables[ComboVariables.ItemIndex];
- // ¬ зависимости от типа выбранной переменной устанавливаем элемент редактировани€
  f_Control.Free;
  case Variable.VarType of
   vtNumeric,
@@ -87,6 +86,12 @@ begin
  f_Control.Width:= ComboVariables.Width;
 end;
 
+procedure TVarActionFrame.ComboVariablesChange(Sender: TObject);
+begin
+ Variable:= Script.Variables[ComboVariables.ItemIndex];
+ ChangeVariableControl;
+end;
+
 function TVarActionFrame.pm_GetValue: string;
 begin
  if Variable <> nil then
@@ -112,18 +117,38 @@ begin
  UpdateVariableList;
 end;
 
+procedure TVarActionFrame.pm_SetValue(const Value: string);
+begin
+ if Variable <> nil then
+  case Variable.VarType of
+   vtNumeric,
+   vtText:
+    Begin
+     TEdit(f_Control).Text:= Value
+    end;
+   vtBoolean,
+   vtEnum:
+    begin
+      TComboBox(f_Control).ItemIndex:= TComboBox(f_Control).Items.IndexOf(Value);
+    end;
+  end
+end;
+
 procedure TVarActionFrame.pm_SetVariable(const Value: TdcVariable);
 begin
  f_Variable := Value;
+ ChangeVariableControl;
 end;
 
 procedure TVarActionFrame.UpdateVariableList;
 var
   i: Integer;
 begin
-  comboVariables.Items.Clear;
-  for i:= 0 to Pred(f_Script.VariablesCount) do
-   comboVariables.Items.Add(f_Script.Variables[i].Caption);
+ comboVariables.Items.Clear;
+ for i:= 0 to Pred(f_Script.VariablesCount) do
+  comboVariables.Items.Add(f_Script.Variables[i].Caption);
+ if Variable <> nil then
+  comboVariables.ItemIndex:= comboVariables.Items.IndexOf(Variable.Caption);
 end;
 
 end.
