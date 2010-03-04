@@ -16,10 +16,9 @@ object LocationEditExDlg: TLocationEditExDlg
   TextHeight = 13
   object EditPlace: TScrollBox
     Left = 0
-    Top = 0
+    Top = 128
     Width = 854
-    Height = 561
-    Align = alClient
+    Height = 433
     PopupMenu = PopupMenu1
     TabOrder = 0
     OnResize = EditPlaceResize
@@ -34,13 +33,6 @@ object LocationEditExDlg: TLocationEditExDlg
     DesignSize = (
       854
       41)
-    object Label1: TLabel
-      Left = 16
-      Top = 16
-      Width = 50
-      Height = 13
-      Caption = #1053#1072#1079#1074#1072#1085#1080#1077
-    end
     object OKButton: TButton
       Left = 686
       Top = 8
@@ -62,13 +54,32 @@ object LocationEditExDlg: TLocationEditExDlg
       ModalResult = 2
       TabOrder = 1
     end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 854
+    Height = 105
+    Align = alTop
+    Caption = 'Panel2'
+    TabOrder = 2
+    DesignSize = (
+      854
+      105)
+    object Label1: TLabel
+      Left = 16
+      Top = 16
+      Width = 50
+      Height = 13
+      Caption = #1053#1072#1079#1074#1072#1085#1080#1077
+    end
     object editCaption: TEdit
       Left = 96
       Top = 8
       Width = 532
       Height = 25
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 2
+      TabOrder = 0
     end
   end
   object ActionList1: TActionList

@@ -27,6 +27,7 @@ type
     Panel1: TPanel;
     OKButton: TButton;
     CancelButton: TButton;
+    Panel2: TPanel;
     Label1: TLabel;
     editCaption: TEdit;
     procedure FormDestroy(Sender: TObject);
