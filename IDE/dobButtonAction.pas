@@ -19,14 +19,14 @@ type
     procedure FrameResize(Sender: TObject);
   private
     { Public declarations }
-   f_Model: TdcScript;
+   f_Script: TdcScript;
     function pm_GetGotoLocation: String;
     procedure pm_SetGotoLocation(const Value: String);
-   procedure pm_SetModel(const Value: TdcScript);
+   procedure pm_SetScript(const Value: TdcScript);
     { Private declarations }
   public
     property GotoLocation: String read pm_GetGotoLocation write pm_SetGotoLocation;
-   property Model: TdcScript read f_Model write pm_SetModel;
+   property Script: TdcScript read f_Script write pm_SetScript;
   end;
 
 implementation
@@ -38,13 +38,13 @@ var
  l_S: String;
 begin
  // запросить имя локации
- l_S:= Model.GenerateCaption;
+ l_S:= Script.GenerateCaption;
  if InputQuery('Новая локация', 'Введите имя локации', l_S) then
  begin
   comboLocations.Items.Add(l_S);
   comboLocations.ItemIndex:= comboLocations.Items.IndexOf(l_S);
   // Создать новую локацию
-  f_Model.NewLocation(l_S);
+  f_Script.NewLocation(l_S);
  end;
 end;
 
@@ -66,10 +66,10 @@ begin
  comboLocations.ItemIndex:= comboLocations.Items.IndexOf(Value);
 end;
 
-procedure TButtonFrame.pm_SetModel(const Value: TdcScript);
+procedure TButtonFrame.pm_SetScript(const Value: TdcScript);
 begin
- f_Model := Value;
- f_Model.Locations2Strings(comboLocations.Items);
+ f_Script := Value;
+ f_Script.Locations2Strings(comboLocations.Items);
 end;
 
 end.

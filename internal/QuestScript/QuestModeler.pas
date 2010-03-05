@@ -13,7 +13,7 @@ Type
  private
   f_Caption: string;
   f_Changed: Boolean;
-  f_Model: TdcScript;
+  f_Script: TdcScript;
   procedure pm_SetChanged(const Value: Boolean);
  public
   constructor Create(aModel: TdcScript); virtual;
@@ -24,7 +24,7 @@ Type
   procedure Save(Element: IXMLNode); virtual;
   property Caption: string read f_Caption write f_Caption;
   property Changed: Boolean read f_Changed write pm_SetChanged;
-  property Model: TdcScript read f_Model write f_Model;
+  property Script: TdcScript read f_Script write f_Script;
  end;
 
  TdcAction = class;
@@ -271,7 +271,7 @@ procedure TqmBase.Assign(Source: TPersistent);
 begin
   if Source is TqmBase then
   begin
-   f_Model:= (Source as TqmBase).Model;
+   f_Script:= (Source as TqmBase).Script;
    f_Caption:= TqmBase(Source).Caption;
    f_Changed:= Tqmbase(Source).Changed;
   end
@@ -282,7 +282,7 @@ end;
 constructor TqmBase.Create(aModel: TdcScript);
 begin
  inherited Create;
- f_Model:= aModel;
+ f_Script:= aModel;
  f_Changed:= False;
  f_Caption:= '';
 end;
@@ -328,7 +328,8 @@ begin
  inherited;
  if Source is TdcLocation then
  begin
-  CloneActions((Source as TdcLocation).ActionList, f_ActionList, Model);
+  Hint:=  TdcLocation(Source).Hint;
+  CloneActions((Source as TdcLocation).ActionList, f_ActionList, Script);
  end;
 end;
 
@@ -467,13 +468,13 @@ begin
  for i:= 0 to l_Node.ChildNodes.Count - 1 do
  begin
   l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Model));
+  AddAction(TdcAction.Make(l_E, Script));
  end; // for i
  l_Node:= Element.ChildNodes.FindNode('Buttons');
  for i:= 0 to l_Node.ChildNodes.Count - 1 do
  begin
   l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Model));
+  AddAction(TdcAction.Make(l_E, Script));
  end; // for i
  if Element.HasAttribute('Hint') then
   Hint:= element.GetAttribute('Hint');
@@ -526,7 +527,7 @@ end;
 
 procedure TdcLocation.pm_SetActionList(aValue: TObjectList);
 begin
- CloneActions(aValue, f_ActionList, Model);
+ CloneActions(aValue, f_ActionList, Script);
 end;
 
 procedure TdcLocation.Save(Element: IXMLNode);
@@ -566,9 +567,9 @@ end;
 procedure TdcGotoAction.Load(Element: IXMLNode);
 begin
  inherited;
- Assert(Model <> nil);
+ Assert(Script <> nil);
  if Element.HasAttribute('Target') then
-  Location:= Model.CheckLocation(Element.Attributes['Target']);
+  Location:= Script.CheckLocation(Element.Attributes['Target']);
 end;
 
 procedure TdcGotoAction.Save(Element: IXMLNode);
@@ -753,8 +754,8 @@ begin
  Result:= CreateLocation;
  if Result <> nil then
  begin
-  if Result.Model = nil then
-   Result.Model:= Self;
+  if Result.Script = nil then
+   Result.Script:= Self;
   if aCaption = '' then
    Result.Caption:= GenerateCaption
   else
@@ -954,7 +955,7 @@ begin
  inherited;
  if Element.HasAttribute('Variable') then
  begin
-  Variable:= f_Model.CheckVariable(element.GetAttribute('Variable'));
+  Variable:= f_Script.CheckVariable(element.GetAttribute('Variable'));
   if (Variable <> nil) and Element.HasAttribute('Value') then
    Value:= Element.GetAttribute('Value');
  end;

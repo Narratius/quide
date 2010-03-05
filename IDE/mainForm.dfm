@@ -57,6 +57,8 @@ object QuestEditorForm: TQuestEditorForm
       Width = 731
       Height = 435
       Align = alClient
+      ParentShowHint = False
+      ShowHint = True
       Visible = False
       OnMouseDown = ModelBoxMouseDown
       OnMouseMove = ModelBoxMouseMove
