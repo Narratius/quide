@@ -1541,6 +1541,7 @@ begin
  Result.ColorShadow := tmpSolid.ColorShadow;
  Result.Pen.Assign(tmpSolid.Pen);
  Result.ShadowSize := tmpSolid.ShadowSize;
+ Result.ShowHint:= True;
 end;
 
 procedure TQuestEditorForm.FileExitExecute(Sender: TObject);
@@ -1786,6 +1787,7 @@ begin
   begin
    Changed:= True;
    TdoLOcation(Sender).Strings.Text:= TdoLocation(Sender).Data.Caption;
+   TdoLocation(Sender).Hint:= TdoLocation(Sender).Data.Hint;
    TdoLocation(Sender).Padding := 0;
    ClearConnectors(TdoLocation(Sender));
    CheckNewObjects;
@@ -1820,7 +1822,10 @@ begin
  with ModelBox do
   for i := 0 to Pred(ControlCount) do
    if (Controls[i] is TdoLocation) then
+   begin
     TdoLocation(Controls[i]).Data:= f_Script.FindLocation(TdoLocation(Controls[i]).Strings.Text);
+
+   end;
 end;
 
 //------------------------------------------------------------------------------

@@ -160,7 +160,7 @@ var
  l_LocName: string;
 begin
  GetActionData;
- l_A:= aAction.Create(f_Location.Model);
+ l_A:= aAction.Create(f_Location.Script);
  f_Location.AddAction(l_A);
  AddAction2ListBox(l_A);
 end;
@@ -181,7 +181,7 @@ begin
  if aAction is TdcGotoAction then
  begin
   l_Frame:= TGotoActionFrame.Create(nil);
-  TGotoActionFrame(l_Frame).Model:= f_Location.Model;
+  TGotoActionFrame(l_Frame).Model:= f_Location.Script;
   if TdcGotoAction(aAction).Location <> nil then
    TGotoActionFrame(l_Frame).GotoLocation:= TdcGotoAction(aAction).Location.Caption;
  end
@@ -192,7 +192,7 @@ begin
   if TdcVariableAction(aAction).Variable <> nil then
    TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
   TVarActionFrame(l_Frame).Value:= TdcVariableAction(aAction).Value;
-  TVarActionFrame(l_Frame).Script:= Location.Model;
+  TVarActionFrame(l_Frame).Script:= Location.Script;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
  l_Frame.Parent:= EditPanel;
@@ -208,7 +208,7 @@ begin
  begin
   l_Frame:= TButtonFrame.Create(nil);
   TButtonFrame(l_Frame).editCaption.Text:= TdcButtonAction(aAction).Caption;
-  TButtonFrame(l_Frame).Model:= f_Location.Model;
+  TButtonFrame(l_Frame).Script:= f_Location.Script;
   if TdcButtonAction(aAction).Location <> nil then
    TButtonFrame(l_Frame).GotoLocation:= TdcButtonAction(aAction).Location.Caption;
   l_Frame.Name:= 'Frame'+IntToStr(ButtonsPanel.ControlCount);
@@ -223,7 +223,7 @@ var
 begin
  if ButtonsListBox.ItemIndex <> -1 then
   GetButtonData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
- l_A:= TdcButtonAction.Create(f_Location.Model);
+ l_A:= TdcButtonAction.Create(f_Location.Script);
  f_Location.AddAction(l_A);
  AddButton2ListBox(l_A);
 end;
@@ -275,14 +275,14 @@ begin
   atGoto:
    begin
     l_LocName:= TGotoActionFrame(EditPanel.Controls[Index]).GotoLocation;
-    TdcGotoAction(l_A).Location:= f_Location.Model.FindLocation(l_LocName);
+    TdcGotoAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
     aList.Strings[Index]:= TdcGotoAction(l_A).Caption;
    end;
   atButton:
    begin
     TdcButtonAction(l_A).Caption:= TButtonFrame(ButtonsPanel.Controls[Index]).editCaption.Text;
     l_LocName:= TButtonFrame(ButtonsPanel.Controls[Index]).GotoLocation;
-    TdcButtonAction(l_A).Location:= f_Location.Model.FindLocation(l_LocName);
+    TdcButtonAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
     aList.Strings[Index]:= TdcButtonAction(l_A).Caption;
    end;
  end;
@@ -320,7 +320,7 @@ begin
    atGoto:
     begin
      l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
-     TdcGotoAction(l_A).Location:= f_Location.Model.FindLocation(l_LocName);
+     TdcGotoAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
      treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
     end;
    atVariable:
@@ -369,7 +369,7 @@ end;
 
 procedure TLocationDlg.pm_SetLocation(const Value: TdcLocation);
 begin
- f_Location := Value.Clone(Value.Model);
+ f_Location := Value.Clone(Value.Script);
  editCaption.Text:= IfThen(f_Location.Caption = '', 'Новая локация', f_Location.Caption);
  Caption:= editCaption.Text;
  RefreshList();

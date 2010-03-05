@@ -90,6 +90,7 @@ begin
  begin
   f_Data := Value;
   Strings.Text:= f_Data.Caption;
+  Hint:= f_Data.Hint;
  end; // Value <> nil
 end;
 
