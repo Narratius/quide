@@ -54,7 +54,7 @@ procedure TActionFrame.AddTextExecute(Sender: TObject);
 var
  l_A: TdcTextAction;
 begin
- // Добавить фрем для редактирования текста
+ // Добавить фрейм для редактирования текста
  l_A:= TdcTextAction.Create(f_Script);
  f_ActionList.Add(l_A);
  CreateAction(l_A);

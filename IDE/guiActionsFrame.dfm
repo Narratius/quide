@@ -1,21 +1,21 @@
 object ActionFrame: TActionFrame
   Left = 0
   Top = 0
-  Width = 879
-  Height = 667
+  Width = 559
+  Height = 214
   Align = alClient
   TabOrder = 0
   object EditPlace: TScrollBox
     Left = 0
     Top = 0
-    Width = 879
-    Height = 667
+    Width = 559
+    Height = 214
     Align = alClient
     TabOrder = 0
   end
   object PopupMenu1: TPopupMenu
-    Left = 288
-    Top = 264
+    Left = 24
+    Top = 16
     object N1: TMenuItem
       Action = TextAction
     end
@@ -39,8 +39,8 @@ object ActionFrame: TActionFrame
     end
   end
   object ActionList1: TActionList
-    Left = 456
-    Top = 152
+    Left = 120
+    Top = 16
     object TextAction: TAction
       Caption = #1058#1077#1082#1089#1090
     end
