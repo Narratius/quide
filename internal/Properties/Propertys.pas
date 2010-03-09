@@ -31,7 +31,18 @@ type
     function pm_GetItems(Index: Integer): TProperty;
     procedure pm_SetItems(Index: Integer; aValue: TProperty);
   public
+    function Add: TProperty;
     property Items[Index: Integer]: TProperty read pm_GetItems write pm_SetItems; default;
+  end;
+
+  TPropertyObject = class
+  private
+    f_Properties: TProperties;
+  public
+   constructor Create;
+   destructor Destroy;
+   procedure Define(const aAlias: String; const aCaption: TCaption; aType: TPropertyType; aValue:
+        Variant);
   end;
 
 
@@ -92,5 +103,23 @@ begin
 end;
 
 
+
+{ TPropertyObject }
+
+constructor TPropertyObject.Create;
+begin
+ f_Properties:= TProperties.Create(TProperty);
+end;
+
+procedure TPropertyObject.Define(const aAlias: String; const aCaption: TCaption;
+  aType: TPropertyType; aValue: Variant);
+begin
+ TProperty(f_Properties.Add).Define(aAlias, aCaption, aType, aValue);
+end;
+
+destructor TPropertyObject.Destroy;
+begin
+ FreeAndNil(f_Properties);
+end;
 
 end.
