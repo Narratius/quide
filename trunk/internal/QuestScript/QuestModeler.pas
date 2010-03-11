@@ -3,18 +3,18 @@ unit QuestModeler;
 interface
 
 uses
+ Propertys,
  Types, Classes, Contnrs,
  XMLIntf;
 
 Type
  TdcScript = class;
  TdcVariable = class;
- TqmBase = class(TPersistent)
+ TqmBase = class(TPropertyObject)
  private
-  f_Caption: string;
-  f_Changed: Boolean;
   f_Script: TdcScript;
-  procedure pm_SetChanged(const Value: Boolean);
+  function pm_GetCaption: string;
+  procedure pm_SetCaption(const Value: string);
  public
   constructor Create(aModel: TdcScript); virtual;
   destructor Destroy; override;
@@ -22,8 +22,7 @@ Type
   function Clone(aModel: TdcScript): Pointer;
   procedure Load(Element: IXMLNode); virtual;
   procedure Save(Element: IXMLNode); virtual;
-  property Caption: string read f_Caption write f_Caption;
-  property Changed: Boolean read f_Changed write pm_SetChanged;
+  property Caption: string read pm_GetCaption write pm_SetCaption;
   property Script: TdcScript read f_Script write f_Script;
  end;
 
@@ -271,9 +270,8 @@ procedure TqmBase.Assign(Source: TPersistent);
 begin
   if Source is TqmBase then
   begin
+   inherited;
    f_Script:= (Source as TqmBase).Script;
-   f_Caption:= TqmBase(Source).Caption;
-   f_Changed:= Tqmbase(Source).Changed;
   end
   else
    inherited;
@@ -283,8 +281,7 @@ constructor TqmBase.Create(aModel: TdcScript);
 begin
  inherited Create;
  f_Script:= aModel;
- f_Changed:= False;
- f_Caption:= '';
+ Define('Caption', 'Название', ptString, '');
 end;
 
 destructor TqmBase.Destroy;
@@ -307,9 +304,15 @@ begin
   Caption:= Element.Attributes['Caption'];
 end;
 
-procedure TqmBase.pm_SetChanged(const Value: Boolean);
+function TqmBase.pm_GetCaption: string;
 begin
- f_Changed := Value;
+ Result := Values['Caption'];
+end;
+
+procedure TqmBase.pm_SetCaption(const Value: string);
+begin
+ Values['Caption']:= Value;
+ Changed:= True;
 end;
 
 procedure TqmBase.Save(Element: IXMLNode);

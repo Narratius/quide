@@ -20,7 +20,9 @@ type
   TPropertiesPanel = class(TPanel)
   private
     f_Properties: TProperties;
+    f_PropertyObject: TPropertyObject;
     procedure pm_SetProperties(aValue: TProperties);
+    procedure pm_SetPropertyObject(const Value: TPropertyObject);
   public
     constructor Create(aOwner: TComponent); override;
     procedure CreateControl(aProp: TProperty);
@@ -29,6 +31,7 @@ type
     procedure ResizeControls(Sender: TObject);
     procedure SetValues;
     property Properties: TProperties read f_Properties write pm_SetProperties;
+    property PropertyObject: TPropertyObject read f_PropertyObject write pm_SetPropertyObject;
   end;
 
 
@@ -43,6 +46,7 @@ begin
   inherited Create(aOwner);
   OnChange:= TextChanged;
   LineHeight:= 16;
+  Height:= 2*LineHeight + 4;
 end;
 
 procedure TAutoSizeMemo.TextChanged(Sender: TObject);
@@ -58,27 +62,26 @@ constructor TPropertiesPanel.Create(aOwner: TComponent);
 begin
   inherited ;
   OnResize:= ResizeControls;
+  Height:= 12;
 end;
 
 procedure TPropertiesPanel.CreateControl(aProp: TProperty);
 var
   l_Controls: TControlsArray;
   l_C: TControl;
-  i: Integer;
+  i, l_Top: Integer;
 begin
   GetControls(aProp.PropertyType, l_Controls);
   for i:= 0 to Length(l_Controls)-1 do
   begin
    l_C:= l_Controls[i].Create(Self);
    l_C.Name:= l_C.ClassName + IntToStr(Succ(ControlCount));
-   if ControlCount > 0 then
-    l_C.Top:= Controls[Pred(ControlCount)].Top + 8 + Controls[Pred(ControlCount)].Height
-   else
-    l_C.Top:= 8;
+   l_C.Top:= Height - 4;
    l_C.Left:= 8;
    if l_C is TLabel then
     TLabel(l_C).Caption:= aProp.Caption;
-   Height:= l_C.Top + l_C.Height + 8; 
+   l_C.Tag:= aProp.Index;
+   Height:= l_C.Top + l_C.Height + 8;
    InsertControl(l_C);
   end; // for i
 end;
@@ -96,7 +99,17 @@ begin
 end;
 
 procedure TPropertiesPanel.GetValues;
+var
+ i: Integer;
 begin
+ for i:= 0 to ControlCount-1 do
+ begin
+  if Controls[i] is TEdit then
+   Properties[Controls[i].Tag].Value:= TEdit(Controls[i]).Text
+  else
+  if Controls[i] is TMemo then
+   Properties[Controls[i].Tag].Value:= TMemo(Controls[i]).Text;
+ end;
 end;
 
 procedure TPropertiesPanel.pm_SetProperties(aValue: TProperties);
@@ -104,12 +117,17 @@ var
  i: Integer;
 begin
   f_Properties := aValue;
-  Height:= f_Properties.Count*24 + 16;
   for i:= 0 to Pred(f_Properties.Count) do
   begin
    CreateControl(TProperty(f_Properties.Items[i]));
-   SetValues;
   end;
+  SetValues;
+end;
+
+procedure TPropertiesPanel.pm_SetPropertyObject(const Value: TPropertyObject);
+begin
+ f_PropertyObject := Value;
+ Properties:= f_PropertyObject.Properties;
 end;
 
 procedure TPropertiesPanel.ResizeControls(Sender: TObject);
@@ -121,11 +139,21 @@ begin
   for i:= 0 to Pred(ControlCount) do
    if not (Controls[i] is TButton) then
     Controls[i].Width:= ClientWidth - 16;
- end;   
+ end;
 end;
 
 procedure TPropertiesPanel.SetValues;
+var
+ i: Integer;
 begin
+ for i:= 0 to ControlCount-1 do
+ begin
+  if Controls[i] is TEdit then
+   TEdit(Controls[i]).Text:= Properties[Controls[i].Tag].Value
+  else
+  if Controls[i] is TMemo then
+   TMemo(Controls[i]).Text:= Properties[Controls[i].Tag].Value
+ end;
 end;
 
 
