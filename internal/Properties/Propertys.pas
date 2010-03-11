@@ -35,14 +35,22 @@ type
     property Items[Index: Integer]: TProperty read pm_GetItems write pm_SetItems; default;
   end;
 
-  TPropertyObject = class
+  TPropertyObject = class(TPersistent)
   private
+    f_Changed: Boolean;
     f_Properties: TProperties;
+    function pm_GetValues(Alias: String): Variant;
+    procedure pm_SetValues(Alias: String; const Value: Variant);
+  protected
   public
    constructor Create;
-   destructor Destroy;
+   destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
    procedure Define(const aAlias: String; const aCaption: TCaption; aType: TPropertyType; aValue:
         Variant);
+    property Changed: Boolean read f_Changed write f_Changed;
+    property Properties: TProperties read f_Properties;
+    property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
   end;
 
 
@@ -76,6 +84,11 @@ end;
 {
 ********************************* TProperties **********************************
 }
+function TProperties.Add: TProperty;
+begin
+ Result:= TProperty(inherited Add);
+end;
+
 function TProperties.FindProperty(aAlias: String): TProperty;
 var
   i: Integer;
@@ -108,7 +121,9 @@ end;
 
 constructor TPropertyObject.Create;
 begin
+ inherited;
  f_Properties:= TProperties.Create(TProperty);
+ f_Changed:= False;
 end;
 
 procedure TPropertyObject.Define(const aAlias: String; const aCaption: TCaption;
@@ -120,6 +135,38 @@ end;
 destructor TPropertyObject.Destroy;
 begin
  FreeAndNil(f_Properties);
+ inherited;
+end;
+
+procedure TPropertyObject.Assign(Source: TPersistent);
+begin
+  if Source is TPropertyObject then
+   f_Properties.Assign(TPropertyObject(Source).Properties)
+  else
+   inherited;
+end;
+
+function TPropertyObject.pm_GetValues(Alias: String): Variant;
+var
+ l_Prop: TProperty;
+begin
+ l_Prop:= Properties.FindProperty(Alias);
+ if l_Prop <> nil then
+  Result := l_Prop.Value
+ else
+  raise Exception.CreateFmt('Отсутствует свойство %s', [Alias]);
+end;
+
+procedure TPropertyObject.pm_SetValues(Alias: String; const Value: Variant);
+var
+ l_Prop: TProperty;
+begin
+ l_Prop:= Properties.FindProperty(Alias);
+ if l_Prop <> nil then
+  l_Prop.Value:= Value
+ else
+  raise Exception.CreateFmt('Отсутствует свойство %s', [Alias]);
+ f_Changed:= True;
 end;
 
 end.
