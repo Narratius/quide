@@ -28,16 +28,17 @@ Type
 
  TdcAction = class;
  TdcButtonAction = class;
+ TdcActionList = class;
  TdcLocation = class(TqmBase)
  private
-  f_ActionList: TObjectList;
+  f_ActionList: TdcActionList;
   f_Hint: String;
   procedure GenerateCaption(aAction: TdcAction);
   function pm_GetActions(Index: Integer): TdcAction;
   function pm_GetActionsCount: Integer;
   function pm_GetButtons(Index: Integer): TdcButtonAction;
   function pm_GetButtonsCount: Integer;
-  procedure pm_SetActionList(aValue: TObjectList);
+  procedure pm_SetActionList(aValue: TdcActionList);
  public
   constructor Create(aModel: TdcScript); override;
   destructor Destroy; override;
@@ -46,7 +47,7 @@ Type
   procedure Load(Element: IXMLNode); override;
   class function Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
   procedure Save(Element: IXMLNode); override;
-  property ActionList: TObjectList
+  property ActionList: TdcActionList
    read f_ActionList
    write pm_SetActionList;
   property Actions[Index: Integer]: TdcAction read pm_GetActions;
@@ -226,7 +227,16 @@ Type
   property VarType: TdcVariableType read f_VarType write f_VarType;
  end;
 
-procedure CloneActions(aSource: TObjectList; var aDestination: TObjectList;
+
+ TdcActionList = class(TObjectList)
+ private
+  function pm_GetItems(Index: Integer): TdcAction;
+ public
+   property Items[Index: Integer]: TdcAction
+    read pm_GetItems; default;
+ end;
+
+procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
     aModel: TdcScript);
 
 function FindInList(theList: TObjectList; const aCaption: String): TqmBase;
@@ -336,7 +346,7 @@ begin
  end;
 end;
 
-procedure CloneActions(aSource: TObjectList; var aDestination: TObjectList;
+procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
     aModel: TdcScript);
 var
  i: Integer;
@@ -410,10 +420,12 @@ begin
  if AnsiCompareText(aStr, 'button') = 0 then
   Result:= atButton
 end;
+
+
 constructor TdcLocation.Create(aModel: TdcScript);
 begin
  inherited;
- f_ActionList:= TObjectList.Create;
+ f_ActionList:= TdcActionList.Create;
 end;
 
 destructor TdcLocation.Destroy;
@@ -528,7 +540,7 @@ begin
    Inc(Result);
 end;
 
-procedure TdcLocation.pm_SetActionList(aValue: TObjectList);
+procedure TdcLocation.pm_SetActionList(aValue: TdcActionList);
 begin
  CloneActions(aValue, f_ActionList, Script);
 end;
@@ -1029,6 +1041,13 @@ begin
   for i:= 0 to (f_Enum.Count-1) do
    Element.AddChild('Item').Text:= f_Enum[i];
  end;
+end;
+
+{ TdcActionList }
+
+function TdcActionList.pm_GetItems(Index: Integer): TdcAction;
+begin
+  Result:= TdcAction(inherited Items[Index])
 end;
 
 end.
