@@ -21,14 +21,14 @@ type
     procedure EditButtonClick(Sender: TObject);
     procedure DeleteButtonClick(Sender: TObject);
   private
-    f_ActionList: TObjectList;
+    f_ActionList: TdcActionList;
     f_Model: TdcScript;
     { Private declarations }
-    procedure pm_SetActionList(aValue: TObjectList);
+    procedure pm_SetActionList(aValue: TdcActionList);
     procedure RefreshList;
   public
     { Public declarations }
-   property ActionList: TObjectList
+   property ActionList: TdcActionList
     read f_ActionList
     write pm_SetActionList;
   end;
@@ -66,7 +66,7 @@ end;
 
 procedure TActionListDlg.FormCreate(Sender: TObject);
 begin
- f_ActionList:= TObjectList.Create;
+ f_ActionList:= TdcActionList.Create;
 end;
 
 procedure TActionListDlg.FormDestroy(Sender: TObject);
@@ -102,7 +102,7 @@ begin
  end;
 end;
 
-procedure TActionListDlg.pm_SetActionList(aValue: TObjectList);
+procedure TActionListDlg.pm_SetActionList(aValue: TdcActionList);
 begin
  if aValue <> nil then
  begin

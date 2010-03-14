@@ -848,7 +848,7 @@ begin
 
   //get the number of characters which will fit within LineWidth...
   if not GetTextExtentExPointNoPartials(canvas.handle,
-    pchar(ls),len,LineWidthInPxls,NumCharWhichFit,0,dummy) then
+    PAnsiChar(ls),len,LineWidthInPxls,NumCharWhichFit,0,dummy) then
     begin
       ls := '';
       rs := '';
