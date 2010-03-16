@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, QuestModeler, ActnList, Menus, ExtCtrls, StdCtrls, guiActionsFrame;
+  Dialogs, QuestModeler, ActnList, Menus, ExtCtrls, StdCtrls, quideControls;
 
 type
   TLocationEditExDlg = class(TForm)
@@ -15,10 +15,26 @@ type
     HintEdit: TEdit;
     OKButton: TButton;
     CancelButton: TButton;
+    ActionList1: TActionList;
+    TextAction: TAction;
+    ButtonAction: TAction;
+    VarAction: TAction;
+    LogicAction: TAction;
+    GotoAction: TAction;
+    TuneAction: TAction;
+    PopupMenu1: TPopupMenu;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    N6: TMenuItem;
+    N5: TMenuItem;
+    N7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure TextActionExecute(Sender: TObject);
   private
-    f_ActionFrame: TActionFrame;
+    f_ActionFrame: TqcActionsScrollBox;
     f_Location: TdcLocation;
     function pm_GetLocation: TdcLocation;
     procedure pm_SetLocation(const Value: TdcLocation);
@@ -55,7 +71,8 @@ end;
 
 procedure TLocationEditExDlg.FormCreate(Sender: TObject);
 begin
- f_ActionFrame:= TActionFrame.Create(Self);
+ f_ActionFrame:= TqcActionsScrollBox.Create(Self);
+ f_ActionFrame.Align:= alClient;
  InsertControl(f_ActionFrame);
 end;
 
@@ -69,7 +86,7 @@ begin
  f_Location.Caption:= editCaption.Text;
  f_Location.Hint:= HintEdit.Text;
  //f_Location.ActionList:= f_ActionFrame.ActionList;
- f_ActionFrame.GetLocationData;
+ //f_ActionFrame.GetLocationData;
  Result := f_Location;
 end;
 
@@ -80,8 +97,12 @@ begin
  HintEdit.Text:= f_Location.Hint;
  Caption:= IfThen(f_Location.Caption = '', 'Новая локация', f_Location.Caption);
  f_ActionFrame.Script:= f_Location.Script;
- f_ActionFrame.ActionList:= f_Location.ActionList;
- f_ActionFrame.RefreshList();
+ f_ActionFrame.Actions:= f_Location.ActionList;
+end;
+
+procedure TLocationEditExDlg.TextActionExecute(Sender: TObject);
+begin
+ f_ActionFrame.Add(TdcTextAction.Create(Location.Script));
 end;
 
 end.
