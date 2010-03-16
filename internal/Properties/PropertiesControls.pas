@@ -61,6 +61,7 @@ end;
 constructor TPropertiesPanel.Create(aOwner: TComponent);
 begin
   inherited ;
+  Caption:= '';
   OnResize:= ResizeControls;
   Height:= 12;
 end;
