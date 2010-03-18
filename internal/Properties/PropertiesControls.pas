@@ -36,6 +36,9 @@ type
     property PropertyObject: TPropertyObject read f_PropertyObject write pm_SetPropertyObject;
   end;
 
+ TTextButton = class(TPanel)
+ end;
+
 
 implementation
 
@@ -111,6 +114,10 @@ begin
   ptString : l_Controls[i]:= TEdit;
   ptText   : l_Controls[i]:= TAutoSizeMemo;
   ptBoolean: l_Controls[i]:= TComboBox;
+  ptCaption: l_Controls[i]:= TLabel;
+  ptButton : l_Controls[i]:= TButton;
+  ptTextWitButton: l_Controls[i]:= TTextButton;
+  ptActions: l_Controls[i]:= TScrollBox;
  end;
 end;
 

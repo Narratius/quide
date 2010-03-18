@@ -6,7 +6,8 @@ uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
 
 type
- TPropertyType = (ptInteger, ptString, ptText, ptBoolean, ptCaption, ptButton);
+ TPropertyType = (ptInteger, ptString, ptText, ptBoolean, ptCaption, ptButton, ptTextWitButton,
+                  ptActions);
 
   TProperty = class(TCollectionItem)
   private
