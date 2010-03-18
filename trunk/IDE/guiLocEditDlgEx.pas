@@ -15,23 +15,9 @@ type
     HintEdit: TEdit;
     OKButton: TButton;
     CancelButton: TButton;
-    ActionList1: TActionList;
-    TextAction: TAction;
-    ButtonAction: TAction;
-    VarAction: TAction;
-    LogicAction: TAction;
-    GotoAction: TAction;
-    TuneAction: TAction;
-    PopupMenu1: TPopupMenu;
-    N1: TMenuItem;
-    N2: TMenuItem;
-    N3: TMenuItem;
-    N4: TMenuItem;
-    N6: TMenuItem;
-    N5: TMenuItem;
-    N7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure LogicActionExecute(Sender: TObject);
     procedure TextActionExecute(Sender: TObject);
   private
     f_ActionFrame: TqcActionsScrollBox;
@@ -79,6 +65,11 @@ end;
 procedure TLocationEditExDlg.FormDestroy(Sender: TObject);
 begin
  FreeAndNil(f_Location);
+end;
+
+procedure TLocationEditExDlg.LogicActionExecute(Sender: TObject);
+begin
+ f_ActionFrame.Add(TdcLogicAction.Create(Location.Script));
 end;
 
 function TLocationEditExDlg.pm_GetLocation: TdcLocation;

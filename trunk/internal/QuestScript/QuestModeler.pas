@@ -291,7 +291,7 @@ constructor TqmBase.Create(aModel: TdcScript);
 begin
  inherited Create;
  f_Script:= aModel;
- Define('Caption', 'Название', ptString, '');
+ Define('Caption', 'Название', ptString, '', False);
 end;
 
 destructor TqmBase.Destroy;
@@ -876,6 +876,8 @@ begin
  inherited;
  f_Description:= TStringList.Create;
  ActionType:= atText;
+ Visible['Caption']:= False;
+ Define('Description', '', ptText, '');
 end;
 
 procedure TdcTextAction.Assign(Source: TPersistent);
