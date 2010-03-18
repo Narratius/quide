@@ -17,7 +17,13 @@ type
     property OnResize;
   end;
 
-  TControlsArray = array of TControlClass;
+  TControlAlign = (caNewLine, caInline);
+  TControlRec = record
+   ControlClass: TControlClass;
+   Align       : TControlAlign;
+  end;
+
+  TControlsArray = array of TControlRec;
   TPropertiesPanel = class(TPanel)
   private
     f_Properties: TProperties;
@@ -82,7 +88,8 @@ begin
   GetControls(aProp, l_Controls);
   for i:= 0 to Length(l_Controls)-1 do
   begin
-   l_C:= l_Controls[i].Create(Self);
+   { TODO : Ќужно учитывать взаимное расположение }
+   l_C:= l_Controls[i].ControlClass.Create(Self);
    l_C.Name:= l_C.ClassName + IntToStr(Succ(ControlCount));
    l_C.Top:= Height - 4;
    l_C.Left:= 8;
@@ -104,20 +111,26 @@ begin
  if aProp.Caption <> '' then
  begin
   SetLength(l_Controls, 2);
-  l_Controls[0]:= TLabel;
+  l_Controls[0].ControlClass:= TLabel;
+  l_Controls[0].Align:= caNewLine;
  end
  else
   SetLength(l_Controls, 1);
  i:= Pred(Length(l_Controls));
+ l_Controls[i].Align:= caNewLine;
  case aProp.PropertyType of
-  ptInteger: l_Controls[i]:= TEdit;
-  ptString : l_Controls[i]:= TEdit;
-  ptText   : l_Controls[i]:= TAutoSizeMemo;
-  ptBoolean: l_Controls[i]:= TComboBox;
-  ptCaption: l_Controls[i]:= TLabel;
-  ptButton : l_Controls[i]:= TButton;
-  ptTextWitButton: l_Controls[i]:= TTextButton;
-  ptActions: l_Controls[i]:= TScrollBox;
+  ptInteger: l_Controls[i].ControlClass:= TEdit;
+  ptString : l_Controls[i].ControlClass:= TEdit;
+  ptText   : l_Controls[i].ControlClass:= TAutoSizeMemo;
+  ptBoolean: l_Controls[i].ControlClass:= TComboBox;
+  ptCaption: l_Controls[i].ControlClass:= TLabel;
+  ptButton : l_Controls[i].ControlClass:= TButton;
+  ptTextWitButton:
+   begin
+    l_Controls[i].ControlClass:= TButton;
+    l_Controls[i].Align:= caInline;
+   end;
+  ptActions: l_Controls[i].ControlClass:= TScrollBox;
  end;
 end;
 

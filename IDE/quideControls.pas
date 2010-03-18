@@ -214,7 +214,10 @@ var
  i: Integer;
 begin
  for i:= 0 to ControlCount-1 do
+ begin
   Controls[i].Width:= ClientWidth;
+  (Controls[i] as TqcActionPanel).ControlResize(Self);
+ end;
 end;
 
 { TqcActionPanel }
