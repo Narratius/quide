@@ -14,6 +14,7 @@ type
     constructor Create(aOwner: TComponent); override;
     procedure TextChanged(Sender: TObject);
     property LineHeight: Integer read f_LineHeight write f_LineHeight;
+    property OnResize;
   end;
 
   TControlsArray = array of TControlClass;
@@ -26,9 +27,10 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     procedure CreateControl(aProp: TProperty);
-    procedure GetControls(PropertyType: TPropertyType; var l_Controls: TControlsArray);
+    procedure GetControls(aProp: TProperty; var l_Controls: TControlsArray);
     procedure GetValues;
     procedure ResizeControls(Sender: TObject);
+    procedure ControlResize(Sender: TObject);
     procedure SetValues;
     property Properties: TProperties read f_Properties write pm_SetProperties;
     property PropertyObject: TPropertyObject read f_PropertyObject write pm_SetPropertyObject;
@@ -72,7 +74,9 @@ var
   l_C: TControl;
   i, l_Top: Integer;
 begin
-  GetControls(aProp.PropertyType, l_Controls);
+ if aProp.Visible then
+ begin
+  GetControls(aProp, l_Controls);
   for i:= 0 to Length(l_Controls)-1 do
   begin
    l_C:= l_Controls[i].Create(Self);
@@ -84,19 +88,30 @@ begin
    l_C.Tag:= aProp.Index;
    Height:= l_C.Top + l_C.Height + 8;
    InsertControl(l_C);
+   if l_C is TAutoSizeMemo then
+    TAutoSizeMemo(l_C).OnResize:= ControlResize;
   end; // for i
+ end; // aProp.Visible
 end;
 
-procedure TPropertiesPanel.GetControls(PropertyType: TPropertyType; var l_Controls: TControlsArray);
+procedure TPropertiesPanel.GetControls(aProp: TProperty; var l_Controls: TControlsArray);
+var
+ i: Integer;
 begin
+ if aProp.Caption <> '' then
+ begin
   SetLength(l_Controls, 2);
   l_Controls[0]:= TLabel;
-  case PropertyType of
-   ptInteger: l_Controls[1]:= TEdit;
-   ptString : l_Controls[1]:= TEdit;
-   ptText   : l_Controls[1]:= TAutoSizeMemo;
-   ptBoolean: l_Controls[1]:= TComboBox;
-  end;
+ end
+ else
+  SetLength(l_Controls, 1);
+ i:= Pred(Length(l_Controls));
+ case aProp.PropertyType of
+  ptInteger: l_Controls[i]:= TEdit;
+  ptString : l_Controls[i]:= TEdit;
+  ptText   : l_Controls[i]:= TAutoSizeMemo;
+  ptBoolean: l_Controls[i]:= TComboBox;
+ end;
 end;
 
 procedure TPropertiesPanel.GetValues;
@@ -122,7 +137,6 @@ begin
   begin
    CreateControl(TProperty(f_Properties.Items[i]));
   end;
-  SetValues;
 end;
 
 procedure TPropertiesPanel.pm_SetPropertyObject(const Value: TPropertyObject);
@@ -141,6 +155,22 @@ begin
    if not (Controls[i] is TButton) then
     Controls[i].Width:= ClientWidth - 16;
  end;
+end;
+
+procedure TPropertiesPanel.ControlResize(Sender: TObject);
+var
+ l_C, l_Next: TWinControl;
+begin
+ // Нужно сдвинуть всех тех, кто ниже сендера и увеличить собственный размер
+ l_C:= Sender as TWinControl;
+ l_Next:= FindNextControl(l_C, True, True, False);
+ while (l_Next <> nil) and (l_C <> l_Next) do
+ begin
+  l_Next.Top:= l_C.Top + l_C.Height + 4;
+  l_C:= l_Next;
+  l_Next:= FindNextControl(l_C, True, True, False);
+ end;
+ ClientHeight:= l_C.Top + l_C.Height + 4;
 end;
 
 procedure TPropertiesPanel.SetValues;

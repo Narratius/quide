@@ -4,7 +4,7 @@ interface
 Uses
  QuestModeler,
  PropertiesControls,
- Forms, ExtCtrls;
+ Forms, ExtCtrls, Classes, Menus;
 
 type
  TqcActionPanel = class(TPropertiesPanel)
@@ -20,15 +20,24 @@ type
  TqcActionsScrollBox = class(TScrollBox)
  private
   f_Actions: TdcActionList;
+  f_EnableResize: Boolean;
+  f_PopUpMenu: TPopUpMenu;
   f_Script: TdcScript;
+  procedure BuildMenu;
   procedure pm_SetActions(aValue: TdcActionList);
   procedure ClearActionControls;
   procedure CreateActionControls;
   procedure CreateOneControl(aAction: TdcAction);
-    procedure ControlResize(Sender: TObject);
-    procedure EditPlaceResize(Sender: TObject);
+  procedure ControlResize(Sender: TObject);
+  procedure InsertButtonAction(Sender: TObject);
+  procedure InsertGotoAction(Sender: TObject);
+  procedure InsertLogicAction(Sender: TObject);
+  procedure InsertTextAction(Sender: TObject);
+  procedure InsertVarAction(Sender: TObject);
  public
+  constructor Create(aOwner: TComponent); override;
   procedure Add(aAction: TdcAction);
+  procedure SelfResize(Sender: TObject);
   property Actions: TdcActionList
    read f_Actions
    write pm_SetActions;
@@ -45,10 +54,59 @@ Uses
 
 { TqcActionsScrollBox }
 
+constructor TqcActionsScrollBox.Create(aOwner: TComponent);
+begin
+ inherited;
+ OnResize:= SelfResize;
+ f_PopUpMenu:= TPopupMenu.Create(Self);
+ BuildMenu;
+ PopupMenu:= f_PopupMenu;
+end;
+
 procedure TqcActionsScrollBox.Add(aAction: TdcAction);
 begin
  Actions.Add(aAction);
  CreateOneControl(aAction);
+end;
+
+procedure TqcActionsScrollBox.BuildMenu;
+var
+ l_M: TMenuItem;
+begin
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M1';
+ l_M.Caption:= 'Текст';
+ l_M.OnClick:= InsertTextAction;
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M2';
+ l_M.Caption:= 'Переменная';
+ l_M.OnClick:= InsertVarAction;
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M3';
+ l_M.Caption:= 'Условие';
+ l_M.OnClick:= InsertLogicAction;
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M4';
+ l_M.Caption:= 'Переход';
+ l_M.OnClick:= InsertGotoAction;
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M5';
+ l_M.Caption:= 'Кнопка';
+ l_M.OnClick:= InsertButtonAction;
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M6';
+ l_M.Caption:= '-';
+ f_PopupMenu.Items.Add(l_M);
+ l_M:= TMenuItem.Create(Self);
+ l_M.Name:= 'M7';
+ l_M.Caption:= 'Упорядочить';
+ //l_M.OnClick:=
+ f_PopupMenu.Items.Add(l_M);
 end;
 
 procedure TqcActionsScrollBox.ClearActionControls;
@@ -68,7 +126,7 @@ procedure TqcActionsScrollBox.CreateOneControl(aAction: TdcAction);
 var
  l_Panel: TqcActionPanel;
 begin
-   l_Panel:= TqcActionPanel.Create(Self);
+  l_Panel:= TqcActionPanel.Create(Self);
   l_Panel.Action:= aAction;
   if ControlCount > 0 then
    l_Panel.Top:= Controls[Pred(ControlCount)].Top + Controls[Pred(ControlCount)].Height
@@ -76,6 +134,7 @@ begin
    l_Panel.Top:= 1;
   l_Panel.Name:= l_Panel.ClassName + IntToStr(Succ(ControlCount));
   l_Panel.Width:= ClientWidth;
+  l_Panel.OnResize:= ControlResize;
   InsertControl(l_Panel);
 end;
 
@@ -89,9 +148,14 @@ end;
 
 procedure TqcActionsScrollBox.pm_SetActions(aValue: TdcActionList);
 begin
- f_Actions:= aValue;
- ClearActionControls;
- CreateActionControls;
+ f_EnableResize:= False;
+ try
+  f_Actions:= aValue;
+  ClearActionControls;
+  CreateActionControls;
+ finally
+  f_EnableResize:= True;
+ end;
 end;
 
 procedure TqcActionsScrollBox.ControlResize(Sender: TObject);
@@ -105,36 +169,60 @@ begin
  begin
   l_Move:= False;
   l_Delta:= 0;
-  for i:= 0 to EditPlace.ControlCount-1 do
+  for i:= 0 to ControlCount-1 do
   begin
    if l_Move then
-    EditPlace.Controls[i].Top:= EditPlace.Controls[i].Top + l_Delta
+    Controls[i].Top:= Controls[i].Top + l_Delta
    else
-   if EditPlace.Controls[i] = Sender then
+   if Controls[i] = Sender then
    begin
     l_Move:= True;
-    if i < Pred(EditPlace.ControlCount) then
-     l_Delta:= EditPlace.Controls[i].Top + EditPlace.Controls[i].Height - EditPlace.Controls[i+1].Top;
+    if i < Pred(ControlCount) then
+     l_Delta:= Controls[i].Top + Controls[i].Height - Controls[i+1].Top;
    end;
   end;
  end;
 end;
 
-procedure TqcActionsScrollBox.EditPlaceResize(Sender: TObject);
+procedure TqcActionsScrollBox.InsertButtonAction(Sender: TObject);
+begin
+ Add(TdcButtonAction.Create(Script));
+end;
+
+procedure TqcActionsScrollBox.InsertGotoAction(Sender: TObject);
+begin
+ Add(TdcGotoAction.Create(Script));
+end;
+
+procedure TqcActionsScrollBox.InsertLogicAction(Sender: TObject);
+begin
+ Add(TdcLogicAction.Create(Script));
+end;
+
+procedure TqcActionsScrollBox.InsertTextAction(Sender: TObject);
+begin
+ Add(TdcTextAction.Create(Script));
+end;
+
+procedure TqcActionsScrollBox.InsertVarAction(Sender: TObject);
+begin
+ Add(TdcVariableAction.Create(Script));
+end;
+
+procedure TqcActionsScrollBox.SelfResize(Sender: TObject);
 var
  i: Integer;
 begin
- // Изменился размер - нужно поменять ширины контролам
- for i:= 0 to EditPlace.ControlCount-1 do
-  EditPlace.Controls[i].Width:= EditPlace.ClientWidth;
+ for i:= 0 to ControlCount-1 do
+  Controls[i].Width:= ClientWidth;
 end;
 
 { TqcActionPanel }
 
 procedure TqcActionPanel.pm_SetAction(Value: TdcAction);
 begin
- f_Action:= Value;
- Properties:= f_Action.Properties;
+  f_Action:= Value;
+  Properties:= f_Action.Properties;
 end;
 
 end.
