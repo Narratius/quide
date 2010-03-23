@@ -4,7 +4,7 @@ interface
 Uses
  QuestModeler,
  PropertiesControls,
- Forms, ExtCtrls, Classes, Menus;
+ Forms, ExtCtrls, Classes, Menus, Propertys;
 
 type
  TqcActionPanel = class(TPropertiesPanel)
@@ -12,6 +12,7 @@ type
   f_Action: TdcAction;
   procedure pm_SetAction(Value: TdcAction);
  public
+  procedure GetControls(aProp: TProperty; var l_Controls: TControlsArray); override;
   property Action : TdcAction
    read f_Action
    write pm_SetAction;
@@ -50,7 +51,7 @@ type
 implementation
 
 Uses
- SysUtils, Controls;
+ SysUtils, Controls, StdCtrls;
 
 { TqcActionsScrollBox }
 
@@ -61,6 +62,7 @@ begin
  f_PopUpMenu:= TPopupMenu.Create(Self);
  BuildMenu;
  PopupMenu:= f_PopupMenu;
+ f_Actions:= TdcActionList.Create;
 end;
 
 procedure TqcActionsScrollBox.Add(aAction: TdcAction);
@@ -135,6 +137,7 @@ begin
   l_Panel.Name:= l_Panel.ClassName + IntToStr(Succ(ControlCount));
   l_Panel.Width:= ClientWidth;
   l_Panel.OnResize:= ControlResize;
+  ClientHeight:= l_Panel.Top + l_Panel.Height + 4;
   InsertControl(l_Panel);
 end;
 
@@ -150,7 +153,7 @@ procedure TqcActionsScrollBox.pm_SetActions(aValue: TdcActionList);
 begin
  f_EnableResize:= False;
  try
-  f_Actions:= aValue;
+  f_Actions.Assign(aValue);
   ClearActionControls;
   CreateActionControls;
  finally
@@ -180,6 +183,8 @@ begin
     if i < Pred(ControlCount) then
      l_Delta:= Controls[i].Top + Controls[i].Height - Controls[i+1].Top;
    end;
+   if Controls[i] is TPropertiesPanel then
+    TPropertiesPanel(Controls[i]).ResizeControls(Self);
   end;
  end;
 end;
@@ -217,6 +222,29 @@ begin
  begin
   Controls[i].Width:= ClientWidth;
   (Controls[i] as TqcActionPanel).ControlResize(Self);
+ end;
+end;
+
+procedure TqcActionPanel.GetControls(aProp: TProperty; var l_Controls: TControlsArray);
+var
+ i: Integer;
+begin
+ inherited;
+ if Length(l_Controls) = 0 then
+ begin
+  if aProp.Caption <> '' then
+  begin
+   SetLength(l_Controls, 2);
+   l_Controls[0].ControlClass:= TLabel;
+  end
+  else
+   SetLength(l_Controls, 1);
+  i:= Pred(Length(l_Controls));
+  case aProp.PropertyType of
+   ptButton : l_Controls[i].ControlClass:= TButton;
+   ptTextWitButton: l_Controls[i].ControlClass:= TButton;
+   ptActions: l_Controls[i].ControlClass:= TqcActionsScrollBox;
+  end;
  end;
 end;
 
