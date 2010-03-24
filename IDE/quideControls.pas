@@ -184,7 +184,7 @@ begin
      l_Delta:= Controls[i].Top + Controls[i].Height - Controls[i+1].Top;
    end;
    if Controls[i] is TPropertiesPanel then
-    TPropertiesPanel(Controls[i]).ResizeControls(Self);
+    TPropertiesPanel(Controls[i]).ResizeControls;
   end;
  end;
 end;
