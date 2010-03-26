@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DrawObjects1, DrawObjects2, Menus, ComCtrls, Printers,
   Types, ClipBrd, ExtCtrls, ActnList, ActnMan, IniFiles,
-  ExtDlgs, dobQM, QuestModeler, dobFileStorage, ImgList, XPStyleActnCtrls, guiTypes;
+  ExtDlgs, dobQM, QuestModeler, dobFileStorage, ImgList, guiTypes,
+  XPStyleActnCtrls;
 
 type
   TDragListRec = record
@@ -256,7 +257,7 @@ uses
 
 
 {$R *.dfm}
-{$R winxp.res}
+{.$R winxp.res}
 
 
 function ScreenToPrinterX(pxl: integer): integer;

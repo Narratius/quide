@@ -58,6 +58,9 @@ Uses
 constructor TqcActionsScrollBox.Create(aOwner: TComponent);
 begin
  inherited;
+ Constraints.MinHeight:= 24;
+ Constraints.MinWidth:= 100;
+ //AutoSize:= True;
  OnResize:= SelfResize;
  f_PopUpMenu:= TPopupMenu.Create(Self);
  BuildMenu;
