@@ -58,6 +58,7 @@ end;
 procedure TLocationEditExDlg.FormCreate(Sender: TObject);
 begin
  f_ActionFrame:= TqcActionsScrollBox.Create(Self);
+ f_ActionFrame.AutoSize:= False;
  f_ActionFrame.Align:= alClient;
  InsertControl(f_ActionFrame);
 end;
