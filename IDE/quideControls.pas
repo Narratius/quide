@@ -18,10 +18,11 @@ type
    write pm_SetAction;
  end;
 
- TqcActionsScrollBox = class(TScrollBox)
+ TqcActionsScrollBox = class(TPropertiesScrollBox)
  private
   f_Actions: TdcActionList;
   f_EnableResize: Boolean;
+  f_OnControlResize: TNotifyEvent;
   f_PopUpMenu: TPopUpMenu;
   f_Script: TdcScript;
   procedure BuildMenu;
@@ -29,7 +30,6 @@ type
   procedure ClearActionControls;
   procedure CreateActionControls;
   procedure CreateOneControl(aAction: TdcAction);
-  procedure ControlResize(Sender: TObject);
   procedure InsertButtonAction(Sender: TObject);
   procedure InsertGotoAction(Sender: TObject);
   procedure InsertLogicAction(Sender: TObject);
@@ -38,13 +38,14 @@ type
  public
   constructor Create(aOwner: TComponent); override;
   procedure Add(aAction: TdcAction);
-  procedure SelfResize(Sender: TObject);
   property Actions: TdcActionList
    read f_Actions
    write pm_SetActions;
   property Script: TdcScript
    read f_Script
    write f_Script;
+ published
+  property OnControlResize: TNotifyEvent read f_OnControlResize write f_OnControlResize;
  end;
 
 
@@ -58,10 +59,6 @@ Uses
 constructor TqcActionsScrollBox.Create(aOwner: TComponent);
 begin
  inherited;
- Constraints.MinHeight:= 24;
- Constraints.MinWidth:= 100;
- //AutoSize:= True;
- OnResize:= SelfResize;
  f_PopUpMenu:= TPopupMenu.Create(Self);
  BuildMenu;
  PopupMenu:= f_PopupMenu;
@@ -139,9 +136,10 @@ begin
    l_Panel.Top:= 1;
   l_Panel.Name:= l_Panel.ClassName + IntToStr(Succ(ControlCount));
   l_Panel.Width:= ClientWidth;
-  l_Panel.OnResize:= ControlResize;
   ClientHeight:= l_Panel.Top + l_Panel.Height + 4;
   InsertControl(l_Panel);
+  l_Panel.OnControlResize:= ControlResize;
+  l_Panel.ResizeControls;
 end;
 
 procedure TqcActionsScrollBox.CreateActionControls;
@@ -161,34 +159,6 @@ begin
   CreateActionControls;
  finally
   f_EnableResize:= True;
- end;
-end;
-
-procedure TqcActionsScrollBox.ControlResize(Sender: TObject);
-var
- i: Integer;
- l_Move: Boolean;
- l_Delta: Integer;
-begin
- // Один из контролов изменился. Нужно сдвинуть вниз всех, стоящих за ним
- if f_EnableResize then
- begin
-  l_Move:= False;
-  l_Delta:= 0;
-  for i:= 0 to ControlCount-1 do
-  begin
-   if l_Move then
-    Controls[i].Top:= Controls[i].Top + l_Delta
-   else
-   if Controls[i] = Sender then
-   begin
-    l_Move:= True;
-    if i < Pred(ControlCount) then
-     l_Delta:= Controls[i].Top + Controls[i].Height - Controls[i+1].Top;
-   end;
-   if Controls[i] is TPropertiesPanel then
-    TPropertiesPanel(Controls[i]).ResizeControls;
-  end;
  end;
 end;
 
@@ -215,17 +185,6 @@ end;
 procedure TqcActionsScrollBox.InsertVarAction(Sender: TObject);
 begin
  Add(TdcVariableAction.Create(Script));
-end;
-
-procedure TqcActionsScrollBox.SelfResize(Sender: TObject);
-var
- i: Integer;
-begin
- for i:= 0 to ControlCount-1 do
- begin
-  Controls[i].Width:= ClientWidth;
-  (Controls[i] as TqcActionPanel).ControlResize(Self);
- end;
 end;
 
 procedure TqcActionPanel.GetControls(aProp: TProperty; var l_Controls: TControlsArray);
