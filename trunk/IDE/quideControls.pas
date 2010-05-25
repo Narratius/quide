@@ -138,7 +138,7 @@ begin
   l_Panel.Width:= ClientWidth;
   ClientHeight:= l_Panel.Top + l_Panel.Height + 4;
   InsertControl(l_Panel);
-  l_Panel.OnControlResize:= ControlResize;
+  l_Panel.OnSizeChanged:= ControlResize;
   l_Panel.ResizeControls;
 end;
 
