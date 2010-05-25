@@ -4,17 +4,23 @@ interface
 
 uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs, stdCtrls, ExtCtrls,
-  Propertys, Contnrs, Menus, QuestModeler;
+  Propertys, Contnrs, Menus, QuestModeler, PropertyIntf;
 
 type
-  TAutoSizeMemo = class(TMemo)
+  TPropertiesMemo = class(TMemo, IPropertyControl)
   private
     f_LineHeight: Integer;
+    f_OnSizeChanged: TNotifyEvent;
+    function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+    function pm_GetValue: Variant; stdcall;
+    procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
+    procedure pm_SetValue(const Value: Variant); stdcall;
   public
     constructor Create(aOwner: TComponent); override;
     procedure TextChanged(Sender: TObject);
     property LineHeight: Integer read f_LineHeight write f_LineHeight;
-    property OnResize;
+    property Value: Variant read pm_GetValue write pm_SetValue;
+    property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
   end;
 
   TControlAlign = (caNewLine, caInline);
@@ -25,14 +31,19 @@ type
 
   TControlsArray = array of TControlRec;
   //1 Панель для редактирования одного объекта
-  TPropertiesPanel = class(TPanel)
+  TPropertiesPanel = class(TPanel, IPropertyControl)
   private
     f_Controls: TList;
-    f_OnControlResize: TNotifyEvent;
+    f_OnSizeChanged: TNotifyEvent;
     f_Properties: TProperties;
     f_PropertyObject: TPropertyObject;
+    function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+    function pm_GetValue: Variant; stdcall;
+    procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
     procedure pm_SetProperties(aValue: TProperties);
     procedure pm_SetPropertyObject(const Value: TPropertyObject);
+    procedure pm_SetValue(const Value: Variant); stdcall;
+    property Value: Variant read pm_GetValue write pm_SetValue;
   protected
     procedure MyControlResized(Sender: TObject);
   public
@@ -45,8 +56,8 @@ type
     procedure SetValues;
     property Properties: TProperties read f_Properties write pm_SetProperties;
     property PropertyObject: TPropertyObject read f_PropertyObject write pm_SetPropertyObject;
+    property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
   published
-    property OnControlResize: TNotifyEvent read f_OnControlResize write f_OnControlResize;
   end;
 
  TTextButton = class(TPanel)
@@ -56,24 +67,49 @@ type
  TPropertiesScrollBox = class(TScrollBox)
  private
   f_EnableResize: Boolean;
-  f_OnControlResize: TNotifyEvent;
+  f_OnSizeChanged: TNotifyEvent;
+  function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+  procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
  protected
   procedure ControlResize(Sender: TObject);
  public
   constructor Create(aOwner: TComponent); override;
   procedure SelfResize(Sender: TObject);
+  property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
  published
-  property OnControlResize: TNotifyEvent read f_OnControlResize write f_OnControlResize;
+ end;
+
+ TPropertiesEdit = class(TEdit, IPropertyControl)
+ private
+  f_OnSizeChanged: TNotifyEvent;
+  function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+  function pm_GetValue: Variant; stdcall;
+  procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
+  procedure pm_SetValue(const Value: Variant); stdcall;
+ public
+  property Value: Variant read pm_GetValue write pm_SetValue;
+  property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
+ end;
+
+ TPropertiesComboBox = class(TComboBox, IPropertyControl)
+ private
+  f_OnSizeChanged: TNotifyEvent;
+  function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+  function pm_GetValue: Variant; stdcall;
+  procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
+  procedure pm_SetValue(const Value: Variant); stdcall;
+ public
+  property Value: Variant read pm_GetValue write pm_SetValue;
+  property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
  end;
 
 
 implementation
 
-
 {
-******************************** TAutoSizeMemo *********************************
+******************************** TPropertiesMemo *********************************
 }
-constructor TAutoSizeMemo.Create(aOwner: TComponent);
+constructor TPropertiesMemo.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   OnChange:= TextChanged;
@@ -81,10 +117,32 @@ begin
   Height:= 2*LineHeight + 4;
 end;
 
-procedure TAutoSizeMemo.TextChanged(Sender: TObject);
+function TPropertiesMemo.pm_GetOnSizeChanged: TNotifyEvent;
+begin
+ Result := f_OnSizeChanged;
+end;
+
+function TPropertiesMemo.pm_GetValue: Variant;
+begin
+ Result:= Text;
+end;
+
+procedure TPropertiesMemo.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+begin
+ f_OnSizeChanged := aValue;
+end;
+
+procedure TPropertiesMemo.pm_SetValue(const Value: Variant);
+begin
+ Text:= Value;
+end;
+
+procedure TPropertiesMemo.TextChanged(Sender: TObject);
 begin
  if Parent <> nil then
   Height:= (Lines.Count+1)*LineHeight + 4;
+ if Assigned(f_OnSizeChanged) then
+  f_OnSizeChanged(Self);
 end;
 
 {
@@ -111,6 +169,7 @@ var
   l_Controls: TControlsArray;
   l_C: TControl;
   i, l_Top: Integer;
+  l_IC: IPropertyControl;
 begin
  if aProp.Visible then
  begin
@@ -128,11 +187,10 @@ begin
    l_C.Width:= Width - 8;
    Height:= l_C.Top + l_C.Height + 8;
    f_Controls.Add(l_C);
-   if (l_C is TAutoSizeMemo) then
-    TAutoSizeMemo(l_C).OnResize:= MyControlResized
-   else
-   if l_C is TPropertiesScrollBox then
-    TPropertiesScrollBox(l_C).OnControlResize:= MyControlResized;
+   if l_C.GetInterface(IPropertyControl, l_IC) then
+   begin
+    l_IC.OnSizeChanged:= MyControlResized;
+   end;
    InsertControl(l_C);
   end; // for i
  end; // aProp.Visible
@@ -153,10 +211,10 @@ begin
    SetLength(l_Controls, 1);
   i:= Pred(Length(l_Controls));
   case aProp.PropertyType of
-   ptInteger: l_Controls[i].ControlClass:= TEdit;
-   ptString : l_Controls[i].ControlClass:= TEdit;
-   ptText   : l_Controls[i].ControlClass:= TAutoSizeMemo;
-   ptBoolean: l_Controls[i].ControlClass:= TComboBox;
+   ptInteger: l_Controls[i].ControlClass:= TPropertiesEdit;
+   ptString : l_Controls[i].ControlClass:= TPropertiesEdit;
+   ptText   : l_Controls[i].ControlClass:= TPropertiesMemo;
+   ptBoolean: l_Controls[i].ControlClass:= TPropertiesComboBox;
   end;
  end
  else
@@ -166,14 +224,12 @@ end;
 procedure TPropertiesPanel.GetValues;
 var
  i: Integer;
+ l_I: IPropertyControl;
 begin
  for i:= 0 to ControlCount-1 do
  begin
-  if Controls[i] is TEdit then
-   Properties[Controls[i].Tag].Value:= TEdit(Controls[i]).Text
-  else
-  if Controls[i] is TMemo then
-   Properties[Controls[i].Tag].Value:= TMemo(Controls[i]).Text;
+  if Controls[i].GetInterface(IPropertyControl, l_I) then
+   Properties[Controls[i].Tag].Value:= l_I.Value
  end;
 end;
 
@@ -210,30 +266,55 @@ end;
 procedure TPropertiesPanel.MyControlResized(Sender: TObject);
 var
  l_Index, l_Start: Integer;
+ l_Delta, l_Height: Integer;
 begin
  // Нужно сдвинуть всех тех, кто ниже сендера и увеличить собственный размер
  l_Start:= f_Controls.IndexOf(Sender);
  if l_Start <> -1 then
  begin
-  for l_Index:= +1 to f_Controls.Count-1 do
+  l_Height:= TControl(f_Controls[l_Start]).Top + TControl(f_Controls[l_Start]).Height;
+  if l_Start < Pred(f_Controls.Count) then
+   l_Delta:= l_Height - TControl(f_Controls[Succ(l_Start)]).Top
+  else
+   l_Delta:= l_Height - Height;
+  Height:= Height + l_Delta; 
+  for l_Index:= l_Start+1 to f_Controls.Count-1 do
   begin
-   TControl(f_Controls[l_Index]).Top:= TControl(f_Controls[l_Index-1]).Top + TControl(f_Controls[l_Index-1]).Height + 4
+   TControl(f_Controls[l_Index]).Top:= TControl(f_Controls[l_Index-1]).Top + l_Delta
   end;
-  ClientHeight:= TControl(f_Controls.Last).Top + TControl(f_Controls.Last).Height + 4;
+  ClientHeight:= TControl(f_Controls.Last).Top + l_delta;
  end;
+end;
+
+function TPropertiesPanel.pm_GetOnSizeChanged: TNotifyEvent;
+begin
+ Result := f_OnSizeChanged;
+end;
+
+function TPropertiesPanel.pm_GetValue: Variant;
+begin
+ // TODO -cMM: TPropertiesPanel.pm_GetValue необходимо написать реализацию
+end;
+
+procedure TPropertiesPanel.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+begin
+ f_OnSizeChanged := aValue;
+end;
+
+procedure TPropertiesPanel.pm_SetValue(const Value: Variant);
+begin
+ // TODO -cMM: TPropertiesPanel.pm_SetValue необходимо написать реализацию
 end;
 
 procedure TPropertiesPanel.SetValues;
 var
  i: Integer;
+ l_I: IPropertyControl;
 begin
  for i:= 0 to ControlCount-1 do
  begin
-  if Controls[i] is TEdit then
-   TEdit(Controls[i]).Text:= Properties[Controls[i].Tag].Value
-  else
-  if Controls[i] is TMemo then
-   TMemo(Controls[i]).Text:= Properties[Controls[i].Tag].Value
+  if Controls[i].GetInterface(IPropertyControl, l_I) then
+   l_I.value:= Properties[Controls[i].Tag].Value
  end;
 end;
 
@@ -275,6 +356,16 @@ begin
  end;
 end;
 
+function TPropertiesScrollBox.pm_GetOnSizeChanged: TNotifyEvent;
+begin
+ Result:= f_OnSizeChanged;
+end;
+
+procedure TPropertiesScrollBox.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+begin
+ f_OnSizeChanged:= aValue;
+end;
+
 procedure TPropertiesScrollBox.SelfResize(Sender: TObject);
 var
  i: Integer;
@@ -284,6 +375,46 @@ begin
   Controls[i].Width:= ClientWidth;
   (Controls[i] as TPropertiesPanel).ResizeControls;
  end;
+end;
+
+function TPropertiesEdit.pm_GetOnSizeChanged: TNotifyEvent;
+begin
+ Result := f_OnSizeChanged;
+end;
+
+function TPropertiesEdit.pm_GetValue: Variant;
+begin
+ Result:= Text;
+end;
+
+procedure TPropertiesEdit.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+begin
+ f_OnSizeChanged := aValue;
+end;
+
+procedure TPropertiesEdit.pm_SetValue(const Value: Variant);
+begin
+ Text := Value;
+end;
+
+function TPropertiesComboBox.pm_GetOnSizeChanged: TNotifyEvent;
+begin
+ Result := f_OnSizeChanged;
+end;
+
+function TPropertiesComboBox.pm_GetValue: Variant;
+begin
+ Result:= ItemIndex;
+end;
+
+procedure TPropertiesComboBox.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+begin
+ f_OnSizeChanged := aValue;
+end;
+
+procedure TPropertiesComboBox.pm_SetValue(const Value: Variant);
+begin
+ ItemIndex:= Value;
 end;
 
 
