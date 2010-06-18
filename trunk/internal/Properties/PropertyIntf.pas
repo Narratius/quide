@@ -8,6 +8,7 @@ uses
 type
   IPropertyContainer = interface(IInterface)
   ['{D2FBC108-88B0-4800-B449-4532600E4F80}']
+   procedure AddControl(aControl: TControl); stdcall;
   end;
 
   IPropertyControl = interface(IInterface)

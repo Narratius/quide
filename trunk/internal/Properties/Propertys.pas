@@ -139,7 +139,7 @@ end;
 procedure TPropertyObject.Define(const aAlias: String; const aCaption: TCaption; aType:
     TPropertyType; aValue: Variant; aVisible: Boolean = True);
 begin
- TProperty(f_Properties.Add).Define(aAlias, aCaption, aType, aValue);
+ TProperty(f_Properties.Add).Define(aAlias, aCaption, aType, aValue, aVisible);
 end;
 
 destructor TPropertyObject.Destroy;

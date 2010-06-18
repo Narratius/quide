@@ -12,7 +12,7 @@ type
   f_Action: TdcAction;
   procedure pm_SetAction(Value: TdcAction);
  public
-  procedure GetControls(aProp: TProperty; var l_Controls: TControlsArray); override;
+  procedure GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray); override;
   property Action : TdcAction
    read f_Action
    write pm_SetAction;
@@ -52,7 +52,7 @@ type
 implementation
 
 Uses
- SysUtils, Controls, StdCtrls;
+ SysUtils, Controls, StdCtrls, Graphics;
 
 { TqcActionsScrollBox }
 
@@ -63,6 +63,8 @@ begin
  BuildMenu;
  PopupMenu:= f_PopupMenu;
  f_Actions:= TdcActionList.Create;
+ Color:= clTeal;
+ BorderStyle:= bsSingle;
 end;
 
 procedure TqcActionsScrollBox.Add(aAction: TdcAction);
@@ -187,7 +189,7 @@ begin
  Add(TdcVariableAction.Create(Script));
 end;
 
-procedure TqcActionPanel.GetControls(aProp: TProperty; var l_Controls: TControlsArray);
+procedure TqcActionPanel.GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray);
 var
  i: Integer;
 begin
