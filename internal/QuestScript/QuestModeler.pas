@@ -949,9 +949,9 @@ constructor TdcLogicAction.Create(aModel: TdcScript);
 begin
  inherited;
  ActionType:= atLogic;
- Define('Condition', 'Если |', ptTextWitButton, '');
- Define('True', '', ptActions, '');
- Define('false', 'иначе', ptActions, '');
+ //Define('Condition', 'Если |', ptTextWitButton, '');
+ Define('True', 'так', ptActions, '');
+ Define('False', 'иначе', ptActions, '');
 end;
 
 constructor TdcVariableAction.Create(aModel: TdcScript);

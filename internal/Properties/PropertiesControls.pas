@@ -27,6 +27,7 @@ type
   TControlRec = record
    ControlClass: TControlClass;
    Align       : TControlAlign;
+   Height      : Integer;
   end;
 
   TControlsArray = array of TControlRec;
@@ -50,7 +51,7 @@ type
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure CreateControl(aProp: TProperty);
-    procedure GetControls(aProp: TProperty; var l_Controls: TControlsArray); virtual;
+    procedure GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray); virtual;
     procedure GetValues;
     procedure ResizeControls;
     procedure SetValues;
@@ -64,17 +65,20 @@ type
  end;
 
 type
- TPropertiesScrollBox = class(TScrollBox)
+ TPropertiesScrollBox = class(TScrollBox, IPropertyControl)
  private
   f_EnableResize: Boolean;
   f_OnSizeChanged: TNotifyEvent;
   function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
+  function pm_GetValue: Variant; stdcall;
   procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
+  procedure pm_SetValue(const Value: Variant); stdcall;
  protected
   procedure ControlResize(Sender: TObject);
  public
   constructor Create(aOwner: TComponent); override;
   procedure SelfResize(Sender: TObject);
+  property Value: Variant read pm_GetValue write pm_SetValue;
   property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
  published
  end;
@@ -103,8 +107,13 @@ type
   property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
  end;
 
+const
+ cDefaultHeight = -1;
 
 implementation
+
+uses
+ Math;
 
 {
 ******************************** TPropertiesMemo *********************************
@@ -140,7 +149,7 @@ end;
 procedure TPropertiesMemo.TextChanged(Sender: TObject);
 begin
  if Parent <> nil then
-  Height:= (Lines.Count+1)*LineHeight + 4;
+  Height:= (Lines.Count+1)*LineHeight;
  if Assigned(f_OnSizeChanged) then
   f_OnSizeChanged(Self);
 end;
@@ -150,11 +159,11 @@ end;
 }
 constructor TPropertiesPanel.Create(aOwner: TComponent);
 begin
-  inherited ;
-  BevelOuter:= bvNone;
-  Caption:= '';
-  //OnResize:= ResizeControls;
-  Height:= 12;
+ inherited ;
+ BevelOuter:= bvNone;
+ Caption:= '';
+ Color:= clGreen;
+ Height:= 12;
  f_Controls := TList.Create();
 end;
 
@@ -173,7 +182,7 @@ var
 begin
  if aProp.Visible then
  begin
-  GetControls(aProp, l_Controls);
+  GetPropertyControls(aProp, l_Controls);
   for i:= 0 to Length(l_Controls)-1 do
   begin
    { TODO : Ќужно учитывать взаимное расположение }
@@ -196,7 +205,7 @@ begin
  end; // aProp.Visible
 end;
 
-procedure TPropertiesPanel.GetControls(aProp: TProperty; var l_Controls: TControlsArray);
+procedure TPropertiesPanel.GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray);
 var
  i: Integer;
 begin
@@ -206,14 +215,20 @@ begin
   begin
    SetLength(l_Controls, 2);
    l_Controls[0].ControlClass:= TLabel;
+   l_Controls[0].Height:= cDefaultHeight;
   end
   else
    SetLength(l_Controls, 1);
   i:= Pred(Length(l_Controls));
+  l_Controls[i].Height:= cDefaultHeight;
   case aProp.PropertyType of
    ptInteger: l_Controls[i].ControlClass:= TPropertiesEdit;
    ptString : l_Controls[i].ControlClass:= TPropertiesEdit;
-   ptText   : l_Controls[i].ControlClass:= TPropertiesMemo;
+   ptText   :
+    begin
+     l_Controls[i].ControlClass:= TPropertiesMemo;
+     l_Controls[i].Height:= 32;
+    end;
    ptBoolean: l_Controls[i].ControlClass:= TPropertiesComboBox;
   end;
  end
@@ -273,16 +288,24 @@ begin
  if l_Start <> -1 then
  begin
   l_Height:= TControl(f_Controls[l_Start]).Top + TControl(f_Controls[l_Start]).Height;
-  if l_Start < Pred(f_Controls.Count) then
-   l_Delta:= l_Height - TControl(f_Controls[Succ(l_Start)]).Top
-  else
-   l_Delta:= l_Height - Height;
-  Height:= Height + l_Delta; 
-  for l_Index:= l_Start+1 to f_Controls.Count-1 do
+  if f_Controls.Count > 1 then
   begin
-   TControl(f_Controls[l_Index]).Top:= TControl(f_Controls[l_Index-1]).Top + l_Delta
+   if l_Start < Pred(f_Controls.Count) then
+    l_Delta:= l_Height - TControl(f_Controls[Succ(l_Start)]).Top
+   else
+    l_Delta:= l_Height - Height;
+   Height:= Height + l_Delta;
+   for l_Index:= l_Start+1 to f_Controls.Count-1 do
+   begin
+    TControl(f_Controls[l_Index]).Top:= TControl(f_Controls[l_Index-1]).Top + l_Delta
+   end;
+  end
+  else
+  begin
+   Height:= l_Height + 8;
+   l_Delta:= 0;
   end;
-  ClientHeight:= TControl(f_Controls.Last).Top + l_delta;
+  //ClientHeight:= TControl(f_Controls.Last).Top + l_delta;
  end;
 end;
 
@@ -361,9 +384,19 @@ begin
  Result:= f_OnSizeChanged;
 end;
 
+function TPropertiesScrollBox.pm_GetValue: Variant;
+begin
+ Result:= Text;
+end;
+
 procedure TPropertiesScrollBox.pm_SetOnSizeChanged(aValue: TNotifyEvent);
 begin
  f_OnSizeChanged:= aValue;
+end;
+
+procedure TPropertiesScrollBox.pm_SetValue(const Value: Variant);
+begin
+ Text:= Value;
 end;
 
 procedure TPropertiesScrollBox.SelfResize(Sender: TObject);
@@ -375,6 +408,8 @@ begin
   Controls[i].Width:= ClientWidth;
   (Controls[i] as TPropertiesPanel).ResizeControls;
  end;
+ if Assigned(f_OnSizeChanged) then
+  f_OnSizeChanged(Self);
 end;
 
 function TPropertiesEdit.pm_GetOnSizeChanged: TNotifyEvent;
