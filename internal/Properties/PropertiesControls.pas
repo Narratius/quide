@@ -32,19 +32,19 @@ type
 
   TControlsArray = array of TControlRec;
   //1 Панель для редактирования одного объекта
-  TPropertiesPanel = class(TPanel, IPropertyControl)
+  TPropertiesPanel = class(TPanel, IPropertyContainer, IPropertyControlValue)
   private
     f_Controls: TList;
     f_OnSizeChanged: TNotifyEvent;
     f_Properties: TProperties;
     f_PropertyObject: TPropertyObject;
+    procedure AddControl(aControl: TControl); stdcall;
     function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
     function pm_GetValue: Variant; stdcall;
     procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
     procedure pm_SetProperties(aValue: TProperties);
     procedure pm_SetPropertyObject(const Value: TPropertyObject);
     procedure pm_SetValue(const Value: Variant); stdcall;
-    property Value: Variant read pm_GetValue write pm_SetValue;
   protected
     procedure MyControlResized(Sender: TObject);
   public
@@ -57,6 +57,7 @@ type
     procedure SetValues;
     property Properties: TProperties read f_Properties write pm_SetProperties;
     property PropertyObject: TPropertyObject read f_PropertyObject write pm_SetPropertyObject;
+    property Value: Variant read pm_GetValue write pm_SetValue;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write pm_SetOnSizeChanged;
   published
   end;
@@ -65,10 +66,11 @@ type
  end;
 
 type
- TPropertiesScrollBox = class(TScrollBox, IPropertyControl)
+ TPropertiesScrollBox = class(TScrollBox, IPropertyContainer)
  private
   f_EnableResize: Boolean;
   f_OnSizeChanged: TNotifyEvent;
+  procedure AddControl(aControl: TControl); stdcall;
   function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
   function pm_GetValue: Variant; stdcall;
   procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
@@ -173,12 +175,23 @@ begin
  inherited Destroy;
 end;
 
+procedure TPropertiesPanel.AddControl(aControl: TControl);
+var
+  l_IC: IPropertyControl;
+begin
+ f_Controls.Add(aControl);
+ if aControl.GetInterface(IPropertyControl, l_IC) then
+ begin
+  l_IC.OnSizeChanged:= MyControlResized;
+ end;
+end;
+
 procedure TPropertiesPanel.CreateControl(aProp: TProperty);
 var
   l_Controls: TControlsArray;
   l_C: TControl;
-  i, l_Top: Integer;
-  l_IC: IPropertyControl;
+  i: Integer;
+
 begin
  if aProp.Visible then
  begin
@@ -195,11 +208,7 @@ begin
    l_C.Tag:= aProp.Index;
    l_C.Width:= Width - 8;
    Height:= l_C.Top + l_C.Height + 8;
-   f_Controls.Add(l_C);
-   if l_C.GetInterface(IPropertyControl, l_IC) then
-   begin
-    l_IC.OnSizeChanged:= MyControlResized;
-   end;
+   AddControl(l_C);
    InsertControl(l_C);
   end; // for i
  end; // aProp.Visible
@@ -239,11 +248,11 @@ end;
 procedure TPropertiesPanel.GetValues;
 var
  i: Integer;
- l_I: IPropertyControl;
+ l_I: IPropertyControlValue;
 begin
  for i:= 0 to ControlCount-1 do
  begin
-  if Controls[i].GetInterface(IPropertyControl, l_I) then
+  if Controls[i].GetInterface(IPropertyControlValue, l_I) then
    Properties[Controls[i].Tag].Value:= l_I.Value
  end;
 end;
@@ -332,11 +341,11 @@ end;
 procedure TPropertiesPanel.SetValues;
 var
  i: Integer;
- l_I: IPropertyControl;
+ l_I: IPropertyControlValue;
 begin
  for i:= 0 to ControlCount-1 do
  begin
-  if Controls[i].GetInterface(IPropertyControl, l_I) then
+  if Controls[i].GetInterface(IPropertyControlValue, l_I) then
    l_I.value:= Properties[Controls[i].Tag].Value
  end;
 end;
@@ -349,6 +358,11 @@ begin
  Constraints.MinHeight:= 24;
  Constraints.MinWidth:= 100;
  OnResize:= SelfResize;
+end;
+
+procedure TPropertiesScrollBox.AddControl(aControl: TControl);
+begin
+ // TODO -cMM: TPropertiesScrollBox.AddControl необходимо написать реализацию
 end;
 
 procedure TPropertiesScrollBox.ControlResize(Sender: TObject);
