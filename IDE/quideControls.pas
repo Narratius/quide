@@ -142,6 +142,8 @@ begin
   InsertControl(l_Panel);
   l_Panel.OnSizeChanged:= ControlResize;
   l_Panel.ResizeControls;
+  if Assigned(f_OnControlResize) then
+   f_OnControlResize(Self);
 end;
 
 procedure TqcActionsScrollBox.CreateActionControls;
