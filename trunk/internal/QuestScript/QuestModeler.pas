@@ -10,13 +10,13 @@ uses
 Type
  TdcScript = class;
  TdcVariable = class;
- TqmBase = class(TPropertyObject)
+ TqmBase = class(TProperties)
  private
   f_Script: TdcScript;
   function pm_GetCaption: string;
   procedure pm_SetCaption(const Value: string);
  public
-  constructor Create(aModel: TdcScript); virtual;
+  constructor Create(aModel: TdcScript); reintroduce; virtual;
   destructor Destroy; override;
   procedure Assign(Source: TPersistent); override;
   function Clone(aModel: TdcScript): Pointer;
@@ -289,9 +289,9 @@ end;
 
 constructor TqmBase.Create(aModel: TdcScript);
 begin
- inherited Create;
+ inherited Create(TProperty);
  f_Script:= aModel;
- Define('Caption', 'Название', ptString, '', False);
+ Define('Caption', 'Название', ptString{, '', False});
 end;
 
 destructor TqmBase.Destroy;
@@ -322,7 +322,6 @@ end;
 procedure TqmBase.pm_SetCaption(const Value: string);
 begin
  Values['Caption']:= Value;
- Changed:= True;
 end;
 
 procedure TqmBase.Save(Element: IXMLNode);
@@ -876,8 +875,8 @@ begin
  inherited;
  f_Description:= TStringList.Create;
  ActionType:= atText;
- Visible['Caption']:= False;
- Define('Description', '', ptText, '');
+ //Visible['Caption']:= False;
+ Define('Description', '', ptText);
 end;
 
 procedure TdcTextAction.Assign(Source: TPersistent);
@@ -950,8 +949,8 @@ begin
  inherited;
  ActionType:= atLogic;
  //Define('Condition', 'Если |', ptTextWitButton, '');
- Define('True', 'так', ptActions, '');
- Define('False', 'иначе', ptActions, '');
+ //Define('True', 'так', ptActions);
+// Define('False', 'иначе', ptActions, '');
 end;
 
 constructor TdcVariableAction.Create(aModel: TdcScript);
