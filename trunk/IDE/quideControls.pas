@@ -3,26 +3,26 @@ unit quideControls;
 interface
 Uses
  QuestModeler,
- PropertiesControls,
+ ParamControls, SizeableControls,
  Forms, ExtCtrls, Classes, Menus, Propertys;
 
 type
- TqcActionPanel = class(TPropertiesPanel)
+ TqcActionPanel = class(TControlPanel)
  private
   f_Action: TdcAction;
   procedure pm_SetAction(Value: TdcAction);
+ protected
+  function GetActionControls: TControlsArray;
  public
-  procedure GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray); override;
   property Action : TdcAction
    read f_Action
    write pm_SetAction;
  end;
 
- TqcActionsScrollBox = class(TPropertiesScrollBox)
+ TqcActionsScrollBox = class(TSizeableScrollBox)
  private
   f_Actions: TdcActionList;
   f_EnableResize: Boolean;
-  f_OnControlResize: TNotifyEvent;
   f_PopUpMenu: TPopUpMenu;
   f_Script: TdcScript;
   procedure BuildMenu;
@@ -45,14 +45,21 @@ type
    read f_Script
    write f_Script;
  published
-  property OnControlResize: TNotifyEvent read f_OnControlResize write f_OnControlResize;
  end;
+
+type
+  IPropertyControlValue = interface(IInterface)
+    ['{7660D972-81B7-4062-AF86-4517B58AA55E}']
+    function pm_GetValue: Variant; stdcall;
+    procedure pm_SetValue(const Value: Variant); stdcall;
+    property Value: Variant read pm_GetValue write pm_SetValue;
+  end;
 
 
 implementation
 
 Uses
- SysUtils, Controls, StdCtrls, Graphics;
+ SysUtils, Controls, StdCtrls, Graphics, SizeableTypes;
 
 { TqcActionsScrollBox }
 
@@ -131,19 +138,9 @@ var
  l_Panel: TqcActionPanel;
 begin
   l_Panel:= TqcActionPanel.Create(Self);
+  AddControl(l_Panel, csAutoSize, cpNewLine);
   l_Panel.Action:= aAction;
-  if ControlCount > 0 then
-   l_Panel.Top:= Controls[Pred(ControlCount)].Top + Controls[Pred(ControlCount)].Height
-  else
-   l_Panel.Top:= 1;
   l_Panel.Name:= l_Panel.ClassName + IntToStr(Succ(ControlCount));
-  l_Panel.Width:= ClientWidth;
-  ClientHeight:= l_Panel.Top + l_Panel.Height + 4;
-  InsertControl(l_Panel);
-  l_Panel.OnSizeChanged:= ControlResize;
-  l_Panel.ResizeControls;
-  if Assigned(f_OnControlResize) then
-   f_OnControlResize(Self);
 end;
 
 procedure TqcActionsScrollBox.CreateActionControls;
@@ -191,35 +188,35 @@ begin
  Add(TdcVariableAction.Create(Script));
 end;
 
-procedure TqcActionPanel.GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray);
+function TqcActionPanel.GetActionControls: TControlsArray;
 var
  i: Integer;
 begin
- inherited;
- if Length(l_Controls) = 0 then
- begin
-  if aProp.Caption <> '' then
-  begin
-   SetLength(l_Controls, 2);
-   l_Controls[0].ControlClass:= TLabel;
-  end
-  else
-   SetLength(l_Controls, 1);
-  i:= Pred(Length(l_Controls));
-  case aProp.PropertyType of
-   ptButton : l_Controls[i].ControlClass:= TButton;
-   ptTextWitButton: l_Controls[i].ControlClass:= TButton;
-   ptActions: l_Controls[i].ControlClass:= TqcActionsScrollBox;
-  end;
- end;
+ case Action.ActionType of
+  atNone: SetLength(Result, 0);
+  atGoto: ;
+  atInventory: ;
+  atLogic: ;
+  atText:
+   begin
+    SetLength(Result, Action.Count);
+    for i:= 0 to Action.Count-1 do
+    begin
+     Result[i]:= cDefControlRec;
+     Result[i].ControlClass:= Action[i].;
+    end;
+   end;
+  atVariable: ;
+  atButton: ;
+ end; // case Action.ActionType
 end;
 
 { TqcActionPanel }
 
 procedure TqcActionPanel.pm_SetAction(Value: TdcAction);
 begin
-  f_Action:= Value;
-  Properties:= f_Action.Properties;
+ f_Action:= Value;
+ CreateControls(GetActionControls);
 end;
 
 end.

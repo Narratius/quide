@@ -6,7 +6,14 @@ uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
 
 type
- TPropertyType = (ptString, ptInteger, ptText, ptBoolean);
+ TPropertyType = (ptString,  // TEdit
+                  ptInteger, // TEdit
+                  ptText,    // TMemo
+                  ptBoolean, // TRadioGroup (TCombobox)
+                  ptChoice,  // TComboBox
+                  ptAction   // TButton
+                  );
+
   TProperty = class(TCollectionItem)
   private
     f_Alias: string;
@@ -32,6 +39,8 @@ type
     procedure pm_SetItems(Alias: String; aValue: TProperty);
     procedure pm_SetValues(Alias: String; const Value: string);
   public
+    constructor Create;
+    function Add: TProperty;
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType);
     property Changed: Boolean read f_Changed write pm_SetChanged;
     property Items[Alias: String]: TProperty read pm_GetItems write pm_SetItems;
@@ -58,9 +67,24 @@ begin
    inherited;
 end;
 
-procedure TProperties.Define(const aAlias, aCaption: String; aType: TPropertyType);
+constructor TProperties.Create;
 begin
- // TODO -cMM: TProperty.Define необходимо написать реализацию
+ inherited Create(TProperty);
+end;
+
+function TProperties.Add: TProperty;
+begin
+ Result := TProperty(inherited Add);
+end;
+
+procedure TProperties.Define(const aAlias, aCaption: String; aType: TPropertyType);
+var
+ l_P: TProperty;
+begin
+ l_P:= Add;
+ l_P.Alias:= aAlias;
+ l_P.Caption:= aCaption;
+ l_P.PropertyType:= aType;
 end;
 
 {
@@ -86,8 +110,7 @@ end;
 
 function TProperties.pm_GetValues(Alias: String): string;
 begin
- // TODO -cMM: TProperties.pm_GetValues необходимо написать реализацию
- Result := '';
+ Result := Items[Alias].Value;
 end;
 
 procedure TProperties.pm_SetChanged(const Value: Boolean);
@@ -101,7 +124,7 @@ var
 begin
   l_Prop:= FindProperty(Alias);
   if l_Prop = nil then
-   l_Prop:= TProperty(Add);
+   l_Prop:= Add;
   l_Prop.Assign(aValue);
 end;
 

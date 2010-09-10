@@ -289,7 +289,7 @@ end;
 
 constructor TqmBase.Create(aModel: TdcScript);
 begin
- inherited Create(TProperty);
+ inherited Create;
  f_Script:= aModel;
  Define('Caption', 'Название', ptString{, '', False});
 end;

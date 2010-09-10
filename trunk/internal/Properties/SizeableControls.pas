@@ -127,7 +127,7 @@ begin
   inherited Create(aOwner);
   OnChange:= TextChanged;
   LineHeight:= 13;
-  Height:= LineHeight+2;
+  Height:= 2*LineHeight+2;
 end;
 
 function TSizeableMemo.pm_GetLineHeight: Integer;
@@ -167,7 +167,7 @@ end;
 procedure TSizeableMemo.TextChanged(Sender: TObject);
 begin
   if Parent <> nil then
-   ClientHeight:= (Lines.Count)*LineHeight+2;
+   ClientHeight:= (Lines.Count+1)*LineHeight+2;
   if Assigned(f_OnSizeChanged) then
    f_OnSizeChanged(Self);
 end;
