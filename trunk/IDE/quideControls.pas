@@ -55,6 +55,7 @@ type
     property Value: Variant read pm_GetValue write pm_SetValue;
   end;
 
+function Property2Control(aActionType)
 
 implementation
 
@@ -200,6 +201,7 @@ begin
   atText:
    begin
     SetLength(Result, Action.Count);
+    Action.IterateAll()
     for i:= 0 to Action.Count-1 do
     begin
      Result[i]:= cDefControlRec;
@@ -210,8 +212,6 @@ begin
   atButton: ;
  end; // case Action.ActionType
 end;
-
-{ TqcActionPanel }
 
 procedure TqcActionPanel.pm_SetAction(Value: TdcAction);
 begin

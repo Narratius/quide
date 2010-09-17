@@ -5,121 +5,153 @@ interface
 uses classes, ExtCtrls, StdCtrls, Controls, Propertys, SizeableControls, ParamControls;
 
 type
-  TTextButton = class(TPanel)
-  end;
-
-  TPropertiesEdit = class(TEdit)
-  private
-    f_OnSizeChanged: TNotifyEvent;
-    function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
-    function pm_GetValue: Variant; stdcall;
-    procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
-    procedure pm_SetValue(const Value: Variant); stdcall;
-  public
-    property Value: Variant read pm_GetValue write pm_SetValue;
-    property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
-        pm_SetOnSizeChanged;
-  end;
-
-  TPropertiesComboBox = class(TComboBox)
-  private
-    f_OnSizeChanged: TNotifyEvent;
-    function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
-    function pm_GetValue: Variant; stdcall;
-    procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
-    procedure pm_SetValue(const Value: Variant); stdcall;
-  public
-    property Value: Variant read pm_GetValue write pm_SetValue;
-    property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
-        pm_SetOnSizeChanged;
-  end;
-
   //1 Панель для редактирования одного объекта
-  TPropertiesPanel = class(TParamPanel)
+  TPropertiesPanel = class(TControlPanel)
   private
+   f_Controls: TControlsArray;
+   f_Properties: TProperties;
+   function MakePropertyControl(aProperty: TProperty): Boolean;
+   procedure pm_SetProperties(const Value: TProperties);
   protected
+   procedure AddDefControl;
+   function FillControls: TControlsArray; virtual;
+   procedure GetLastControl(var aRec: TControlRec);
+   procedure MakeActionControl(aProperty: TProperty); virtual;
+   procedure MakeBooleanControl(aProperty: TProperty); virtual;
+   procedure MakeChoiceControl(aProperty: TProperty); virtual;
+   procedure MakeCustomControl(aControlClass: TControlClass);
+   procedure MakeIntegerControl(aProperty: TProperty); virtual;
+   procedure MakeStringControl(aProperty: TProperty); virtual;
+   procedure MakeTextControl(aProperty: TProperty); virtual;
+   procedure TuneupControl(aControl: TControl); override;
   public
+   procedure CorrectControl(aControlRec: TControlRec); virtual;
+   procedure MakeControls;
+   procedure SetValues;
+   procedure GetValues;
+   property Properties: TProperties read f_Properties write pm_SetProperties;
   end;
-
-procedure GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray);
 
 implementation
 
-procedure GetPropertyControls(aProp: TProperty; var l_Controls: TControlsArray);
-var
-  i: Integer;
+uses SizeableTypes;
+
+procedure TPropertiesPanel.AddDefControl;
 begin
-  if aProp.PropertyType in [ptInteger, ptString, ptText, ptBoolean] then
-  begin
-   if aProp.Caption <> '' then
-   begin
-    SetLength(l_Controls, 2);
-    l_Controls[0].ControlClass:= TLabel;
-    l_Controls[0].Height:= cDefaultHeight;
-   end
-   else
-    SetLength(l_Controls, 1);
-   i:= Pred(Length(l_Controls));
-   l_Controls[i].Height:= cDefaultHeight;
-   case aProp.PropertyType of
-    ptInteger: l_Controls[i].ControlClass:= TPropertiesEdit;
-    ptString : l_Controls[i].ControlClass:= TPropertiesEdit;
-    ptText   :
-     begin
-      l_Controls[i].ControlClass:= TPropertiesMemo;
-      l_Controls[i].Height:= 32;
-     end;
-    ptBoolean: l_Controls[i].ControlClass:= TPropertiesComboBox;
-   end;
-  end
-  else
-   SetLength(l_Controls, 0);
+ SetLength(f_Controls, Length(f_Controls)+1);
+ f_Controls[Length(f_Controls)-1]:= cDefControlRec;
 end;
 
-{
-******************************* TPropertiesEdit ********************************
-}
-function TPropertiesEdit.pm_GetOnSizeChanged: TNotifyEvent;
+procedure TPropertiesPanel.CorrectControl(aControlRec: TControlRec);
 begin
-  Result := f_OnSizeChanged;
 end;
 
-function TPropertiesEdit.pm_GetValue: Variant;
+function TPropertiesPanel.FillControls: TControlsArray;
 begin
-  Result:= Text;
+ SetLength(f_Controls, 0);
+ if Properties <> nil then
+  Properties.IterateAll(MakePropertyControl);
+ Result:= f_Controls;
 end;
 
-procedure TPropertiesEdit.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+procedure TPropertiesPanel.MakeControls;
 begin
-  f_OnSizeChanged := aValue;
+ ClearControls;
+ CreateControls(FillControls);
+ SetValues;
 end;
 
-procedure TPropertiesEdit.pm_SetValue(const Value: Variant);
+procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
-  Text := Value;
+ f_Properties := Value;
 end;
 
-{
-***************************** TPropertiesComboBox ******************************
-}
-function TPropertiesComboBox.pm_GetOnSizeChanged: TNotifyEvent;
+procedure TPropertiesPanel.SetValues;
 begin
-  Result := f_OnSizeChanged;
+ // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
 end;
 
-function TPropertiesComboBox.pm_GetValue: Variant;
+procedure TPropertiesPanel.GetValues;
 begin
-  Result:= ItemIndex;
+ // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
 end;
 
-procedure TPropertiesComboBox.pm_SetOnSizeChanged(aValue: TNotifyEvent);
+procedure TPropertiesPanel.GetLastControl(var aRec: TControlRec);
 begin
-  f_OnSizeChanged := aValue;
+ aRec:= f_Controls[Length(f_Controls)-1];
 end;
 
-procedure TPropertiesComboBox.pm_SetValue(const Value: Variant);
+procedure TPropertiesPanel.MakeActionControl(aProperty: TProperty);
 begin
-  ItemIndex:= Value;
+ MakeCustomControl(TButton);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  Caption:= aProperty.Caption;
+  Size:= csFixed;
+ end;
+end;
+
+procedure TPropertiesPanel.MakeBooleanControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TComboBox);
+end;
+
+procedure TPropertiesPanel.MakeChoiceControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TComboBox);
+end;
+
+procedure TPropertiesPanel.MakeCustomControl(aControlClass: TControlClass);
+begin
+ AddDefControl;
+ with f_Controls[Length(f_Controls)-1] do
+  ControlClass:= aControlClass;
+end;
+
+procedure TPropertiesPanel.MakeIntegerControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TEdit);
+end;
+
+function TPropertiesPanel.MakePropertyControl(aProperty: TProperty): Boolean;
+begin
+ Result:= True;
+  case aProperty.PropertyType of
+   ptString: MakeStringControl(aProperty);
+   ptInteger: MakeIntegerControl(aProperty);
+   ptText: MakeTextControl(aProperty);
+   ptBoolean: MakeBooleanControl(aProperty);
+   ptChoice: MakeChoiceControl(aProperty);
+   ptAction: MakeActionControl(aProperty);
+ end;
+ Вызвать заполнение дополнительных полей, например, заполнить эвент для последующего наполнения свойств 
+end;
+
+procedure TPropertiesPanel.MakeStringControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TEdit);
+end;
+
+procedure TPropertiesPanel.MakeTextControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TSizeableMemo);
+end;
+
+procedure TPropertiesPanel.TuneupControl(aControl: TControl);
+begin
+ 
 end;
 
 end.

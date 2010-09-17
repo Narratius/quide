@@ -29,6 +29,8 @@ type
     property Value: Variant read f_Value write f_Value;
   end;
 
+
+  TPropertyFunc = function (aItem: TProperty): Boolean of object;
   TProperties = class(TCollection)
   private
     f_Changed: Boolean;
@@ -42,6 +44,7 @@ type
     constructor Create;
     function Add: TProperty;
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType);
+    procedure IterateAll(aFunc: TPropertyFunc);
     property Changed: Boolean read f_Changed write pm_SetChanged;
     property Items[Alias: String]: TProperty read pm_GetItems write pm_SetItems;
         default;
@@ -101,6 +104,16 @@ begin
      Result:= TProperty(inherited Items[i]);
      break
     end;
+end;
+
+procedure TProperties.IterateAll(aFunc: TPropertyFunc);
+var
+ i: Integer;
+begin
+ if Assigned(aFunc) then
+  for i:= 0 to Pred(Count) do
+   if not aFunc(TProperty(inherited Items[i])) then
+    break;
 end;
 
 function TProperties.pm_GetItems(Alias: String): TProperty;
