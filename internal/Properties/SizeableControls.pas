@@ -181,7 +181,6 @@ begin
   BevelOuter:= bvNone;
   Caption:= '';
   Height:= 12;
-  Color:= clGreen;
   f_InnerControls := TList.Create();
   f_Locked:= 0;
 end;
