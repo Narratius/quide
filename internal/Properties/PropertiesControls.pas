@@ -123,9 +123,12 @@ begin
 end;
 
 function TPropertiesPanel.MakePropertyControl(aProperty: TProperty): Boolean;
+var
+ i, l_Count: Integer;
 begin
  Result:= True;
-  case aProperty.PropertyType of
+ l_Count:= Length(f_Controls);
+ case aProperty.PropertyType of
    ptString: MakeStringControl(aProperty);
    ptInteger: MakeIntegerControl(aProperty);
    ptText: MakeTextControl(aProperty);
@@ -133,7 +136,11 @@ begin
    ptChoice: MakeChoiceControl(aProperty);
    ptAction: MakeActionControl(aProperty);
  end;
- Вызвать заполнение дополнительных полей, например, заполнить эвент для последующего наполнения свойств 
+ for i:= l_Count to Pred(Length(f_Controls)) do
+ begin
+  f_Controls[i].Tag:= aProperty.ID;
+  f_Controls[i].Event:= aProperty.Event;
+ end;
 end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TProperty);
@@ -146,12 +153,20 @@ end;
 
 procedure TPropertiesPanel.MakeTextControl(aProperty: TProperty);
 begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
  MakeCustomControl(TSizeableMemo);
 end;
 
 procedure TPropertiesPanel.TuneupControl(aControl: TControl);
+var
+ l_Property: TProperty;
 begin
- 
+ l_Property:= TProperty(f_Properties.FindItemID(aControl.Tag));
+ if l_Property <> nil then
+ begin
+ end;
 end;
 
 end.
