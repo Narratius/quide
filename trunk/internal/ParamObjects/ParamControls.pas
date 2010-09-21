@@ -12,6 +12,7 @@ type
     Position    : TControlPosition;
     Size        : TControlSize;
     Height      : Integer;
+    Tag         : Integer;
     Event       : TNotifyEvent;
   end;
   TControlsArray = array of TControlRec;
@@ -49,10 +50,14 @@ begin
   begin
    l_C:= aControls[i].ControlClass.Create(Self);
    l_C.Name:= l_C.ClassName + IntToStr(Succ(ControlCount));
-   l_C.Tag:= Succ(i);
+   l_C.Tag:= aControls[i].Tag;
+
+   if (aControls[i].Size = csFixed) and (aControls[i].Height > 0) then
+    l_C.Height:= aControls[i].Height;
+   AddControl(l_C, aControls[i].Size, aControls[i].Position);
    if l_C is TLabel then
     TLabel(l_C).Caption:= aControls[i].Caption
-   else 
+   else
    if l_C is TButton then
    begin
     TButton(l_C).OnClick:= aControls[i].Event;
@@ -60,10 +65,17 @@ begin
    end
    else
    if l_C is TEdit then
-    TEdit(l_C).Text:= '';
-   if (aControls[i].Size = csFixed) and (aControls[i].Height > 0) then
-    l_C.Height:= aControls[i].Height;
-   AddControl(l_C, aControls[i].Size, aControls[i].Position);
+    TEdit(l_C).Text:= ''
+   else
+   if (l_C is TComboBox) then
+   begin
+    if Assigned(aControls[i].Event) then
+     aControls[i].Event(l_C);
+    TComboBox(l_C).Style:= csDropDownList;
+   end
+   else
+   if l_C is TMemo then
+    TMemo(l_C).Text:= '';
    TuneupControl(l_C)
   end; // for i
  finally
