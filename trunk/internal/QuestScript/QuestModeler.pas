@@ -106,6 +106,9 @@ Type
  { Условное действие }
  TdcLogicAction = class(TdcAction)
 
+ protected
+  procedure ButtonClick(Sender: TObject);
+  procedure MakePopupmenu(Sender: TObject);
  public
   constructor Create(aModel: TdcScript); override;
  end;
@@ -248,7 +251,7 @@ function StringToActionType(aStr: String): TdcActionType;
 implementation
 
 Uses
- SysUtils, XMLDoc, StrUtils, Variants, TypInfo;
+ SysUtils, XMLDoc, StrUtils, Variants, TypInfo, Dialogs;
 
 
 function VarType2String(aVarType: TdcVariableType): String;
@@ -291,7 +294,7 @@ constructor TqmBase.Create(aModel: TdcScript);
 begin
  inherited Create;
  f_Script:= aModel;
- Define('Caption', 'Название', ptString{, '', False});
+ Define('Caption', 'Название', ptString, False);
 end;
 
 destructor TqmBase.Destroy;
@@ -875,8 +878,7 @@ begin
  inherited;
  f_Description:= TStringList.Create;
  ActionType:= atText;
- //Visible['Caption']:= False;
- Define('Description', '', ptText);
+ Define('Description', 'Текст', ptText);
 end;
 
 procedure TdcTextAction.Assign(Source: TPersistent);
@@ -948,9 +950,20 @@ constructor TdcLogicAction.Create(aModel: TdcScript);
 begin
  inherited;
  ActionType:= atLogic;
- //Define('Condition', 'Если |', ptTextWitButton, '');
- //Define('True', 'так', ptActions);
-// Define('False', 'иначе', ptActions, '');
+ Define('Condition', 'Условие', ptAction, True, ButtonClick);
+ Define('True', 'Выполняется', ptProperties, True, MakePopupmenu);
+ Define('False', 'Не выполняется', ptProperties, True, MakePopupmenu);
+end;
+
+procedure TdcLogicAction.ButtonClick(Sender: TObject);
+begin
+ // TODO -cMM: Редактор условия
+ ShowMessage('Тут формулируется условие :)');
+end;
+
+procedure TdcLogicAction.MakePopupmenu(Sender: TObject);
+begin
+ // TODO -cMM: Меню для добавления сущностей
 end;
 
 constructor TdcVariableAction.Create(aModel: TdcScript);

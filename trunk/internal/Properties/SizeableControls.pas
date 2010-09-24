@@ -18,6 +18,7 @@ type
     procedure pm_SetValue(const Value: Variant); stdcall;
   public
     constructor Create(aOwner: TComponent); override;
+    procedure SizeChanged; stdcall;
     procedure TextChanged(Sender: TObject);
     property LineHeight: Integer read pm_GetLineHeight write f_LineHeight;
     property Value: Variant read pm_GetValue write pm_SetValue;
@@ -43,6 +44,7 @@ type
     destructor Destroy; override;
     procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition: TControlPosition); stdcall;
     procedure ResizeControls;
+    procedure SizeChanged; stdcall;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
         pm_SetOnSizeChanged;
   end;
@@ -68,6 +70,7 @@ type
     destructor Destroy; override;
     procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition: TControlPosition); stdcall;
     procedure SelfResize(Sender: TObject);
+    procedure SizeChanged; stdcall;
     property Value: Variant read pm_GetValue write pm_SetValue;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
         pm_SetOnSizeChanged;
@@ -111,12 +114,47 @@ begin
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
  if (aSize = csAutoSize) then
+ begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
+  aControl.Anchors:= aControl.Anchors + [akRight];
+ end;
 
  aParent.InsertControl(aControl);
+ if aParent.GetInterface(ISizeableControl, l_IC) then
+  l_Ic.SizeChanged;
  if aControl.GetInterface(ISizeableControl, l_IC) then
   l_IC.OnSizeChanged:= aMyControlResized;
  aControls.Add(aControl);
+end;
+
+procedure InnerControlResized(aParent: TWinControl; aControl: TControl; aControlsList: TList);
+var
+ i,
+ l_Delta,
+ l_Index: Integer;
+ l_IC: ISizeableControl;
+begin
+ l_Delta:= cIndent;
+ l_Index:= aControlsList.IndexOf(aControl);
+ if l_Index <> -1 then
+ begin
+  if l_Index = Pred(aControlsList.Count) then
+   l_Delta:= cIndent + aControl.Top + aControl.Height - aParent.Height
+  else
+   l_Delta:= cIndent + aControl.Top + aControl.Height - TControl(aControlsList[Succ(l_Index)]).Top;
+
+  for i:= Succ(l_Index) to Pred(aControlsList.Count) do
+  begin
+   TControl(aControlsList[i]).Top:= TControl(aControlsList[i]).Top + l_Delta
+   (*
+   if Controls[i] is TSizeablePanel then
+    TSizeablePanel(Controls[i]).ResizeControls;
+   *)
+  end;
+  aParent.Height:= aParent.Height + l_Delta;
+  if aParent.GetInterface(ISizeableControl, l_IC) then
+   l_Ic.SizeChanged;
+ end;
 end;
 
 {
@@ -164,6 +202,12 @@ begin
   Text:= Value;
 end;
 
+procedure TSizeableMemo.SizeChanged;
+begin
+ if Assigned(f_OnSizeChanged) then
+  f_OnSizeChanged(Self);
+end;
+
 procedure TSizeableMemo.TextChanged(Sender: TObject);
 begin
   if Parent <> nil then
@@ -208,38 +252,8 @@ begin
 end;
 
 procedure TSizeablePanel.MyControlResized(Sender: TObject);
-var
-  i: Integer;
-  l_Move: Boolean;
-  l_Delta: Integer;
 begin
-  // Один из контролов изменился. Нужно сдвинуть вниз всех, стоящих за ним
-  //if f_EnableResize then
-  begin
-   l_Move:= False;
-   l_Delta:= cIndent;
-   for i:= 0 to f_InnerControls.Count-1 do
-   begin
-    if l_Move then
-     TControl(f_InnerControls[i]).Top:= TControl(f_InnerControls[i]).Top + l_Delta
-    else
-    if f_InnerControls[i] = Sender then
-    begin
-     l_Move:= True;
-     if i < Pred(f_InnerControls.Count) then
-      l_Delta:= cIndent + TControl(f_InnerControls[i]).Top + TControl(f_InnerControls[i]).Height - TControl(f_InnerControls[i+1]).Top
-     else
-      l_Delta:= cIndent + TControl(f_InnerControls[i]).Top + TControl(f_InnerControls[i]).Height - Height
-    end;
-    (*
-    if Controls[i] is TSizeablePanel then
-     TSizeablePanel(Controls[i]).ResizeControls;
-    *)
-   end;
-   Height:= Height + l_Delta;
-   if Assigned(f_OnSizeChanged) then
-    f_OnSizeChanged(Self);
-  end;
+ InnerControlResized(Self, Sender as TControl, f_InnerControls);
 end;
 
 function TSizeablePanel.pm_GetOnSizeChanged: TNotifyEvent;
@@ -263,6 +277,12 @@ begin
     if not (Controls[i] is TButton) then
      Controls[i].Width:= ClientWidth - 16;
   end;
+end;
+
+procedure TSizeablePanel.SizeChanged;
+begin
+ if Assigned(f_OnSizeChanged) then
+  f_OnSizeChanged(Self);
 end;
 
 procedure TSizeablePanel.Unlock;
@@ -309,33 +329,8 @@ begin
 end;
 
 procedure TSizeableScrollBox.MyControlResized(Sender: TObject);
-var
-  i: Integer;
-  l_Move: Boolean;
-  l_Delta: Integer;
 begin
-  // Один из контролов изменился. Нужно сдвинуть вниз всех, стоящих за ним
-  if f_EnableResize then
-  begin
-   l_Move:= False;
-   l_Delta:= 0;
-   for i:= 0 to f_InnerControls.Count-1 do
-   begin
-    if l_Move then
-     TControl(f_InnerControls[i]).Top:= TControl(f_InnerControls[i]).Top + l_Delta
-    else
-    if f_InnerControls[i] = Sender then
-    begin
-     l_Move:= True;
-     if i < Pred(f_InnerControls.Count) then
-      l_Delta:= TControl(f_InnerControls[i]).Top + TControl(f_InnerControls[i]).Height - TControl(f_InnerControls[i+1]).Top;
-    end;
-    (*
-    if Controls[i] is TSizeablePanel then
-     TSizeablePanel(Controls[i]).ResizeControls;
-    *)
-   end;
-  end;
+  InnerControlResized(Self, Sender as TControl, f_InnerControls);
 end;
 
 function TSizeableScrollBox.pm_GetOnSizeChanged: TNotifyEvent;
@@ -372,6 +367,12 @@ begin
   end;
   if Assigned(f_OnSizeChanged) then
    f_OnSizeChanged(Self);
+end;
+
+procedure TSizeableScrollBox.SizeChanged;
+begin
+ if Assigned(f_OnSizeChanged) then
+  f_OnSizeChanged(Self);
 end;
 
 procedure TSizeableScrollBox.Unlock;

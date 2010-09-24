@@ -6,12 +6,13 @@ uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
 
 type
- TPropertyType = (ptString,  // TEdit
-                  ptInteger, // TEdit
-                  ptText,    // TMemo
-                  ptBoolean, // TRadioGroup (TCombobox)
-                  ptChoice,  // TComboBox
-                  ptAction   // TButton
+ TPropertyType = (ptString,    // TEdit
+                  ptInteger,   // TEdit
+                  ptText,      // TMemo
+                  ptBoolean,   // TRadioGroup (TCombobox)
+                  ptChoice,    // TComboBox
+                  ptAction,    // TButton
+                  ptProperties // TScrollBox (Вложенные свойства)
                   );
 
   TProperty = class(TCollectionItem)
@@ -21,6 +22,7 @@ type
     f_Event: TNotifyEvent;
     f_PropertyType: TPropertyType;
     f_Value: Variant;
+    f_Visible: Boolean;
   public
     procedure Assign(Source: TPersistent); override;
     property Alias: string read f_Alias write f_Alias;
@@ -28,6 +30,7 @@ type
     property PropertyType: TPropertyType read f_PropertyType write
         f_PropertyType;
     property Value: Variant read f_Value write f_Value;
+    property Visible: Boolean read f_Visible write f_Visible;
     property Event: TNotifyEvent read f_Event write f_Event;
   end;
 
@@ -47,7 +50,8 @@ type
   public
     constructor Create;
     function Add: TProperty;
-    procedure Define(const aAlias, aCaption: String; aType: TPropertyType; aEvent: TNotifyEvent = nil);
+    procedure Define(const aAlias, aCaption: String; aType: TPropertyType; aVisible: Boolean = True;
+        aEvent: TNotifyEvent = nil);
     procedure IterateAll(aFunc: TPropertyFunc);
     property Changed: Boolean read f_Changed write pm_SetChanged;
     property Items[Index: Integer]: TProperty read pm_GetItems write pm_SetItems;
@@ -84,8 +88,8 @@ begin
  Result := TProperty(inherited Add);
 end;
 
-procedure TProperties.Define(const aAlias, aCaption: String; aType: TPropertyType; aEvent:
-    TNotifyEvent = nil);
+procedure TProperties.Define(const aAlias, aCaption: String; aType: TPropertyType; aVisible:
+    Boolean = True; aEvent: TNotifyEvent = nil);
 var
  l_P: TProperty;
 begin
@@ -93,6 +97,7 @@ begin
  l_P.Alias:= aAlias;
  l_P.Caption:= aCaption;
  l_P.PropertyType:= aType;
+ l_P.Visible:= aVisible;
  l_P.Event:= aEvent;
 end;
 

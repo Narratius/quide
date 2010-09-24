@@ -8,11 +8,11 @@ type
   //1 Панель для редактирования одного объекта
   TPropertiesPanel = class(TControlPanel)
   private
-   f_Controls: TControlsArray;
    f_Properties: TProperties;
    function MakePropertyControl(aProperty: TProperty): Boolean;
    procedure pm_SetProperties(const Value: TProperties);
   protected
+   f_Controls: TControlsArray;
    procedure AddDefControl;
    function FillControls: TControlsArray; virtual;
    procedure GetLastControl(var aRec: TControlRec);
@@ -21,6 +21,7 @@ type
    procedure MakeChoiceControl(aProperty: TProperty); virtual;
    procedure MakeCustomControl(aControlClass: TControlClass);
    procedure MakeIntegerControl(aProperty: TProperty); virtual;
+   procedure MakePropertiesControl(aProperty: TProperty); virtual;
    procedure MakeStringControl(aProperty: TProperty); virtual;
    procedure MakeTextControl(aProperty: TProperty); virtual;
    procedure TuneupControl(aControl: TControl); override;
@@ -122,25 +123,37 @@ begin
  MakeCustomControl(TEdit);
 end;
 
+procedure TPropertiesPanel.MakePropertiesControl(aProperty: TProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TSizeableScrollBox);
+end;
+
 function TPropertiesPanel.MakePropertyControl(aProperty: TProperty): Boolean;
 var
  i, l_Count: Integer;
 begin
  Result:= True;
- l_Count:= Length(f_Controls);
- case aProperty.PropertyType of
-   ptString: MakeStringControl(aProperty);
-   ptInteger: MakeIntegerControl(aProperty);
-   ptText: MakeTextControl(aProperty);
-   ptBoolean: MakeBooleanControl(aProperty);
-   ptChoice: MakeChoiceControl(aProperty);
-   ptAction: MakeActionControl(aProperty);
- end;
- for i:= l_Count to Pred(Length(f_Controls)) do
+ if aProperty.Visible then
  begin
-  f_Controls[i].Tag:= aProperty.ID;
-  f_Controls[i].Event:= aProperty.Event;
- end;
+  l_Count:= Length(f_Controls);
+  case aProperty.PropertyType of
+    ptString: MakeStringControl(aProperty);
+    ptInteger: MakeIntegerControl(aProperty);
+    ptText: MakeTextControl(aProperty);
+    ptBoolean: MakeBooleanControl(aProperty);
+    ptChoice: MakeChoiceControl(aProperty);
+    ptAction: MakeActionControl(aProperty);
+    ptProperties: MakePropertiesControl(aProperty);
+  end;
+  for i:= l_Count to Pred(Length(f_Controls)) do
+  begin
+   f_Controls[i].Tag:= aProperty.ID;
+   f_Controls[i].Event:= aProperty.Event;
+  end;
+ end; // aProperty.Visible 
 end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TProperty);
