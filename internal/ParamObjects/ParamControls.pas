@@ -64,18 +64,18 @@ begin
     TButton(l_C).Caption:= aControls[i].Caption;
    end
    else
-   if l_C is TEdit then
-    TEdit(l_C).Text:= ''
-   else
-   if (l_C is TComboBox) then
    begin
+    if l_C is TEdit then
+     TEdit(l_C).Text:= ''
+    else
+    if (l_C is TComboBox) then
+     TComboBox(l_C).Style:= csDropDownList
+    else
+    if l_C is TMemo then
+     TMemo(l_C).Text:= '';
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);
-    TComboBox(l_C).Style:= csDropDownList;
-   end
-   else
-   if l_C is TMemo then
-    TMemo(l_C).Text:= '';
+   end;
    TuneupControl(l_C)
   end; // for i
  finally

@@ -10,6 +10,7 @@ type
   ['{5458A399-576E-4970-8762-919AB17A004D}']
     function pm_GetOnSizeChanged: TNotifyEvent; stdcall;
     procedure pm_SetOnSizeChanged(aValue: TNotifyEvent); stdcall;
+    procedure SizeChanged; stdcall;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
         pm_SetOnSizeChanged;
   end;
