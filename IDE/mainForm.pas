@@ -7,7 +7,7 @@ uses
   Dialogs, StdCtrls, DrawObjects1, DrawObjects2, Menus, ComCtrls, Printers,
   Types, ClipBrd, ExtCtrls, ActnList, ActnMan, IniFiles,
   ExtDlgs, dobQM, QuestModeler, dobFileStorage, ImgList, guiTypes,
-  XPStyleActnCtrls;
+  XPStyleActnCtrls, System.Actions;
 
 type
   TDragListRec = record
@@ -875,9 +875,9 @@ var
 begin
   //split a polygon button into 2 buttons ...
   CountFocusedDrawObjs(cnt, drawObj);
-  if not (cnt = 1) or not (drawObj is TPolygon) or (drawObj is TStar) then exit;
+  if not (cnt = 1) or not (drawObj is DrawObjects2.TPolygon) or (drawObj is TStar) then exit;
 
-  with TPolygon(drawObj) do
+  with DrawObjects2.TPolygon(drawObj) do
     if BtnIdxFromPt(ScreenToClient(popupPt),true,i) then DuplicateButton(i);
 end;
 //------------------------------------------------------------------------------
@@ -889,9 +889,9 @@ var
 begin
   //remove a polygon button ...
   CountFocusedDrawObjs(cnt, drawObj);
-  if not (cnt = 1) or not (drawObj is TPolygon) or (drawObj is TStar) then exit;
+  if not (cnt = 1) or not (drawObj is DrawObjects2.TPolygon) or (drawObj is TStar) then exit;
 
-  with TPolygon(drawObj) do
+  with DrawObjects2.TPolygon(drawObj) do
     if BtnIdxFromPt(ScreenToClient(popupPt),true,i) then RemoveButton(i);
 end;
 //------------------------------------------------------------------------------
@@ -902,7 +902,7 @@ var
   drawObj: TDrawObject;
 begin
   CountFocusedDrawObjs(cnt, drawObj);
-  if (drawObj is TPolygon) then TPolygon(drawObj).Mirror
+  if (drawObj is DrawObjects2.TPolygon) then DrawObjects2.TPolygon(drawObj).Mirror
   else if (drawObj is TSolidBezier) then TSolidBezier(drawObj).Mirror;
 end;
 //------------------------------------------------------------------------------
@@ -1435,7 +1435,7 @@ begin
  //  - пробежаться по всем локациям модели и создать недостающие
  for i:= 0 to Pred(f_Script.LocationsCount) do
   if isOrphant(f_Script.Locations[i]) then
-   CreateLocation.Data:= f_Script.Locations[i];
+   CreateLocation.Location:= f_Script.Locations[i];
  //  - пробежаться по всем действиям всех локаций и сделать соединения
  for i:= 0 to Pred(f_Script.LocationsCount) do
  begin
@@ -1542,6 +1542,8 @@ begin
  Result.ColorShadow := tmpSolid.ColorShadow;
  Result.Pen.Assign(tmpSolid.Pen);
  Result.ShadowSize := tmpSolid.ShadowSize;
+ Result.Pen.Style:= psClear;
+
  Result.ShowHint:= True;
 end;
 
@@ -1620,7 +1622,7 @@ begin
  with ModelBox do
   for i := 0 to Pred(ControlCount) do
    if (Controls[i] is TdoLocation) then
-    if TdoLocation(Controls[i]).Data = aLocation then
+    if TdoLocation(Controls[i]).Location = aLocation then
     begin
      Result:= TdoLocation(Controls[i]);
      break;
@@ -1782,18 +1784,19 @@ end;
 procedure TQuestEditorForm.LocationEdit(sender: TObject);
 begin
  if Sender is TdoLocation then
-  if EditLocationEx(TdoLocation(Sender).Data) then
+ begin
+  if EditLocationEx(TdoLocation(Sender).Location) then
 
-  //if EditLocation(TdoLocation(Sender).Data, f_Script) then
+  //if EditLocation(TdoLocation(Sender).Location, f_Script) then
   begin
    Changed:= True;
-   TdoLOcation(Sender).Strings.Text:= TdoLocation(Sender).Data.Caption;
-   TdoLocation(Sender).Hint:= TdoLocation(Sender).Data.Hint;
+   TdoLOcation(Sender).Strings.Text:= TdoLocation(Sender).Location.Caption;
+   TdoLocation(Sender).Hint:= TdoLocation(Sender).Location.Hint;
    TdoLocation(Sender).Padding := 0;
    ClearConnectors(TdoLocation(Sender));
    CheckNewObjects;
-  end; // EditLocation(TdoLocation(Sender).Data)
- 
+  end; // EditLocation(TdoLocation(Sender).Location)
+ end;
 end;
 
 function TQuestEditorForm.pm_GetChanged: Boolean;
@@ -1812,7 +1815,7 @@ var
  l_Loc: TdoLocation;
 begin
  l_Loc:= CreateLocation;
- l_Loc.Data:= f_Script.NewLocation('');
+ l_Loc.Location:= f_Script.NewLocation('');
  LocationEdit(l_Loc);
 end;
 
@@ -1824,7 +1827,7 @@ begin
   for i := 0 to Pred(ControlCount) do
    if (Controls[i] is TdoLocation) then
    begin
-    TdoLocation(Controls[i]).Data:= f_Script.FindLocation(TdoLocation(Controls[i]).Strings.Text);
+    TdoLocation(Controls[i]).Location:= f_Script.FindLocation(TdoLocation(Controls[i]).Strings.Text);
 
    end;
 end;

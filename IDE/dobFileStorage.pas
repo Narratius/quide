@@ -21,6 +21,7 @@ procedure LoadModel(const aFileName: String; theOwner: TComponent; theParent: TW
     PostLoadProc: TNotifyEvent; theModel: TdcScript);
 var
  strings: TStringList;
+ l_Stream: TStream;
 begin
  with TZipMaster.Create(nil) do
  try
@@ -28,11 +29,13 @@ begin
   try
    ZipFileName:= aFileName;
    // На самом деле, aFilename - Это архив, в котором два потока - объекты и их описание
-   if DirEntry[IndexOf(ObjectsPart)]^.UncompressedSize > 0 then
+   if DirEntry[IndexOf(ObjectsPart)].UncompressedSize > 0 then
    begin
     strings := TStringList.Create;
     try
-     strings.LoadFromStream(ExtractFileToStream(ObjectsPart));
+     l_Stream:= ExtractFileToStream(ObjectsPart);
+     l_Stream.Seek(0, 0);
+     strings.LoadFromStream(l_Stream);
      DrawObjects1.LoadDrawObjectsFromStrings(strings, theOwner, theParent, PostLoadProc);
     finally
      strings.Free;

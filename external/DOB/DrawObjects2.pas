@@ -343,6 +343,8 @@ type
     property Regular: boolean read fBoringStar write SetBoringStar;
   end;
 
+{.$I ..\glossa\FlowObjects\DrawObjects3-interface.inc}
+
 procedure Register;
 
 implementation
@@ -829,11 +831,15 @@ begin
 end;
 //------------------------------------------------------------------------------
 
+Const
+//Select Wide Functions in D2009+, or Ansi in D2007-.
+  W_A = Chr(Ord('A') + (Sizeof(system.char) - 1)*(Ord('W') - Ord('A')));
+
 //This declaration modifies Delphi's declaration of GetTextExtentExPoint
 //so that the variable to receive partial string extents (p6) is ignored ...
-function GetTextExtentExPointNoPartials(DC: HDC; p2: PAnsiChar; p3, p4: Integer;
+function GetTextExtentExPointNoPartials(DC: HDC; p2: PChar; p3, p4: Integer;
   var p5: Integer; const p6: integer; var p7: TSize): BOOL; stdcall;
-    external gdi32 name 'GetTextExtentExPointA';
+    external gdi32 name 'GetTextExtentExPoint' + W_A;
 
 //TrimLine: Splits off from LS any characters beyond the allowed width
 //breaking at the end of a word if possible. Leftover chars -> RS.
@@ -848,7 +854,7 @@ begin
 
   //get the number of characters which will fit within LineWidth...
   if not GetTextExtentExPointNoPartials(canvas.handle,
-    PAnsiChar(ls),len,LineWidthInPxls,NumCharWhichFit,0,dummy) then
+    pchar(ls),len,LineWidthInPxls,NumCharWhichFit,0,dummy) then
     begin
       ls := '';
       rs := '';
@@ -3422,8 +3428,8 @@ begin
   begin
     midx := (right - left) div 2 + left;
     midy := (bottom - top) div 2 + top;
-    offx := round((right - left) * offset);
-    offy := round((bottom - top) * offset);
+    offx := {round}((right - left){ * offset});
+    offy := {round}((bottom - top){ * offset});
     BtnPoints[2]  := Point(left, midy);
     BtnPoints[3]  := Point(left, midy - offy);
     BtnPoints[4]  := Point(midx - offx, top);
@@ -3870,6 +3876,8 @@ begin
   ResizeNeeded;
 end;
 //------------------------------------------------------------------------------
+
+{.$I ..\glossa\FlowObjects\DrawObjects3-implementation.inc}
 
 initialization
   RegisterDrawObjClasses;

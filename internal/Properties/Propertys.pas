@@ -59,8 +59,26 @@ type
     property Values[Alias: String]: string read pm_GetValues write pm_SetValues;
   end;
 
+function Property2Control(aProperty: TPropertyType): TControlClass;
+
 
 implementation
+
+uses
+  fmx.Edit;
+
+function Property2Control(aProperty: TPropertyType): TControlClass;
+begin
+  case aProperty of
+   ptString: Result:= TEdit;
+   ptInteger:;   // TEdit
+   ptText:;      // TMemo
+   ptBoolean:;   // TRadioGroup (TCombobox)
+   ptChoice:;    // TComboBox
+   ptAction:;    // TButton
+   ptProperties:; // TScrollBox (Вложенные свойства)
+  end;
+end;
 
 {
 ********************************** TProperty ***********************************
@@ -169,6 +187,7 @@ end;
 procedure TProperties.pm_SetValues(Alias: String; const Value: string);
 begin
  // TODO -cMM: TProperties.pm_SetValues необходимо написать реализацию
+ AliasItems[Alias].Value:= Value;
  Changed:= True;
 end;
 

@@ -1,44 +1,59 @@
 Unit ZMDefMsgs;
  
-(* Built by ZipResMaker
-   DO NOT MODIFY
-  ZMDefMsgs.pas - default messages and compressed tables
-  TZipMaster VCL by Chris Vleghert and Eric W. Engler
+// Built by ZipHelper
+//   DO NOT MODIFY
+//  ZMDefMsgs.pas - default messages and compressed tables
+ 
+(* **************************************************
+TZipMaster VCL originally by Chris Vleghert, Eric W. Engler.
+  Present Maintainers and Authors Roger Aelbrecht and Russell Peters.
+Copyright (C) 1997-2002 Chris Vleghert and Eric W. Engler
+Copyright (C) 1992-2008 Eric W. Engler
+Copyright (C) 2009, 2010, 2011, 2012, 2013 Russell Peters and Roger Aelbrecht
+ 
+All rights reserved.
+For the purposes of Copyright and this license "DelphiZip" is the current
+ authors, maintainers and developers of its code:
+  Russell Peters and Roger Aelbrecht.
+ 
+Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+* DelphiZip reserves the names "DelphiZip", "ZipMaster", "ZipBuilder",
+   "DelZip" and derivatives of those names for the use in or about this
+   code and neither those names nor the names of its authors or
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL DELPHIZIP, IT'S AUTHORS OR CONTRIBUTERS BE
+ LIABLE FOR ANYDIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ 
+contact: problems AT delphizip DOT org
+updates: http://www.delphizip.org
+************************************************** *)
+//Generated 2012-04-30
+{$I   '.\ZipVers.inc'}
+{$I  '.\ZMConfig191.inc'}
 
-  v1.79
-      Copyright (C) 2005  Russell Peters
- 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
- 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License (licence.txt) for more details.
- 
-  You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software 
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
-  contact: problems AT delphizip DOT org
-  updates: http://www.delphizip.org
-
- 
-  modified 6/12/2005 9:41:56 AM
----------------------------------------------------------------------------*)
- 
-{$I ZipConfig.inc} 
-{$INCLUDE '.\ZipVers.inc'}
- 
 Interface
- 
+
 Uses
-  ZipMsg;
+  ZMMsg;
  
 {$IFNDEF USE_COMPRESSED_STRINGS}
- 
 type
   TZipResRec = packed record
     i: Word;
@@ -46,55 +61,58 @@ type
   end;
  
 ResourceString
-  _DT_Language = 'US: default';
-  _DT_Author = 'R.Peters';
-  _DT_Desc = 'Language Neutral';
-  _GE_FatalZip = 'Fatal Error in DLL: abort exception';
-  _GE_NoZipSpecified = 'Error - no zip file specified!';
-  _GE_NoMem = 'Requested memory not available';
-  _GE_WrongPassword = 'Error - passwords do NOT match'#10'Password ignored';
-  _GE_CopyFile = 'Copying: ';
-  _GE_Except = 'Exception in Event handler ';
-  _GE_Reentered = 'Was busy, Instructions may have been lost!';
-  _GE_Busy = ' Busy, Please wait';
-  _GE_Inactive = 'not Active';
-  _GE_RangeError = 'Index (%d) outside range 1..%d';
-  _GE_TempZip = 'Temporary zipfile: %s';
-  _GE_WasBusy = 'Busy + %s';
-  _GE_EventEx = 'Exception in Event ';
-  _GE_DLLAbort = 'DLL Error - Aborting';
-  _GE_DLLBusy = 'DLL Error - Busy';
-  _GE_DLLCancel = 'DLL Error - User Cancelled';
-  _GE_DLLMem = 'DLL Error - Not enough memory';
-  _GE_DLLStruct = 'DLL Error - Invalid structure';
-  _GE_DLLEvent = 'DLL Error - Exception in handler ';
-  _GE_DLLCritical = 'critical DLL Error %d';
-  _GE_Unknown = ' Unknown error %d';
+  _DS_UnknownError = 'Unknown Error';
+  _DS_Canceled = 'User canceled operation';
+  _DS_CopyCentral = 'Central directory';
+  _GE_Abort = 'User Abort';
+  _GE_Copying = 'Copying: %s';
   _GE_Skipped = 'Skipped %s %d';
-  _RN_ZipSFXData = 'Error while copying the SFX header';
-  _RN_NoRenOnSpan = 'Rename is not implemented for a spanned zip file';
-  _RN_ProcessFile = 'Processing: ';
-  _RN_RenameTo = ' renamed to: ';
-  _RN_InvalidDateTime = 'Invalid date/time argument for file: ';
+  _GE_TempZip = 'Temporary zipfile: %s';
+  _LD_DllLoaded = 'Loaded %s';
+  _LD_DllUnloaded = 'Unloaded %s';
+  _LD_LoadErr = 'Error [%d %s] loading %s';
+  _AD_NothingToZip = 'Error - no files to zip!';
+  _AZ_NothingToDo = 'Nothing to do';
+  _DL_NothingToDel = 'Error - no files selected for deletion';
+  _DS_NoDiskSpan = 'DiskSpanning not supported';
+  _DS_NoRenamePart = 'Last part left as : %s';
+  _GE_EventEx = 'Exception in Event ';
+  _GE_NoSkipping = 'Skipping not allowed';
+  _LD_BadDll = 'Unable to load %s - It is old or corrupt';
+  _LD_NoDll = 'Failed to load %s';
+  _LI_WrongZipStruct = 'Warning - Error in zip structure!';
   _PW_UnatAddPWMiss = 'Error - no add password given';
   _PW_UnatExtPWMiss = 'Error - no extract password given';
-  _PW_Caption = 'Password';
-  _PW_MessageEnter = 'Enter Password ';
-  _PW_MessageConfirm = 'Confirm Password ';
-  _PW_ForFile = ' for file: ';
-  _CF_SourceIsDest = 'Source archive is the same as the destination archive!';
+  _PR_Archive = '*Resetting Archive bit';
+  _PR_CopyZipFile = '*Copying Zip File';
+  _PR_SFX = '*SFX';
+  _PR_Header = '*??';
+  _PR_Finish = '*Finalising';
+  _PR_Copying = '*Copying';
+  _PR_CentrlDir = '*Writing Central Directory';
+  _PR_Checking = '*Checking';
+  _PR_Loading = '*Loading Directory';
+  _PR_Joining = '*Joining split zip file';
+  _PR_Splitting = '*Splitting zip file';
+  _PR_Writing = '*Writing zip file';
+  _PR_PreCalc = '*Precalculating CRC';
+  _PR_Processing = '*Processing';
+  _PR_Merging = '*Merging';
+  _CF_FileConflict = 'File conflict!';
+  _CF_Merge = '''%s'''#10'will overwrite'#10' ''%s'''#10'Rename to ''%s''?';
   _CF_OverwriteYN = 'Overwrite file ''%s'' in ''%s'' ?';
-  _CF_CopyFailed = 'Copying a file from ''%s'' to ''%s'' failed';
-  _CF_SourceNotFound = 'File ''%s'' is not present in ''%s''!';
-  _CF_SFXCopyError = 'Error while copying the SFX data';
-  _CF_DestFileNoOpen = 'Destination zip archive could not be opened!';
-  _CF_NoCopyOnSpan = 'CopyZippedFiles is not implemented for a spanned zip file';
-  _LI_ReadZipError = 'Seek error reading Zip archive!';
-  _LI_ErrorUnknown = 'Unknown error in List() function'#10;
-  _LI_WrongZipStruct = 'Warning - Error in zip structure!';
-  _LI_GarbageAtEOF = 'Warning - Garbage at the end of the zipfile!';
-  _LI_FileTooBig = 'File larger than 4GB';
-  _LI_MethodUnknown = 'Unknown Compression Method';
+  _DS_AnotherDisk = 'This disk is part of a backup set,'#10'please insert another disk';
+  _DS_AskDeleteFile = 'There is already a file %s'#10'Do you want to overwrite this file';
+  _DS_AskPrevFile = 'ATTENTION: This is previous disk no %d!!!'#10'Are you sure you want to overwrite the contents';
+  _DS_InDrive = ''#10'in drive: %s';
+  _DS_InsertAVolume = 'Please insert disk volume %.1d';
+  _DS_InsertDisk = 'Please insert last disk';
+  _DS_InsertVolume = 'Please insert disk volume %.1d of %.1d';
+  _FM_Confirm = 'Confirm';
+  _FM_Erase = 'Erase %s';
+  _PW_Caption = 'Password';
+  _PW_MessageConfirm = 'Confirm Password ';
+  _PW_MessageEnter = 'Enter Password ';
   _ZB_Yes = '&Yes';
   _ZB_No = '&No';
   _ZB_OK = '&OK';
@@ -105,301 +123,173 @@ ResourceString
   _ZB_CancelAll = 'CancelAll';
   _ZB_NoToAll = 'NoToAll';
   _ZB_YesToAll = 'YesToAll';
-  _AD_NothingToZip = 'Error - no files to zip!';
-  _AD_UnattPassword = 'Unattended action not possible without a password';
-  _AD_NoFreshenUpdate = 'AddFreshen or AddUpdate not possible on a spanned archive';
-  _AD_AutoSFXWrong = 'Error %.1d occurred during Auto SFX creation.';
+  _AD_BadFileName = 'Invalid Filename';
+  _AD_DuplFileName = 'Duplicate Filename';
   _AD_InIsOutStream = 'Input stream may not be set to the output stream';
+  _AD_InvalidEncode = 'Invalid encoding options';
   _AD_InvalidName = 'Wildcards are not allowed in Filename or file specification';
+  _AD_InvalidZip = 'Invalid zip file';
   _AD_NoDestDir = 'Destination directory ''%s'' must exist!';
-  _DL_NothingToDel = 'Error - no files selected for deletion';
-  _DL_NoDelOnSpan = 'Delete Files from archive is not implemented for a spanned zip file';
-  _EX_FatalUnZip = 'Fatal Error in UnzDLL.DLL: abort exception';
-  _EX_UnAttPassword = 'Warning - Unattended Extract: possible not all files extracted';
-  _EX_NoExtrDir = 'Extract directory ''%s'' must exist';
-  _LD_NoDll = 'Failed to load %s';
-  _LD_BadDll = 'Unable to load %s - It is old or corrupt';
-  _LD_DllLoaded = 'Loaded %s';
-  _LD_DllUnloaded = 'Unloaded %s';
-  _SF_StringTooLong = 'Error - On or more of the 4 property strings mentioned below exceeds 255 characters!';
-  _SF_NoZipSFXBin = 'Error: SFX stub ''%s'' not found!';
-  _SF_InputIsNoZip = 'Error: input file is not a zip file';
-  _SF_NoSFXSupport = 'SFX Functions not supported';
-  _SF_MsgTooLong = 'SFX Message string exceeds 255 characters!';
-  _SF_DefPathTooLong = 'SFX Default path exceeds 255 characters!';
-  _SF_DlgTitleTooLong = 'SFX Dialog title exceeds 255 characters!';
-  _SF_CmdLineTooLong = 'SFX Command line exceeds 255 characters!';
-  _SF_FBkPathTooLong = 'SFX Fallback path exceeds 255 characters!';
-  _CZ_NoExeSpecified = 'Error - no .EXE file specified';
-  _CZ_InputNotExe = 'Error: input file is not an .EXE file';
-  _CZ_SFXTypeUnknown = 'Error determining the type of SFX archive';
-  _CZ_WrongConvert = 'Can only convert ZIP to EXE or EXE to ZIP';
-  _CZ_UnknownHeader = 'Unknown SFX header format in %s';
-  _CZ_BrowseError = 'Error while browsing resources.';
-  _CZ_NoExeResource = 'No resources found in executable.';
-  _CZ_ExeSections = 'Error while reading executable sections.';
-  _CZ_NoExeIcon = 'No icon resources found in executable.';
-  _CZ_NoIcon = 'No icon found.';
-  _CZ_NoCopyIcon = 'Cannot copy icon.';
-  _CZ_NoIconFound = 'No matching icon found.';
-  _DS_NoInFile = 'Input file does not exist';
-  _DS_FileOpen = 'Zip file could not be opened';
-  _DS_NotaDrive = 'Not a valid drive: %s';
-  _DS_DriveNoMount = 'Drive %s is NOT defined';
-  _DS_NoVolume = 'Volume label could not be set';
-  _DS_NoMem = 'Not enough memory to display MsgBox';
-  _DS_Canceled = 'User canceled operation';
-  _DS_FailedSeek = 'Seek error in input file';
-  _DS_NoOutFile = 'Creation of output file failed';
-  _DS_NoWrite = 'Write error in output file';
-  _DS_EOCBadRead = 'Error while reading the End Of Central Directory';
-  _DS_LOHBadRead = 'Error while reading a local header';
-  _DS_CEHBadRead = 'Error while reading a central header';
-  _DS_LOHWrongSig = 'A local header signature is wrong';
-  _DS_CEHWrongSig = 'A central header signature is wrong';
-  _DS_LONameLen = 'Error while reading a local file name';
-  _DS_CENameLen = 'Error while reading a central file name';
-  _DS_LOExtraLen = 'Error while reading a local extra field';
-  _DS_CEExtraLen = 'Error while reading a central extra field';
-  _DS_DataDesc = 'Error while reading/writing a data descriptor area';
-  _DS_ZipData = 'Error while reading zipped data';
-  _DS_CECommentLen = 'Error while reading a file comment';
-  _DS_EOArchComLen = 'Error while reading the archive comment';
-  _DS_ErrorUnknown = 'UnKnown error in function ReadSpan(), WriteSpan(), ChangeFileDetails() or CopyZippedFiles()'#10;
-  _DS_NoUnattSpan = 'Unattended disk spanning not implemented';
-  _DS_EntryLost = 'A local header not found in internal structure';
-  _DS_NoTempFile = 'Temporary file could not be created';
-  _DS_LOHBadWrite = 'Error while writing a local header';
-  _DS_CEHBadWrite = 'Error while writing a central header';
-  _DS_EOCBadWrite = 'Error while writing the End Of Central Directory';
-  _DS_ExtWrongSig = 'Error while reading a Extended Local signature';
-  _DS_NoDiskSpace = 'This disk has not enough free space available';
-  _DS_InsertDisk = 'Please insert last disk';
-  _DS_InsertVolume = 'Please insert disk volume %.1d of %.1d';
-  _DS_InDrive = ''#10'in drive: %s';
-  _DS_NoValidZip = 'This archive is not a valid Zip archive';
-  _DS_FirstInSet = 'This is the first disk in a backup set,'#10'please insert the last disk of this set';
-  _DS_NotLastInSet = 'This is the %dth disk in a backup set,'#10'please insert the last disk of this set';
-  _DS_AskDeleteFile = 'There is already a file %s'#10'Do you want to overwrite this file';
-  _DS_AskPrevFile = 'ATTENTION: This is previous disk no %d!!!'#10'Are you sure you want to overwrite the contents';
-  _DS_NoSFXSpan = 'Error - Self extracting archives(.exe) can not be spanned';
-  _DS_CEHBadCopy = 'Error while copying a filename of a CEH structure';
-  _DS_EOCBadSeek = 'Seek error while skipping a EOC structure';
-  _DS_EOCBadCopy = 'Error while copying the zip archive comment';
-  _DS_FirstFileOnHD = 'This is the first file in a backup set,'#10'please choose the last file of this set';
-  _DS_InsertAVolume = 'Please insert disk volume %.1d';
-  _DS_CopyCentral = 'Central directory';
-  _DS_NoDiskSpan = 'DiskSpanning not supported';
-  _DS_UnknownError = 'Unknown Error';
-  _DS_NoRenamePart = 'Last part left as : %s';
-  _DS_NotChangeable = 'Cannot write to %s';
-  _FM_Erase = 'Erase %s';
-  _FM_Confirm = 'Confirm';
-  _CD_NoCDOnSpan = 'ChangeFileDetails is not implemented for a spanned zip file';
-  _CD_NoEventHndlr = 'No Event Handler found to Change File Details';
-  _CD_LOExtraLen = 'Error while writing a local extra field';
-  _CD_CEExtraLen = 'Error while writing a central extra field';
-  _CD_CEComLen = 'Error while writing a file comment';
+  _AD_UnattPassword = 'Unattended action not possible without a password';
+  _AZ_SameAsSource = 'source and destination on same removable drive';
   _CD_CEHDataSize = 'The combined length of CEH + FileName + FileComment + ExtraData exceeds 65535';
-  _CD_Changing = 'Changing details of: ';
-  _CD_DuplFileName = 'Duplicate Filename: %s';
-  _CD_NoProtected = 'Cannot change details of Excrypted file';
-  _CD_InvalidFileName = 'Invalid Filename: ''%s''';
   _CD_NoChangeDir = 'Cannot change path';
-  _CD_FileSpecSkip = 'Filespec ''%s'' skipped';
-  _DU_InvalidName = 'Invalid name ''%s''';
-  _DU_WrongMethod = 'unsupported compression for ''%s''';
-  _PR_Archive = '*Resetting Archive bit';
-  _PR_CopyZipFile = '*Copying Zip File';
-  _PR_SFX = '*SFX';
-  _PR_Header = '*??';
-  _PR_Finish = '*Finalising';
-  _PR_Copying = '*Copying';
-  _PR_CentrlDir = '*Central Directory';
-  _PR_Checking = '*Checking';
-  _PR_Loading = '*Loading Directory';
-  _PR_Joining = '*Joining split zip file';
-  _PR_Splitting = '*Splitting zip file';
-  _DZ_Skipped = 'Filespec ''%s'' skipped';
-  _DZ_InUse = 'Can not open in-use file ''%s''';
-  _DZ_Refused = 'not permitted to open ''%s''';
-  _DZ_NoOpen = 'Can not open ''%s''';
-  _DZ_NoFiles = 'no files found';
-  _DZ_SizeChanged = 'size of ''%s'' changed';
-  _DZ_InvalidName = '''%s'' is not valid name';
-  _DZ_TooBig = 'file is too big';
-  _WZ_DropDirOnly = 'Dropping %d empty directory entries';
-  _WZ_NothingToWrite = 'Nothing to write';
-  _TM_Erasing = 'EraseFloppy - Removing %s';
+  _CD_NoProtected = 'Cannot change details of Encrypted file';
+  _CF_NoDest = 'No destination specified';
+  _CF_SourceIsDest = 'Source archive is the same as the destination archive!';
+  _CZ_InputNotExe = 'Error: input file is not an .EXE file';
+  _DS_BadDrive = 'cannot use drive';
+  _DS_CEHWrongSig = 'A central header signature is wrong';
+  _DS_DriveNoMount = 'Drive %s is NOT defined';
+  _DS_NoDiskSpace = 'This disk has not enough free space available';
+  _DS_NoEncrypt = 'encryption not supported';
+  _DS_NoInFile = 'Input file does not exist';
+  _DS_NotaDrive = 'Not a valid drive: %s';
+  _DS_NotChangeable = 'Cannot write to %s';
+  _DS_NoUnattSpan = 'Unattended disk spanning not implemented';
+  _DS_NoValidZip = 'This archive is not a valid Zip archive';
+  _DS_Unsupported = 'Unsupported zip version';
+  _EX_NoExtrDir = 'Extract directory ''%s'' must exist';
+  _EX_UnAttPassword = 'Warning - Unattended Extract: possible not all files extracted';
+  _GE_InvalidArguments = 'Invalid Arguments';
+  _GE_InvalidParameter = 'Invalid Parameter! ''%s''';
+  _GE_NoZipSpecified = 'Error - no zip file specified!';
+  _GE_WrongPassword = 'Error - passwords do NOT match'#10'Password ignored';
+  _RN_InvalidDateTime = 'Invalid date/time argument for file: ';
+  _SF_DetachedHeaderTooBig = 'Detached SFX Header too large';
+  _SF_NoZipSFXBin = 'Error: SFX stub ''%s'' not found!';
+  _SF_StringTooLong = 'Error: Combined SFX strings unreasonably long!';
+  _AD_AutoSFXWrong = 'Error %.1d occurred during Auto SFX creation.';
+  _AZ_InternalError = 'Internal error';
+  _CF_CopyFailed = 'Copying a file from ''%s'' to ''%s'' failed';
+  _CF_SFXCopyError = 'Error while copying the SFX data';
+  _CZ_BrowseError = 'Error while browsing resources.';
+  _CZ_ExeSections = 'Error while reading executable sections.';
+  _CZ_NoCopyIcon = 'Cannot copy icon.';
+  _CZ_NoExeIcon = 'No icon resources found in executable.';
+  _CZ_NoExeResource = 'No resources found in executable.';
+  _CZ_NoIcon = 'No icon found.';
+  _CZ_NoIconFound = 'No matching icon found.';
+  _DS_BadCRC = 'CRC error';
+  _DS_CECommentLen = 'Error while reading a file comment';
+  _DS_CEHBadRead = 'Error while reading a central header';
+  _DS_CEHBadWrite = 'Error while writing a central header';
+  _DS_CENameLen = 'Error while reading a central file name';
+  _DS_CopyError = 'File copy error';
+  _DS_DataCopy = 'Error copying compressed data';
+  _DS_DataDesc = 'Error while reading/writing a data descriptor area';
+  _DS_EOCBadRead = 'Error while reading the End Of Central Directory';
+  _DS_EOCBadWrite = 'Error while writing the End Of Central Directory';
+  _DS_ErrorUnknown = 'UnKnown error in function ReadSpan(), WriteSpan(), ChangeFileDetails() or CopyZippedFiles()'#10;
+  _DS_FailedSeek = 'Seek error in input file';
+  _DS_FileChanged = 'File changed';
+  _DS_FileError = 'File Error';
+  _DS_FileOpen = 'Zip file could not be opened';
+  _DS_LOHBadRead = 'Error while reading a local header';
+  _DS_LOHBadWrite = 'Error while writing a local header';
+  _DS_LOHWrongName = 'Local and Central names different : %s';
+  _DS_NoAppend = 'Append failed';
+  _DS_NoInStream = 'No input stream';
+  _DS_NoMem = 'Not enough memory to display MsgBox';
+  _DS_NoOutFile = 'Creation of output file failed';
+  _DS_NoOutStream = 'No output stream';
+  _DS_NoTempFile = 'Temporary file could not be created';
+  _DS_NoVolume = 'Volume label could not be set';
+  _DS_NoWrite = 'Write error in output file';
+  _DS_ReadError = 'Error reading file';
+  _DS_SeekError = 'File seek error';
+  _DS_SFXBadRead = 'Error reading SFX';
+  _DS_TooManyParts = 'More than 999 parts in multi volume archive';
+  _DS_WriteError = 'Error writing file';
+  _DS_Zip64FieldError = 'Error reading Zip64 field';
+  _GE_DLLCritical = 'critical DLL Error %d';
+  _GE_Except = 'Exception in Event handler ';
+  _GE_ExceptErr = 'Error Exception: ';
+  _GE_FatalZip = 'Fatal Error in DLL: abort exception';
+  _GE_FileChanged = 'Zip file was changed!';
+  _GE_Inactive = 'not Active';
+  _GE_NoMem = 'Requested memory not available';
+  _GE_RangeError = 'Index (%d) outside range 0..%d';
+  _GE_Unknown = ' Unknown error %d';
+  _GE_WasBusy = 'Busy + %s';
+  _GE_NoProcess = 'Cannot process invalid zip';
+  _LI_ErrorUnknown = 'Unknown error in List() function';
+  _LI_ReadZipError = 'Seek error reading Zip archive!';
+  _DS_SetDateError = 'Error setting file date';
+  _GE_GeneralError = 'Unspecified error ';
+  _GE_SystemError = 'System error ';
+  _GE_SysErr = ' [$%x] %s';
   _TM_Deleting = 'EraseFloppy - Deleting %s';
+  _TM_Erasing = 'EraseFloppy - Removing %s';
   _TM_GetNewDisk = 'Trace : GetNewDisk Opening: %s';
   _TM_SystemError = 'System error: %d';
+  _TM_Trace = 'Trace: ';
+  _TM_Verbose = 'info: ';
+  _DZ_RES_GOOD = 'Good';
+  _DZ_RES_CANCELLED = 'Cancelled';
+  _DZ_RES_ABORT = 'Aborted by User!';
+  _DZ_RES_CALLBACK = 'Callback exception';
+  _DZ_RES_MEMORY = 'No memory';
+  _DZ_RES_STRUCT = 'Invalid structure';
+  _DZ_RES_ERROR = 'Fatal error';
+  _DZ_RES_PASSWORD_FAIL = 'Password failed!';
+  _DZ_RES_PASSWORD_CANCEL = 'Password cancelled!';
+  _DZ_RES_INVAL_ZIP = 'Invalid zip structure!';
+  _DZ_RES_NO_CENTRAL = 'No Central directory!';
+  _DZ_RES_ZIP_EOF = 'Unexpected end of Zip file!';
+  _DZ_RES_ZIP_END = 'Premature end of file!';
+  _DZ_RES_ZIP_NOOPEN = 'Error opening Zip file!';
+  _DZ_RES_ZIP_MULTI = 'Multi-part Zips not supported!';
+  _DZ_RES_NOT_FOUND = 'File not found!';
+  _DZ_RES_LOGIC_ERROR = 'Internal logic error!';
+  _DZ_RES_NOTHING_TO_DO = 'Nothing to do!';
+  _DZ_RES_BAD_OPTIONS = 'Bad Options specified!';
+  _DZ_RES_TEMP_FAILED = 'Temporary file failure!';
+  _DZ_RES_NO_FILE_OPEN = 'File not found or no permission!';
+  _DZ_RES_ERROR_READ = 'Error reading file!';
+  _DZ_RES_ERROR_CREATE = 'Error creating file!';
+  _DZ_RES_ERROR_WRITE = 'Error writing file!';
+  _DZ_RES_ERROR_SEEK = 'Error seeking in file!';
+  _DZ_RES_EMPTY_ZIP = 'Missing or empty zip file!';
+  _DZ_RES_INVAL_NAME = 'Invalid characters in filename!';
+  _DZ_RES_GENERAL = 'Error ';
+  _DZ_RES_MISS = 'Nothing found';
+  _DZ_RES_WARNING = 'Warning: ';
+  _DZ_ERR_ERROR_DELETE = 'Delete failed';
+  _DZ_ERR_FATAL_IMPORT = 'Fatal Error - could not import symbol!';
+  _DZ_ERR_SKIPPING = 'Skipping: ';
+  _DZ_ERR_LOCKED = 'File locked';
+  _DZ_ERR_DENIED = 'Access denied';
+  _DZ_ERR_DUPNAME = 'Duplicate internal name';
+  _DZ_ERR_SKIPPED = 'Skipped files';
+  _DT_Author = 'R.Peters';
+  _DT_Desc = 'Language Neutral';
+  _DT_Language = 'US: default';
  
 const
-ResTable: array [0..187] of TZipResRec = (
-    (i: DT_Language; s: @_DT_Language),
-    (i: DT_Author; s: @_DT_Author),
-    (i: DT_Desc; s: @_DT_Desc),
-    (i: GE_FatalZip; s: @_GE_FatalZip),
-    (i: GE_NoZipSpecified; s: @_GE_NoZipSpecified),
-    (i: GE_NoMem; s: @_GE_NoMem),
-    (i: GE_WrongPassword; s: @_GE_WrongPassword),
-    (i: GE_CopyFile; s: @_GE_CopyFile),
-    (i: GE_Except; s: @_GE_Except),
-    (i: GE_Reentered; s: @_GE_Reentered),
-    (i: GE_Busy; s: @_GE_Busy),
-    (i: GE_Inactive; s: @_GE_Inactive),
-    (i: GE_RangeError; s: @_GE_RangeError),
-    (i: GE_TempZip; s: @_GE_TempZip),
-    (i: GE_WasBusy; s: @_GE_WasBusy),
-    (i: GE_EventEx; s: @_GE_EventEx),
-    (i: GE_DLLAbort; s: @_GE_DLLAbort),
-    (i: GE_DLLBusy; s: @_GE_DLLBusy),
-    (i: GE_DLLCancel; s: @_GE_DLLCancel),
-    (i: GE_DLLMem; s: @_GE_DLLMem),
-    (i: GE_DLLStruct; s: @_GE_DLLStruct),
-    (i: GE_DLLEvent; s: @_GE_DLLEvent),
-    (i: GE_DLLCritical; s: @_GE_DLLCritical),
-    (i: GE_Unknown; s: @_GE_Unknown),
+ResTable: array [0..203] of TZipResRec = (
+    (i: DS_UnknownError; s: @_DS_UnknownError),
+    (i: DS_Canceled; s: @_DS_Canceled),
+    (i: DS_CopyCentral; s: @_DS_CopyCentral),
+    (i: GE_Abort; s: @_GE_Abort),
+    (i: GE_Copying; s: @_GE_Copying),
     (i: GE_Skipped; s: @_GE_Skipped),
-    (i: RN_ZipSFXData; s: @_RN_ZipSFXData),
-    (i: RN_NoRenOnSpan; s: @_RN_NoRenOnSpan),
-    (i: RN_ProcessFile; s: @_RN_ProcessFile),
-    (i: RN_RenameTo; s: @_RN_RenameTo),
-    (i: RN_InvalidDateTime; s: @_RN_InvalidDateTime),
-    (i: PW_UnatAddPWMiss; s: @_PW_UnatAddPWMiss),
-    (i: PW_UnatExtPWMiss; s: @_PW_UnatExtPWMiss),
-    (i: PW_Caption; s: @_PW_Caption),
-    (i: PW_MessageEnter; s: @_PW_MessageEnter),
-    (i: PW_MessageConfirm; s: @_PW_MessageConfirm),
-    (i: PW_ForFile; s: @_PW_ForFile),
-    (i: CF_SourceIsDest; s: @_CF_SourceIsDest),
-    (i: CF_OverwriteYN; s: @_CF_OverwriteYN),
-    (i: CF_CopyFailed; s: @_CF_CopyFailed),
-    (i: CF_SourceNotFound; s: @_CF_SourceNotFound),
-    (i: CF_SFXCopyError; s: @_CF_SFXCopyError),
-    (i: CF_DestFileNoOpen; s: @_CF_DestFileNoOpen),
-    (i: CF_NoCopyOnSpan; s: @_CF_NoCopyOnSpan),
-    (i: LI_ReadZipError; s: @_LI_ReadZipError),
-    (i: LI_ErrorUnknown; s: @_LI_ErrorUnknown),
-    (i: LI_WrongZipStruct; s: @_LI_WrongZipStruct),
-    (i: LI_GarbageAtEOF; s: @_LI_GarbageAtEOF),
-    (i: LI_FileTooBig; s: @_LI_FileTooBig),
-    (i: LI_MethodUnknown; s: @_LI_MethodUnknown),
-    (i: ZB_Yes; s: @_ZB_Yes),
-    (i: ZB_No; s: @_ZB_No),
-    (i: ZB_OK; s: @_ZB_OK),
-    (i: ZB_Cancel; s: @_ZB_Cancel),
-    (i: ZB_Abort; s: @_ZB_Abort),
-    (i: ZB_Retry; s: @_ZB_Retry),
-    (i: ZB_Ignore; s: @_ZB_Ignore),
-    (i: ZB_CancelAll; s: @_ZB_CancelAll),
-    (i: ZB_NoToAll; s: @_ZB_NoToAll),
-    (i: ZB_YesToAll; s: @_ZB_YesToAll),
-    (i: AD_NothingToZip; s: @_AD_NothingToZip),
-    (i: AD_UnattPassword; s: @_AD_UnattPassword),
-    (i: AD_NoFreshenUpdate; s: @_AD_NoFreshenUpdate),
-    (i: AD_AutoSFXWrong; s: @_AD_AutoSFXWrong),
-    (i: AD_InIsOutStream; s: @_AD_InIsOutStream),
-    (i: AD_InvalidName; s: @_AD_InvalidName),
-    (i: AD_NoDestDir; s: @_AD_NoDestDir),
-    (i: DL_NothingToDel; s: @_DL_NothingToDel),
-    (i: DL_NoDelOnSpan; s: @_DL_NoDelOnSpan),
-    (i: EX_FatalUnZip; s: @_EX_FatalUnZip),
-    (i: EX_UnAttPassword; s: @_EX_UnAttPassword),
-    (i: EX_NoExtrDir; s: @_EX_NoExtrDir),
-    (i: LD_NoDll; s: @_LD_NoDll),
-    (i: LD_BadDll; s: @_LD_BadDll),
+    (i: GE_TempZip; s: @_GE_TempZip),
     (i: LD_DllLoaded; s: @_LD_DllLoaded),
     (i: LD_DllUnloaded; s: @_LD_DllUnloaded),
-    (i: SF_StringTooLong; s: @_SF_StringTooLong),
-    (i: SF_NoZipSFXBin; s: @_SF_NoZipSFXBin),
-    (i: SF_InputIsNoZip; s: @_SF_InputIsNoZip),
-    (i: SF_NoSFXSupport; s: @_SF_NoSFXSupport),
-    (i: SF_MsgTooLong; s: @_SF_MsgTooLong),
-    (i: SF_DefPathTooLong; s: @_SF_DefPathTooLong),
-    (i: SF_DlgTitleTooLong; s: @_SF_DlgTitleTooLong),
-    (i: SF_CmdLineTooLong; s: @_SF_CmdLineTooLong),
-    (i: SF_FBkPathTooLong; s: @_SF_FBkPathTooLong),
-    (i: CZ_NoExeSpecified; s: @_CZ_NoExeSpecified),
-    (i: CZ_InputNotExe; s: @_CZ_InputNotExe),
-    (i: CZ_SFXTypeUnknown; s: @_CZ_SFXTypeUnknown),
-    (i: CZ_WrongConvert; s: @_CZ_WrongConvert),
-    (i: CZ_UnknownHeader; s: @_CZ_UnknownHeader),
-    (i: CZ_BrowseError; s: @_CZ_BrowseError),
-    (i: CZ_NoExeResource; s: @_CZ_NoExeResource),
-    (i: CZ_ExeSections; s: @_CZ_ExeSections),
-    (i: CZ_NoExeIcon; s: @_CZ_NoExeIcon),
-    (i: CZ_NoIcon; s: @_CZ_NoIcon),
-    (i: CZ_NoCopyIcon; s: @_CZ_NoCopyIcon),
-    (i: CZ_NoIconFound; s: @_CZ_NoIconFound),
-    (i: DS_NoInFile; s: @_DS_NoInFile),
-    (i: DS_FileOpen; s: @_DS_FileOpen),
-    (i: DS_NotaDrive; s: @_DS_NotaDrive),
-    (i: DS_DriveNoMount; s: @_DS_DriveNoMount),
-    (i: DS_NoVolume; s: @_DS_NoVolume),
-    (i: DS_NoMem; s: @_DS_NoMem),
-    (i: DS_Canceled; s: @_DS_Canceled),
-    (i: DS_FailedSeek; s: @_DS_FailedSeek),
-    (i: DS_NoOutFile; s: @_DS_NoOutFile),
-    (i: DS_NoWrite; s: @_DS_NoWrite),
-    (i: DS_EOCBadRead; s: @_DS_EOCBadRead),
-    (i: DS_LOHBadRead; s: @_DS_LOHBadRead),
-    (i: DS_CEHBadRead; s: @_DS_CEHBadRead),
-    (i: DS_LOHWrongSig; s: @_DS_LOHWrongSig),
-    (i: DS_CEHWrongSig; s: @_DS_CEHWrongSig),
-    (i: DS_LONameLen; s: @_DS_LONameLen),
-    (i: DS_CENameLen; s: @_DS_CENameLen),
-    (i: DS_LOExtraLen; s: @_DS_LOExtraLen),
-    (i: DS_CEExtraLen; s: @_DS_CEExtraLen),
-    (i: DS_DataDesc; s: @_DS_DataDesc),
-    (i: DS_ZipData; s: @_DS_ZipData),
-    (i: DS_CECommentLen; s: @_DS_CECommentLen),
-    (i: DS_EOArchComLen; s: @_DS_EOArchComLen),
-    (i: DS_ErrorUnknown; s: @_DS_ErrorUnknown),
-    (i: DS_NoUnattSpan; s: @_DS_NoUnattSpan),
-    (i: DS_EntryLost; s: @_DS_EntryLost),
-    (i: DS_NoTempFile; s: @_DS_NoTempFile),
-    (i: DS_LOHBadWrite; s: @_DS_LOHBadWrite),
-    (i: DS_CEHBadWrite; s: @_DS_CEHBadWrite),
-    (i: DS_EOCBadWrite; s: @_DS_EOCBadWrite),
-    (i: DS_ExtWrongSig; s: @_DS_ExtWrongSig),
-    (i: DS_NoDiskSpace; s: @_DS_NoDiskSpace),
-    (i: DS_InsertDisk; s: @_DS_InsertDisk),
-    (i: DS_InsertVolume; s: @_DS_InsertVolume),
-    (i: DS_InDrive; s: @_DS_InDrive),
-    (i: DS_NoValidZip; s: @_DS_NoValidZip),
-    (i: DS_FirstInSet; s: @_DS_FirstInSet),
-    (i: DS_NotLastInSet; s: @_DS_NotLastInSet),
-    (i: DS_AskDeleteFile; s: @_DS_AskDeleteFile),
-    (i: DS_AskPrevFile; s: @_DS_AskPrevFile),
-    (i: DS_NoSFXSpan; s: @_DS_NoSFXSpan),
-    (i: DS_CEHBadCopy; s: @_DS_CEHBadCopy),
-    (i: DS_EOCBadSeek; s: @_DS_EOCBadSeek),
-    (i: DS_EOCBadCopy; s: @_DS_EOCBadCopy),
-    (i: DS_FirstFileOnHD; s: @_DS_FirstFileOnHD),
-    (i: DS_InsertAVolume; s: @_DS_InsertAVolume),
-    (i: DS_CopyCentral; s: @_DS_CopyCentral),
+    (i: LD_LoadErr; s: @_LD_LoadErr),
+    (i: AD_NothingToZip; s: @_AD_NothingToZip),
+    (i: AZ_NothingToDo; s: @_AZ_NothingToDo),
+    (i: DL_NothingToDel; s: @_DL_NothingToDel),
     (i: DS_NoDiskSpan; s: @_DS_NoDiskSpan),
-    (i: DS_UnknownError; s: @_DS_UnknownError),
     (i: DS_NoRenamePart; s: @_DS_NoRenamePart),
-    (i: DS_NotChangeable; s: @_DS_NotChangeable),
-    (i: FM_Erase; s: @_FM_Erase),
-    (i: FM_Confirm; s: @_FM_Confirm),
-    (i: CD_NoCDOnSpan; s: @_CD_NoCDOnSpan),
-    (i: CD_NoEventHndlr; s: @_CD_NoEventHndlr),
-    (i: CD_LOExtraLen; s: @_CD_LOExtraLen),
-    (i: CD_CEExtraLen; s: @_CD_CEExtraLen),
-    (i: CD_CEComLen; s: @_CD_CEComLen),
-    (i: CD_CEHDataSize; s: @_CD_CEHDataSize),
-    (i: CD_Changing; s: @_CD_Changing),
-    (i: CD_DuplFileName; s: @_CD_DuplFileName),
-    (i: CD_NoProtected; s: @_CD_NoProtected),
-    (i: CD_InvalidFileName; s: @_CD_InvalidFileName),
-    (i: CD_NoChangeDir; s: @_CD_NoChangeDir),
-    (i: CD_FileSpecSkip; s: @_CD_FileSpecSkip),
-    (i: DU_InvalidName; s: @_DU_InvalidName),
-    (i: DU_WrongMethod; s: @_DU_WrongMethod),
+    (i: GE_EventEx; s: @_GE_EventEx),
+    (i: GE_NoSkipping; s: @_GE_NoSkipping),
+    (i: LD_BadDll; s: @_LD_BadDll),
+    (i: LD_NoDll; s: @_LD_NoDll),
+    (i: LI_WrongZipStruct; s: @_LI_WrongZipStruct),
+    (i: PW_UnatAddPWMiss; s: @_PW_UnatAddPWMiss),
+    (i: PW_UnatExtPWMiss; s: @_PW_UnatExtPWMiss),
     (i: PR_Archive; s: @_PR_Archive),
     (i: PR_CopyZipFile; s: @_PR_CopyZipFile),
     (i: PR_SFX; s: @_PR_SFX),
@@ -411,198 +301,298 @@ ResTable: array [0..187] of TZipResRec = (
     (i: PR_Loading; s: @_PR_Loading),
     (i: PR_Joining; s: @_PR_Joining),
     (i: PR_Splitting; s: @_PR_Splitting),
-    (i: DZ_Skipped; s: @_DZ_Skipped),
-    (i: DZ_InUse; s: @_DZ_InUse),
-    (i: DZ_Refused; s: @_DZ_Refused),
-    (i: DZ_NoOpen; s: @_DZ_NoOpen),
-    (i: DZ_NoFiles; s: @_DZ_NoFiles),
-    (i: DZ_SizeChanged; s: @_DZ_SizeChanged),
-    (i: DZ_InvalidName; s: @_DZ_InvalidName),
-    (i: DZ_TooBig; s: @_DZ_TooBig),
-    (i: WZ_DropDirOnly; s: @_WZ_DropDirOnly),
-    (i: WZ_NothingToWrite; s: @_WZ_NothingToWrite),
-    (i: TM_Erasing; s: @_TM_Erasing),
+    (i: PR_Writing; s: @_PR_Writing),
+    (i: PR_PreCalc; s: @_PR_PreCalc),
+    (i: PR_Processing; s: @_PR_Processing),
+    (i: PR_Merging; s: @_PR_Merging),
+    (i: CF_FileConflict; s: @_CF_FileConflict),
+    (i: CF_Merge; s: @_CF_Merge),
+    (i: CF_OverwriteYN; s: @_CF_OverwriteYN),
+    (i: DS_AnotherDisk; s: @_DS_AnotherDisk),
+    (i: DS_AskDeleteFile; s: @_DS_AskDeleteFile),
+    (i: DS_AskPrevFile; s: @_DS_AskPrevFile),
+    (i: DS_InDrive; s: @_DS_InDrive),
+    (i: DS_InsertAVolume; s: @_DS_InsertAVolume),
+    (i: DS_InsertDisk; s: @_DS_InsertDisk),
+    (i: DS_InsertVolume; s: @_DS_InsertVolume),
+    (i: FM_Confirm; s: @_FM_Confirm),
+    (i: FM_Erase; s: @_FM_Erase),
+    (i: PW_Caption; s: @_PW_Caption),
+    (i: PW_MessageConfirm; s: @_PW_MessageConfirm),
+    (i: PW_MessageEnter; s: @_PW_MessageEnter),
+    (i: ZB_Yes; s: @_ZB_Yes),
+    (i: ZB_No; s: @_ZB_No),
+    (i: ZB_OK; s: @_ZB_OK),
+    (i: ZB_Cancel; s: @_ZB_Cancel),
+    (i: ZB_Abort; s: @_ZB_Abort),
+    (i: ZB_Retry; s: @_ZB_Retry),
+    (i: ZB_Ignore; s: @_ZB_Ignore),
+    (i: ZB_CancelAll; s: @_ZB_CancelAll),
+    (i: ZB_NoToAll; s: @_ZB_NoToAll),
+    (i: ZB_YesToAll; s: @_ZB_YesToAll),
+    (i: AD_BadFileName; s: @_AD_BadFileName),
+    (i: AD_DuplFileName; s: @_AD_DuplFileName),
+    (i: AD_InIsOutStream; s: @_AD_InIsOutStream),
+    (i: AD_InvalidEncode; s: @_AD_InvalidEncode),
+    (i: AD_InvalidName; s: @_AD_InvalidName),
+    (i: AD_InvalidZip; s: @_AD_InvalidZip),
+    (i: AD_NoDestDir; s: @_AD_NoDestDir),
+    (i: AD_UnattPassword; s: @_AD_UnattPassword),
+    (i: AZ_SameAsSource; s: @_AZ_SameAsSource),
+    (i: CD_CEHDataSize; s: @_CD_CEHDataSize),
+    (i: CD_NoChangeDir; s: @_CD_NoChangeDir),
+    (i: CD_NoProtected; s: @_CD_NoProtected),
+    (i: CF_NoDest; s: @_CF_NoDest),
+    (i: CF_SourceIsDest; s: @_CF_SourceIsDest),
+    (i: CZ_InputNotExe; s: @_CZ_InputNotExe),
+    (i: DS_BadDrive; s: @_DS_BadDrive),
+    (i: DS_CEHWrongSig; s: @_DS_CEHWrongSig),
+    (i: DS_DriveNoMount; s: @_DS_DriveNoMount),
+    (i: DS_NoDiskSpace; s: @_DS_NoDiskSpace),
+    (i: DS_NoEncrypt; s: @_DS_NoEncrypt),
+    (i: DS_NoInFile; s: @_DS_NoInFile),
+    (i: DS_NotaDrive; s: @_DS_NotaDrive),
+    (i: DS_NotChangeable; s: @_DS_NotChangeable),
+    (i: DS_NoUnattSpan; s: @_DS_NoUnattSpan),
+    (i: DS_NoValidZip; s: @_DS_NoValidZip),
+    (i: DS_Unsupported; s: @_DS_Unsupported),
+    (i: EX_NoExtrDir; s: @_EX_NoExtrDir),
+    (i: EX_UnAttPassword; s: @_EX_UnAttPassword),
+    (i: GE_InvalidArguments; s: @_GE_InvalidArguments),
+    (i: GE_InvalidParameter; s: @_GE_InvalidParameter),
+    (i: GE_NoZipSpecified; s: @_GE_NoZipSpecified),
+    (i: GE_WrongPassword; s: @_GE_WrongPassword),
+    (i: RN_InvalidDateTime; s: @_RN_InvalidDateTime),
+    (i: SF_DetachedHeaderTooBig; s: @_SF_DetachedHeaderTooBig),
+    (i: SF_NoZipSFXBin; s: @_SF_NoZipSFXBin),
+    (i: SF_StringTooLong; s: @_SF_StringTooLong),
+    (i: AD_AutoSFXWrong; s: @_AD_AutoSFXWrong),
+    (i: AZ_InternalError; s: @_AZ_InternalError),
+    (i: CF_CopyFailed; s: @_CF_CopyFailed),
+    (i: CF_SFXCopyError; s: @_CF_SFXCopyError),
+    (i: CZ_BrowseError; s: @_CZ_BrowseError),
+    (i: CZ_ExeSections; s: @_CZ_ExeSections),
+    (i: CZ_NoCopyIcon; s: @_CZ_NoCopyIcon),
+    (i: CZ_NoExeIcon; s: @_CZ_NoExeIcon),
+    (i: CZ_NoExeResource; s: @_CZ_NoExeResource),
+    (i: CZ_NoIcon; s: @_CZ_NoIcon),
+    (i: CZ_NoIconFound; s: @_CZ_NoIconFound),
+    (i: DS_BadCRC; s: @_DS_BadCRC),
+    (i: DS_CECommentLen; s: @_DS_CECommentLen),
+    (i: DS_CEHBadRead; s: @_DS_CEHBadRead),
+    (i: DS_CEHBadWrite; s: @_DS_CEHBadWrite),
+    (i: DS_CENameLen; s: @_DS_CENameLen),
+    (i: DS_CopyError; s: @_DS_CopyError),
+    (i: DS_DataCopy; s: @_DS_DataCopy),
+    (i: DS_DataDesc; s: @_DS_DataDesc),
+    (i: DS_EOCBadRead; s: @_DS_EOCBadRead),
+    (i: DS_EOCBadWrite; s: @_DS_EOCBadWrite),
+    (i: DS_ErrorUnknown; s: @_DS_ErrorUnknown),
+    (i: DS_FailedSeek; s: @_DS_FailedSeek),
+    (i: DS_FileChanged; s: @_DS_FileChanged),
+    (i: DS_FileError; s: @_DS_FileError),
+    (i: DS_FileOpen; s: @_DS_FileOpen),
+    (i: DS_LOHBadRead; s: @_DS_LOHBadRead),
+    (i: DS_LOHBadWrite; s: @_DS_LOHBadWrite),
+    (i: DS_LOHWrongName; s: @_DS_LOHWrongName),
+    (i: DS_NoAppend; s: @_DS_NoAppend),
+    (i: DS_NoInStream; s: @_DS_NoInStream),
+    (i: DS_NoMem; s: @_DS_NoMem),
+    (i: DS_NoOutFile; s: @_DS_NoOutFile),
+    (i: DS_NoOutStream; s: @_DS_NoOutStream),
+    (i: DS_NoTempFile; s: @_DS_NoTempFile),
+    (i: DS_NoVolume; s: @_DS_NoVolume),
+    (i: DS_NoWrite; s: @_DS_NoWrite),
+    (i: DS_ReadError; s: @_DS_ReadError),
+    (i: DS_SeekError; s: @_DS_SeekError),
+    (i: DS_SFXBadRead; s: @_DS_SFXBadRead),
+    (i: DS_TooManyParts; s: @_DS_TooManyParts),
+    (i: DS_WriteError; s: @_DS_WriteError),
+    (i: DS_Zip64FieldError; s: @_DS_Zip64FieldError),
+    (i: GE_DLLCritical; s: @_GE_DLLCritical),
+    (i: GE_Except; s: @_GE_Except),
+    (i: GE_ExceptErr; s: @_GE_ExceptErr),
+    (i: GE_FatalZip; s: @_GE_FatalZip),
+    (i: GE_FileChanged; s: @_GE_FileChanged),
+    (i: GE_Inactive; s: @_GE_Inactive),
+    (i: GE_NoMem; s: @_GE_NoMem),
+    (i: GE_RangeError; s: @_GE_RangeError),
+    (i: GE_Unknown; s: @_GE_Unknown),
+    (i: GE_WasBusy; s: @_GE_WasBusy),
+    (i: GE_NoProcess; s: @_GE_NoProcess),
+    (i: LI_ErrorUnknown; s: @_LI_ErrorUnknown),
+    (i: LI_ReadZipError; s: @_LI_ReadZipError),
+    (i: DS_SetDateError; s: @_DS_SetDateError),
+    (i: GE_GeneralError; s: @_GE_GeneralError),
+    (i: GE_SystemError; s: @_GE_SystemError),
+    (i: GE_SysErr; s: @_GE_SysErr),
     (i: TM_Deleting; s: @_TM_Deleting),
+    (i: TM_Erasing; s: @_TM_Erasing),
     (i: TM_GetNewDisk; s: @_TM_GetNewDisk),
-    (i: TM_SystemError; s: @_TM_SystemError));
+    (i: TM_SystemError; s: @_TM_SystemError),
+    (i: TM_Trace; s: @_TM_Trace),
+    (i: TM_Verbose; s: @_TM_Verbose),
+    (i: DZ_RES_GOOD; s: @_DZ_RES_GOOD),
+    (i: DZ_RES_CANCELLED; s: @_DZ_RES_CANCELLED),
+    (i: DZ_RES_ABORT; s: @_DZ_RES_ABORT),
+    (i: DZ_RES_CALLBACK; s: @_DZ_RES_CALLBACK),
+    (i: DZ_RES_MEMORY; s: @_DZ_RES_MEMORY),
+    (i: DZ_RES_STRUCT; s: @_DZ_RES_STRUCT),
+    (i: DZ_RES_ERROR; s: @_DZ_RES_ERROR),
+    (i: DZ_RES_PASSWORD_FAIL; s: @_DZ_RES_PASSWORD_FAIL),
+    (i: DZ_RES_PASSWORD_CANCEL; s: @_DZ_RES_PASSWORD_CANCEL),
+    (i: DZ_RES_INVAL_ZIP; s: @_DZ_RES_INVAL_ZIP),
+    (i: DZ_RES_NO_CENTRAL; s: @_DZ_RES_NO_CENTRAL),
+    (i: DZ_RES_ZIP_EOF; s: @_DZ_RES_ZIP_EOF),
+    (i: DZ_RES_ZIP_END; s: @_DZ_RES_ZIP_END),
+    (i: DZ_RES_ZIP_NOOPEN; s: @_DZ_RES_ZIP_NOOPEN),
+    (i: DZ_RES_ZIP_MULTI; s: @_DZ_RES_ZIP_MULTI),
+    (i: DZ_RES_NOT_FOUND; s: @_DZ_RES_NOT_FOUND),
+    (i: DZ_RES_LOGIC_ERROR; s: @_DZ_RES_LOGIC_ERROR),
+    (i: DZ_RES_NOTHING_TO_DO; s: @_DZ_RES_NOTHING_TO_DO),
+    (i: DZ_RES_BAD_OPTIONS; s: @_DZ_RES_BAD_OPTIONS),
+    (i: DZ_RES_TEMP_FAILED; s: @_DZ_RES_TEMP_FAILED),
+    (i: DZ_RES_NO_FILE_OPEN; s: @_DZ_RES_NO_FILE_OPEN),
+    (i: DZ_RES_ERROR_READ; s: @_DZ_RES_ERROR_READ),
+    (i: DZ_RES_ERROR_CREATE; s: @_DZ_RES_ERROR_CREATE),
+    (i: DZ_RES_ERROR_WRITE; s: @_DZ_RES_ERROR_WRITE),
+    (i: DZ_RES_ERROR_SEEK; s: @_DZ_RES_ERROR_SEEK),
+    (i: DZ_RES_EMPTY_ZIP; s: @_DZ_RES_EMPTY_ZIP),
+    (i: DZ_RES_INVAL_NAME; s: @_DZ_RES_INVAL_NAME),
+    (i: DZ_RES_GENERAL; s: @_DZ_RES_GENERAL),
+    (i: DZ_RES_MISS; s: @_DZ_RES_MISS),
+    (i: DZ_RES_WARNING; s: @_DZ_RES_WARNING),
+    (i: DZ_ERR_ERROR_DELETE; s: @_DZ_ERR_ERROR_DELETE),
+    (i: DZ_ERR_FATAL_IMPORT; s: @_DZ_ERR_FATAL_IMPORT),
+    (i: DZ_ERR_SKIPPING; s: @_DZ_ERR_SKIPPING),
+    (i: DZ_ERR_LOCKED; s: @_DZ_ERR_LOCKED),
+    (i: DZ_ERR_DENIED; s: @_DZ_ERR_DENIED),
+    (i: DZ_ERR_DUPNAME; s: @_DZ_ERR_DUPNAME),
+    (i: DZ_ERR_SKIPPED; s: @_DZ_ERR_SKIPPED),
+    (i: DT_Author; s: @_DT_Author),
+    (i: DT_Desc; s: @_DT_Desc),
+    (i: DT_Language; s: @_DT_Language));
  
 {$ELSE}
  
 const
- CompBlok: array [0..1037] of Cardinal = (
-  $102D0409, $53550002, $00003514, $F0F00035, $FFF0F020, $FFF3F6FF, 
-  $02BCABFD, $F706F5F2, $001178F0, $3000DF00, $00040910, $DF000B05, 
-  $00530055, $64F0F33A, $0065FF00, $00610066, $6CFF0075, $08007400, 
-  $D7005200, $3B50002E, $003B7400, $73DF0072, $4C001000, $006E003F, 
-  $00416755, $65006161, $3B4EF0F3, $4575D500, $003F7200, $2302006C, 
-  $3F467500, $02777400, $55450020, $00727700, $2000556F, $005F6900, 
-  $440020D7, $354C005B, $F5006102, $74029362, $0065F0F3, $63D50078, 
-  $4570003B, $00936900, $1ED5006E, $F32D0A8D, $00936EF0, $7A550020, 
-  $F3700099, $009966F0, $5502696C, $6500BD73, $E76900B9, $00396502, 
-  $00C72155, $71003B52, $57650041, $0152AA00, $6DF0F364, $936D003B, 
-  $D71C7902, $6101B204, $003F7600, $01AA01EA, $2F01ECD2, $00BD0DC9, 
-  $73005761, $9377C500, $00576402, $01DC0138, $4FE7004E, $12195400, 
-  $00630184, $0A00A368, $1B58004D, $D9670198, $FF2E7202, $43000902, 
-  $25700093, $45019A10, $1B023567, $0DB8008D, $33450598, $5F652910, 
-  $6801B200, $EB64025D, $57019602, $5757002A, $00AB2012, $97005775, 
-  $F32C0079, $005F49F0, $02721112, $BF630041, $78116606, $E0112611, 
-  $AA11D611, $D76511F8, $00432012, $2112116F, $F312002B, $18FB42F0, 
-  $5802EB50, $016A4A11, $74123577, $152A1081, $D2241141, $051E11D6, 
-  $78013A22, $0028F0F3, $00392555, $6FF0F329, $99730271, $013AA200, 
-  $60027520, $31016A01, $522E004B, $73152291, $70111E10, $23610293, 
-  $03E06814, $013605E8, $F0005725, $71091201, $A30D1F79, $20254A10, 
-  $24E52B00, $1DB91321, $14D91DC9, $9F140500, $120B8C04, $AB4101D6, 
-  $1013AE06, $06D13D51, $1A49254A, $06D13D7B, $96225D55, $025D4301, 
-  $6C01BA3A, $006402EB, $D13D9D1D, $2B4E1106, $9A11D814, $107F6721, 
-  $3DD21B1A, $0607D088, $6C113421, $01F022A1, $8275270C, $0F21129D, 
-  $2206D14D, $E037323D, $B90A151D, $22677200, $8800B969, $964D4C03, 
-  $2192BA01, $6E32B311, $02D96B00, $029B2877, $49AE0154, $6B00330D, 
-  $01F402E1, $E8111838, $0043B421, $F6F1F600, $7A51011A, $5D1A2DFB, 
-  $8D225624, $107F770A, $6305EAAA, $45201AA7, $02696800, $0081E253, 
-  $5A427B58, $72013A21, $07823000, $003F6E12, $0198111C, $152A1166, 
-  $22C5A069, $111C01EC, $131611DA, $61049366, $5E04EF24, $14156E01, 
-  $4D0C0DE0, $88019200, $115A01BA, $A70D17AE, $18577E22, $935C7411, 
-  $00013600, $2AED4C00, $045D0B7B, $4D282091, $42028364, $8401C011, 
-  $2021CE53, $55A20162, $29DC57AE, $531D5724, $4804D94D, $11185172, 
-  $61201D56, $6E237C00, $8C001003, $B603DA6D, $12037401, $B86DA821, 
-  $0DF1F06B, $001D8308, $A6008D0F, $10019653, $B920297D, $6E11A640, 
-  $1B7202E7, $507D2C10, $032C1118, $23E26D6A, $7D0A1160, $98126D23, 
-  $00333676, $B972219A, $7E635802, $237C0811, $555E5588, $F4568173, 
-  $3A555E13, $1112A001, $0184019A, $7BB8352E, $4F400D21, $7212D542, 
-  $4392105D, $07E8016A, $0922E727, $36069727, $80353F87, $53B61BA6, 
-  $660107E8, $714E0291, $610A8736, $013E8934, $020203EA, $8D2D4611, 
-  $00BD5D87, $215E119E, $408213DA, $0C8B218B, $5D525D42, $63465962, 
-  $20010261, $2F7DEF44, $B855CC34, $4291007D, $1118C001, $2132152A, 
-  $01F42198, $002153C4, $16A53905, $A448E35A, $8A116685, $A85D9A5D, 
-  $5DBA5DAA, $98655DCA, $2AED9678, $7D8F487E, $F0F0AD1E, $3400331F, 
-  $4CCB6B21, $72119E20, $8C950851, $219D4893, $4DBE1003, $9A49CE94, 
-  $92A34C03, $96208F74, $41486621, $C031C400, $10030A05, $5F7211F2, 
-  $95084000, $AD864360, $4D3895E6, $B72C4148, $02D50AAD, $6222CD47, 
-  $01840665, $11D8970E, $6F111822, $970E003D, $4F212BD6, $E087A430, 
-  $615C113A, $911013EA, $0020015E, $B00F0234, $74309B42, $C611A6AD, 
-  $A083C821, $33304A21, $68024F4D, $41F80093, $E2204900, $0F7F0912, 
-  $E0BDD6AD, $260004B6, $0F59008B, $B0F10312, $B1FA31EC, $4B004F4F, 
-  $B0F10700, $330039C0, $09121A10, $00BDC780, $6AB0F106, $14C13C37, 
-  $01741108, $49C20979, $11A41897, $419537C2, $EB0732C9, $00935432, 
-  $5008C376, $C782B4F3, $C3A4CD9D, $842AED24, $D204CD2B, $18C8DECD, 
-  $04D96DC7, $73CA05E8, $210107DC, $B18020B5, $01520184, $11182386, 
-  $2E0063E6, $3E87BE35, $3E21A021, $68216213, $48B1AE21, $93D00172, 
-  $75396DEE, $4661A420, $601084C7, $94019C51, $55D38603, $654600BD, 
-  $5450DD44, $D48500D9, $9CAD609D, $C3852AED, $00D524CD, $B52E4BAA, 
-  $63B33220, $414400B9, $38139E10, $08414401, $02714195, $556601DC, 
-  $5A419048, $2E05C021, $22050121, $00D46970, $215A230A, $2520714E, 
-  $215E9B66, $01DCB322, $9A951090, $82ED7C23, $10F13B51, $406401EA, 
-  $15624299, $D9B221CE, $213C0178, $80141577, $85A4039A, $7B6E5780, 
-  $419A0DF0, $802605C0, $362D9D29, $119EA150, $15222112, $486D8736, 
-  $05B212FB, $DE21A398, $F2F4A4CD, $8B094AFD, $F0F0ED07, $FFCDEF26, 
-  $30E4A5CD, $211220F1, $013A9BC4, $05C0F130, $18F25143, $016A0003, 
-  $87729998, $9DA49D4A, $9DC49DB4, $E4B8DDD8, $B599F49D, $3200000D, 
-  $04912AED, $08E2FDC3, $2280A32A, $CC419E93, $0543BCAD, $2E44A17A, 
-  $11B444A1, $336E113C, $6802F390, $ADFB3E4B, $DD2434B1, $41649162, 
-  $B44067E2, $F4DDBE11, $DEDB04ED, $00917C6B, $E0D062C5, $7AFD6A6B, 
-  $74FD8AFD, $BA000DE2, $9A4AFD22, $2D3A0DD7, $F3112240, $10859A02, 
-  $F1028584, $23E65172, $90145D28, $102D6015, $432443F0, $013C0364, 
-  $8A945F6F, $8A9100A3, $6B751102, $A0950942, $47EA2368, $125D500B, 
-  $47EA2566, $FE03C4E8, $2D2BA449, $54503002, $8017FDD7, $4306D798, 
-  $B9389370, $84C33401, $C1469374, $A3E6E196, $41F2A3C0, $A0656200, 
-  $6E6304B3, $34F30291, $F2917C17, $00328741, $FE30A735, $BA417E81, 
-  $F1827217, $A0312140, $717C1700, $F1565566, $C0414075, $95668944, 
-  $A1A60180, $C523917E, $F10E403C, $F72CE5C4, $01880B5A, $591B0D9C, 
-  $A54609E6, $73095CAC, $118622BF, $917CC146, $E6592A01, $D1C2B1A8, 
-  $3966B518, $3DA43D94, $283DB402, $0126E659, $915E8196, $B16E65EA, 
-  $BA4DAA50, $DA4DCA4D, $02F96949, $00940B6F, $F3308124, $5D0E4DFE, 
-  $35D45D1E, $E192B390, $3EB33040, $4ED1E261, $6E5D5E5D, $484D295D, 
-  $1613A004, $A23963B1, $5DA84DF4, $35BC5DB8, $E229404A, $07AA7A81, 
-  $1E684A3D, $9B0A3D1B, $00FF2E64, $2A00FF58, $7CF73AFD, $05258191, 
-  $254D154D, $10D2354D, $656D72F1, $00A09F10, $26011419, $F20D6D73, 
-  $31609D08, $40919290, $4A35D435, $C40D290B, $A46CD3CE, $9100E295, 
-  $6C84196E, $209D5AD1, $86834050, $A38A65D4, $838665D4, $7F1F735C, 
-  $E65900BD, $23E471E8, $A18AF328, $87D2E192, $C4142194, $628BF239, 
-  $9D77A287, $C8A3C2B2, $915C0883, $F154014C, $FE80E32E, $3A7DF6B1, 
-  $35FA4005, $1136F50C, $D16A0100, $9D2E257A, $7DCE80A0, $AD4A657E, 
-  $65808D3A, $45600300, $B4FB802E, $734CF10C, $8D228D12, $8B428D32, 
-  $8DA3040E, $4F2E38F7, $66C30E20, $8821B895, $87A8D491, $B94EE172, 
-  $6D3FABBA, $0D001700, $4E73BA84, $F8A3C203, $8393088D, $459D939D, 
-  $B0AA0190, $9DC29D43, $7719C0B0, $677C42EA, $F4A08964, $92E59AF3, 
-  $A6591CF7, $B8677C80, $2C41EC21, $58EB9AE1, $15D3E233, $6CB2FD14, 
-  $02F976D5, $46E43D69, $840154E1, $21941126, $60002517, $5A2592A5, 
-  $05E24E03, $041154C0, $D3E2F140, $8256001D, $1F7522A9, $8AB160F4, 
-  $9CAD1C33, $031074ED, $96A54640, $6781CAD1, $017252F1, $96403338, 
-  $707364E1, $60018C81, $4DE196B1, $67152095, $376FB07B, $105D1710, 
-  $23B4F1FA, $96C71090, $5E355803, $E00FA0F7, $04B1B7BC, $C0ED9DB3, 
-  $E852FB53, $04611C51, $026DA81B, $231E6180, $40EB6400, $7CEBBE35, 
-  $0241E867, $D91A2556, $2EE146E0, $BEBD8003, $41657CBD, $618D5130, 
-  $FF7D018D, $4F539200, $43413243, $117A0473, $513601FC, $1B221BDE, 
-  $CD2B80CD, $01881651, $E1E2F102, $79A6C166, $CD7D4024, $CA9DCD8D, 
-  $C95E113A, $852179A6, $CDA888D0, $D15479A8, $44145F67, $7767BAE1, 
-  $54120304, $D20D2311, $DD1ECDF0, $DD3EDD2E, $6A976781, $CDDECDCE, 
-  $677CDB10, $0027F51C, $DDA9DD99, $CA5DCDE3, $DDE2DDD2, $ED02DDF2, 
-  $B4D91210, $B6637A17, $6CE364A1, $ED52ED42, $6EED1288, $32E37EED, 
-  $ED95ED85, $482F1451, $5146D245, $F564E956, $73031204, $6A00F043, 
-  $82113E31, $CCE39E05, $70EDE87D, $00433C87, $A35A315A, $CD7C03F6, 
-  $EB54FD4E, $518CAB14, $340374C0, $3AFD8EED, $B47D28CD, $5A0602FD, 
-  $63B209CA, $5D5C00BD, $78934B12, $7ABDF2B8, $204B5861, $846B5200, 
-  $048D8A53, $2C703728, $B7E600CB, $04430D72, $1154620F, $7E405565, 
-  $8441E463, $02617E81, $6F292172, $22518876, $6EA30C91, $0205A8F3, 
-  $730A03BC, $081D6426, $8651E8B3, $04931261, $45301552, $0E508D69, 
-  $78A1F6B1, $01619433, $A5DD0D2E, $D03DF07C, $F681D487, $24E12C63, 
-  $439EC166, $8012E175, $301923D3, $7800A1F6, $62F1F643, $C2AD1431, 
-  $AA13BAAD, $006194B5, $F7D4FD7E, $ED5EFD02, $1DEACDB6, $EDA81DFA, 
-  $ACDD5C00, $3CCD1A73, $44F7082D, $64CD54CD, $C57420CD, $2D7A61D2, 
-  $270AFDD8, $FAE2C345, $634C2909, $65DD74E8, $E7546067, $10610222, 
-  $61101706, $A9E89BF4, $82129966, $10611665, $A152F3F2, $8586617E, 
-  $80708917, $40314E61, $416463BA, $A1B07554, $1704A106, $543D9326, 
-  $17063AA3, $25AAA376, $3D319081, $711E44B4, $EB0D35F8, $5E83D400, 
-  $F0C373AD, $F6373800, $506DBEFD, $38A50CAB, $3AA18C4B, $D3880035, 
-  $619025A0, $3BDC611E, $415683D4, $750955E2, $A3D6A20F, $2E00EB2C, 
-  $563DCA13, $25A08073, $51E83DB0, $21A0731C, $A3D6D388, $4D7D044E, 
-  $AB25269F, $A253F070, $C24DB24D, $4DD2204D, $4DF24DE2, $57125D02, 
-  $2A32373D, $474440B1, $25F2E1BC, $FBA8A1FE, $C50AA17E, $71828220, 
-  $E4325F79, $84911221, $6F718253, $907451E0, $3A730E25, $00657C35, 
-  $03B5E800, $23B39936, $5159000D, $9F2A54D0, $521B4510, $4EA08B49, 
-  $5D1E62A3, $12997015, $75B2B176, $61C43C3D, $21455334, $510A62A5, 
-  $F8D382D0, $D67F7355, $085DF8C0, $BA6D186D, $BA133815, $05007321, 
-  $2D2AD939, $A1B6729B, $E7C2B1BC, $FC08035E, $E6497025, $84D92E01, 
-  $B33001C0, $10041DC8, $31113C17, $1AB52DD9, $FDA09122, $2C28218A, 
-  $564500E5, $70814341, $991D8948, $75299112, $CF7D87BD, $F4696B72, 
-  $084F2BFA, $7DD0900F, $812B119A, $977D917D, $00F4672D, $0D047D3C, 
-  $4D8C4D7C, $E72233B4, $5D5A5D4A, $625D6A04, $004B6F91, $5D885374, 
-  $5DA4E920, $1EA3D642, $3DD33DC3, $3AF33DE3, $042DB511, $CB6EF2E3, 
-  $0A22C51A, $18058C11, $2863BC1D, $014CF16C, $EF0D133A, $083B6B02, 
-  $1601873A, $55923017, $35AA0174, $4352A194, $6882A186, $906F12A5, 
-  $435093A0, $639E6BE8, $B56C2673, $60483E00, $47B6B758, $A2AD5E6D, 
-  $3908A86A, $28953882, $02C90741, $44952A6E, $88B26C6D, $4FBDAA41, 
-  $05A0B0AD, $6970E534, $77BCF067, $330605A8, $441121BE, $D388F617, 
-  $A3723188, $A0014E02, $735E9021, $F5F23D80, $6A7921BE, $3EBA38AD, 
-  $C36A3912, $B862ADAF, $AB0D9B3B, $8068750D, $1B321D22, $F3321366, 
-  $87687D70, $A42DC512, $61DC6069, $D4827B45, $62D14863, $22890064, 
-  $1968014E, $B974A32E, $21C4A7D2, $C40009B2, $062D86FD, $C8ED642D, 
-  $56ED84ED, $002D4CCD, $CD82EDB4, $1DE6C192, $FB08CDA6, $050CFDAC, 
-  $4D000027, $D52054BB, $70025162, $73B2A2F3, $02543967, $2B75CA43, 
-  $004EA8D1, $D96A76B7, $070A01CA, $ADDCD368, $C1D44156, $3CC1C4B8, 
-  $3651CA11, $D0C53500, $D0C50233, $B8B87315, $8C1158C5, $244102B9, 
-  $C5160141, $5E81D220, $EE211841, $2CB58063, $472400E5, $8176AB14, 
-  $DDE2C724, $31064302, $7951F126, $B5B8F22B, $6516C3FC, $4A596E60, 
-  $24ED1094, $44272741, $1690A300, $5720C409, $37AD11BD, $A00174EC, 
-  $08DD1521, $6341F16E, $8906E89B, $FD19113C, $4182FB28, $B7C609AA, 
-  $11FA54ED, $78B5ED79, $116CF702, $709DB610, $80F3B611, $32237363, 
-  $B5BE0364, $CBE79E14, $AA41C6FD, $FAFD47C9, $07F0ECFD, $692A0016, 
-  $0A83D802, $7661AED7, $D1420A89, $2A906D74, $C5B806C9, $B5804566, 
-  $000F0475, $58B07F53, $000F0300, $006D3F05, $80000F0B, $441384B1, 
-  $C1C3B831, $C70D3D08, $B8018CE0, $009D822D, $41AA3500, $FDEBCAAA, 
-  $028B0900, $CEA01152, $18079681, $B029F631, $3091790D, $4A00032A, 
-  $1174C0F1, $3174C5B8, $4152415E, $13BDDA02, $15340261, $1D3ED70A, 
-  $17801D75, $3A011E0B, $0DD3CC69, $A2BA1DAE, $FE04EDEE, $1DF90EED, 
-  $7762A413, $D1500190, $2D21933E, $85A6628B, $E59EC3FE, $D076631A, 
-  $A1980011, $E36A1358, $250465DA, $916EE59E, $52421DF4, $649B0E2D, 
-  $632A75AE, $2314C510, $A9C85032, $E93817D8, $416AF118, $1D9FCDAA, 
-  $D890E320, $6A4B4817, $0F71BAFD, $839E8AB5, $3481F4A4, $1DB46703, 
-  $41863C4C, $DF08CFAA, $373D7A2D, $100B23A6, $890EC1F0, $D2045136, 
-  $74B1A8C1, $9D8052D9, $05A251DA, $7307C18E, $B2EB1000, $855C6324, 
-  $67E861DC, $E0A3BA6A, $6BD6AA41, $7B19003D, $734641A8, $DA810EC2, 
-  $12711A51, $62DF6D01, $7337A002, $4C334D23, $C1FEB188, $51ECD70A, 
-  $D0331EA1, $D11E732E, $1747E19A, $45846554, $20959480, $2304801F, 
-  $A50AC3B8, $70E50210, $AE529379, $0A79EEB1, $F9FD18A3, $00000047 );
+ CompBlok: array [0..690] of Cardinal = (
+  $0AC30409, $00005355, $E0E2D668, $6C6B5885, $1E15475C, $EF6B37AF, 
+  $AEC7EBDA, $2AA895B7, $24EB0B66, $2050EC6E, $181FE351, $6E375EC7, 
+  $D1F8271C, $BD090934, $F77677BE, $9677BBE2, $DEBD7B99, $05154548, 
+  $8A8FC54A, $44215482, $52A04878, $9687F114, $1F9012A8, $14FE5B55, 
+  $5152D0FE, $42D02509, $41021E25, $72D12A91, $AD7DCCCE, $2592A6E3, 
+  $399CCCEF, $339DF3EF, $96A79097, $90927D2E, $A10F485B, $932920E4, 
+  $9918E4C3, $69F25526, $C8D64AB2, $2E4EA4D3, $AB90DF90, $8D7932E4, 
+  $417E42BC, $4CFE7A06, $F6B7239E, $24DE7A94, $BBFBBEEF, $DE7A379E, 
+  $DD4919E9, $3A9BDA96, $5A9E3A94, $8BA9194F, $BEA7AFA9, $F5317A97, 
+  $A9DBD4C7, $F50FDEA1, $E85EF52E, $52F7A87D, $57DED5EF, $FDECDF7A, 
+  $7ABFEF7B, $4BEDE9DF, $903E91DF, $4E9F499E, $4C1FA66F, $EDFD2D7F, 
+  $4FD30FF4, $C9A7AFA7, $9F3D999E, $9EEAF3DF, $CBE9ECBF, $90B3307C, 
+  $CE9CCE59, $9911903C, $C91E642F, $58F3357C, $A5CC89E6, $97320FCC, 
+  $FCCB3F33, $E662F332, $335FCCD5, $EE1DF7B7, $F70F7D13, $5AF7D53D, 
+  $99FF40DF, $1BFFA77E, $FFFB97FD, $DECB9FD4, $9EC99D96, $7B297ECE, 
+  $FB257B29, $365AF652, $EE68FB97, $FB939CDE, $B9E7EE71, $9DFEE6DF, 
+  $1F1C0CAB, $1D1E07B0, $C6F032B8, $6E067FC0, $E0C4FC1F, $0647C185, 
+  $757839BF, $3FE0FAF0, $62F9B307, $5CFE70FE, $93FCA1FE, $97F92BF9, 
+  $E9A1D9F3, $5FA1CDA1, $FA1F5D0D, $43DBD0C7, $0F4F0EB7, $E2FE1F9F, 
+  $DFC3E3F0, $F87E7E1F, $86B7E1F5, $F772303F, $6D48EAC8, $2BE46B64, 
+  $791D3F23, $C8DAE461, $A38A477F, $D1C5D195, $767E8CCF, $27D1D1F4, 
+  $7D1D9F47, $A30FF46E, $770B40A4, $CE178E17, $83C2CC14, $CF0A2785, 
+  $FC285E14, $E172F0BA, $0BD785F7, $C5B2156F, $BC52B162, $78B478AB, 
+  $7C59B15F, $E29DF8B8, $8A97C533, $AFFE2B7F, $63BB1C58, $A7D8C8EC, 
+  $97D8C4C6, $F635BEC7, $C7E7B193, $94F58DAE, $94B74BFA, $B4AA6968, 
+  $E4A07A5E, $1E962E94, $F4B77D2F, $A5B3D2A3, $E5D37775, $8556976D, 
+  $4BAC82E0, $B869A826, $45987326, $C3098B79, $E64BB9B3, $C309EB98, 
+  $982D96A1, $D1D171E9, $5C1BB394, $B78E6478, $9F5BB63A, $564915A6, 
+  $0B56ED37, $AD2456AE, $358D6458, $A2185C5B, $ADDA2F43, $4530ED9A, 
+  $4B0DC4B3, $D7759091, $052B7E89, $2E0AB9E8, $07DC53CE, $24C1F19E, 
+  $16453975, $D91C7A92, $F732C995, $6B03481A, $2648DF8B, $03D306C1, 
+  $B7D835E6, $992CA160, $6AE6E5B7, $BC5D70CB, $4A8F72E9, $023A05BF, 
+  $A432591D, $F0865B47, $1E6AC3A8, $EA552435, $D64DB756, $06D4BBC2, 
+  $27816D37, $E43336A8, $6F0E3860, $D775FDC3, $AA1870D8, $0BA3DA83, 
+  $47A2E926, $03B9496D, $72C704CE, $4796FC21, $DD1B0C16, $D392131B, 
+  $4D0A5086, $24A038EA, $4F4A9130, $0BE7A6F8, $679A4E56, $29A81658, 
+  $8B0B9B65, $28D06DD6, $21B6CA79, $93B7A652, $49856262, $642879E6, 
+  $D80D9856, $47B61BA3, $D1E08226, $016E20B3, $AB1322D4, $8993F70B, 
+  $B1321999, $6386BB60, $C88D384B, $6169C4C8, $4661262B, $311947CC, 
+  $E660D731, $0A5A22A6, $BC3897A2, $42CADB97, $4F6C72D9, $D2D35719, 
+  $C638AD70, $788CA17B, $31F014E7, $0C77D31C, $0E657C2D, $A4C9B8F7, 
+  $1304EF56, $1681FC75, $9ADD9B80, $995E9B63, $BDC8ADEC, $76DB5CF9, 
+  $98B7CA1C, $965F0368, $BDBD51CF, $A9A35CC2, $19EB85C2, $50A43272, 
+  $C626D532, $219FFD41, $A3880D6B, $F183C905, $6BC24954, $861BA0D4, 
+  $A043E9B9, $9F207798, $90CC396B, $6D412E0C, $6E405A40, $F048A034, 
+  $82675C12, $11C355E1, $703AB0CC, $C8A94955, $D39E6E7C, $DB69F70E, 
+  $6D02CC80, $87A94D22, $66039532, $CBAAD6D7, $97278B6B, $0452A9A7, 
+  $CB6C1075, $14A07EE6, $9562BE04, $6E7CE5CB, $3B20E416, $763F07E9, 
+  $E49CABE3, $C9250841, $4B48C0E7, $6CA84240, $8365D53F, $1DC5BDE2, 
+  $99551C1F, $71DACBBA, $28C560EC, $0D7E6EFB, $CFAEA57D, $D16C6841, 
+  $6A457C84, $69641714, $0DC34278, $A0A0AA4A, $CFC7AC48, $97C64930, 
+  $793F1939, $29CF8C9C, $1AE32290, $9857C682, $BE365907, $60B97758, 
+  $3ACE1F44, $1AC4600E, $5770FFC7, $B77458FF, $952DA920, $327F18EB, 
+  $9A0643EF, $DA25B806, $BE5B745A, $8CC7C587, $1D1A6D26, $0C1BE555, 
+  $448E8CA3, $8BDF71F7, $CCA62269, $7C4AB935, $EA0300AE, $D32C76DA, 
+  $1DC41610, $0B0091A2, $1E50ACCC, $064A8342, $5DA662D9, $A9106543, 
+  $1551A642, $D90933CC, $20630EAF, $F4D9F9D6, $DB6C1021, $00F49096, 
+  $16841E43, $00701561, $8B6E5189, $3C20A943, $01AF6DB5, $860243DA, 
+  $F7244108, $6120C985, $58C9C02D, $5449FC06, $DF26B04F, $D2A6D052, 
+  $D2197304, $BB61B9A7, $A84C0220, $F00C0D7B, $BD18F55C, $8CB51953, 
+  $39CFF4B7, $62226CDE, $88AB49DE, $6786F34B, $63269E80, $87C392E0, 
+  $10EC7D0E, $33F50AC6, $675B861B, $D8D793A0, $0F3165B1, $88A252F0, 
+  $4E8A6BAA, $3A3A614B, $E9779964, $900FB81B, $28303578, $16A83A00, 
+  $C632998C, $F793BFD0, $6300B202, $183421A7, $B811155A, $D2E682A9, 
+  $55FDEAA9, $DAD4D52D, $C7F432F9, $3003352C, $4369406C, $0EBB4ACE, 
+  $F05D7DAC, $9801C16D, $5B1291E6, $9F2CEC02, $35F9035C, $56025F74, 
+  $C596861A, $1BD7EE5C, $261826B4, $6C668184, $7FE8FD81, $61FDB4C2, 
+  $B5D6E34C, $716CAB18, $74C23016, $A10926C0, $571499D6, $00E1E079, 
+  $C5EEB80E, $7D28DA51, $DA49B264, $0C36C04D, $C272A864, $02426EB5, 
+  $08E09176, $A9FA4618, $91F8061C, $A0D5D798, $0A67BD41, $4261BA27, 
+  $74DAE0A9, $3941C99C, $E83EED05, $5A19CA7B, $F7515999, $C2E30A9B, 
+  $8086539D, $2958001C, $B6C9992B, $9C595619, $0DCF7145, $C522050B, 
+  $869AF455, $B9F23667, $056C9B08, $0B64B13B, $67A0E4E0, $3A05BA63, 
+  $4F4421A8, $9EC75040, $24C03661, $98F4B4E8, $C38F194E, $2CC40030, 
+  $933C424C, $9DA1BF9E, $B8D6A683, $92515AEF, $A80585CE, $4BF80509, 
+  $3805DF52, $90E71C92, $6E16CC0E, $8341B43D, $42FA69B0, $A17D7C60, 
+  $221F00E6, $B84DD78F, $05354985, $A0738006, $C6A653EB, $083870C1, 
+  $F04D559A, $6827D6A6, $26A6B49A, $BB484099, $BEAFBBA1, $CC865583, 
+  $174617C1, $6DE086C1, $2B80DAEC, $54E4781A, $47F639D7, $CCDB663C, 
+  $3B853DF4, $03202992, $401A10C2, $544DB508, $7F004019, $A3B4DCC4, 
+  $0E636010, $29FDEC8A, $A8752314, $A8CC2A96, $661F724A, $BB3BC08F, 
+  $CA781D29, $1EF7B0D4, $D170DD24, $460ED445, $DD129B9F, $550949C8, 
+  $8C216BBD, $61929741, $982F4050, $D664A41B, $B809718D, $40558C1E, 
+  $534A4412, $54282DD8, $5EBB61EC, $82AEB151, $76D64F47, $33770B99, 
+  $D617A6EF, $49EAE3DD, $B851C2C2, $91BABBE6, $1C3C80AD, $3FEDF7DE, 
+  $64487140, $B54E62E1, $5E7DB40A, $FB7D8B77, $FE62ABB1, $120F559E, 
+  $7CCD823C, $B632AC8E, $B18EB319, $629CF03E, $7E85E964, $910D9D13, 
+  $CC3EE4C1, $002CC1F1, $4777236F, $7161C7E6, $E17EF9B8, $525922ED, 
+  $A1BFEC0B, $D8963037, $98356A18, $143E011B, $2582CF6A, $1D141340, 
+  $50626BE6, $341F4851, $6C74268F, $187C55C0, $C37030D9, $D6427304, 
+  $326DF28F, $363A5417, $D18460D3, $ECB11D95, $07E26C1E, $501E8DDC, 
+  $EE9701A8, $741E73D3, $5374E628, $5444BCC0, $277F6298, $098E0684, 
+  $40C716BD, $41DA1146, $13932F82, $3E90B400, $1C8F91D0, $7106A239, 
+  $BE9B7C89, $C8E1D9E3, $C0A07619, $77CF81F3, $3DA10991, $603871FC, 
+  $244C458E, $2FCC30C3, $30AF052D, $F2EEC178, $96D903F8, $F01D9003, 
+  $D900288A, $9C60A017, $9C0709F8, $0381A9A6, $14799AAA, $6D4E9C55, 
+  $BA41F868, $6C7A0995, $B41C9216, $F39F615E, $12813A61, $FAA8C20D, 
+  $2C03345C, $A6DC3742, $7ED62AFB, $2DB4A674, $27353C48, $0A6A647D, 
+  $83E1A614, $1C26859E, $E60765F5, $B7EBB8AF, $3409C3F4, $D24C068C, 
+  $5F740B7D, $450C4682, $B25E9614, $DBDE126C, $F0D13B31, $1127A989, 
+  $029C0F48, $5C1A86C2, $B01DAB27, $E8AE19AE, $B6570FB9, $3E87EBCF, 
+  $1C160A3C, $9AF002DE, $C5EAF3A4, $48027E1E, $3CE0AC9E, $09AC9C1A, 
+  $E9A6909C, $665BCC3D, $D3DC7C6D, $D1245093, $A88488E7, $0245F569, 
+  $B65221E9, $EFF0E35B, $E0ADCE1E, $AFF980B5, $E8A0131E, $F7E28746, 
+  $391C328D, $12F13E0E, $A0BEC3F1, $FB7512E2, $C41E95E8, $346EA75F, 
+  $2ADAE81C, $28661BC7, $E335DCAF, $20FB1E27, $2E2F86E3, $EDB3D838, 
+  $81A4FE96, $1C250030, $873012E6, $9C8F5D21, $D6DE91C1, $23DAE151, 
+  $5813F209, $19EA932E, $7BB29B0B, $32EB2C9A, $D11CCC4C, $BAF0E058, 
+  $77036A6D, $93297F7C, $B9E006A3, $8724F77E, $82101DA8, $763650DE, 
+  $86B440CB, $44C5AC29, $263896D3, $87817796, $2BCF4F70, $6593363B, 
+  $DB23A71E, $0DDBFD54, $07D5B6ED, $6A069403, $EC689D79, $2501438B, 
+  $2148E6A9, $C5886BC3, $68C8C721, $A93875A5, $D20EA1AA, $24D20235, 
+  $40264C10, $805F46D1, $0DCD3BAB, $CFA394EE, $E81D0848, $9B0A680E, 
+  $AAA68698, $06A20B4F, $6A81F8AB, $9D506187, $A6D4FC3E, $32B25FC6, 
+  $5B070A75, $0C009649, $60F0037C, $4198F999, $1A757D64, $84061B9F, 
+  $001FFC9C );
 {$ENDIF}
  
 implementation
