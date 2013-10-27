@@ -83,7 +83,9 @@ Type
   procedure Load(Element: IXMLNode); override;
   class function Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
   procedure Save(Element: IXMLNode); override;
-  property ActionType: TdcActionType read f_ActionType write f_ActionType;
+  property ActionType: TdcActionType
+   read f_ActionType
+   write f_ActionType;
   property TagName: String read pm_GetTagName;
  end;
 
@@ -401,25 +403,25 @@ end;
 function StringToActionType(aStr: String): TdcActionType;
 begin
  Result := atNone;
- if AnsiCompareText(aStr, 'none') = 0 then
+ if AnsiSameText(aStr, 'none') then
   Result:= atNone
  else
- if AnsiCompareText(aStr, 'goto') = 0 then
+ if AnsiSameText(aStr, 'goto') then
   Result:= atGoto
  else
- if AnsiCompareText(aStr, 'inv') = 0 then
+ if AnsiSameText(aStr, 'inv') then
   Result:= atInventory
  else
- if AnsiCompareText(aStr, 'logic') = 0 then
+ if AnsiSameText(aStr, 'logic') then
   Result:= atLogic
  else
- if AnsiCompareText(aStr, 'text') = 0 then
+ if AnsiSameText(aStr, 'text') then
   Result:= atText
  else
- if AnsiCompareText(aStr, 'var') = 0 then
+ if AnsiSameText(aStr, 'var') then
   Result:= atVariable
  else
- if AnsiCompareText(aStr, 'button') = 0 then
+ if AnsiSameText(aStr, 'button') then
   Result:= atButton
 end;
 
@@ -893,7 +895,7 @@ end;
 procedure TdcTextAction.Load(Element: IXMLNode);
 begin
   inherited;
-  f_Description.Text:= Element.text;
+  f_Description.Text:= Element.ChildValues['Description'];
 end;
 
 procedure TdcTextAction.pm_SetDescription(aValue: TStrings);
@@ -924,7 +926,7 @@ end;
 class function TdcAction.Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
 begin
  Result:= nil;
-  case StringToActionType(aElement.NodeName) of
+  case StringToActionType(aElement.Attributes['Type']) of
     atGoto: Result:= TdcGotoAction.Create(aModel);
     atInventory: Result:= TdcInventoryAction.Create(aModel);
     atLogic: Result:= TdcLogicAction.Create(aModel);

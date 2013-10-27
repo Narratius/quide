@@ -25,12 +25,12 @@ type
 
  TdoLocation = class(TRectangle)
  private
-  f_Data: TdcLocation;
-  procedure pm_SetData(const Value: TdcLocation);
+  f_Location: TdcLocation;
+  procedure pm_SetLocation(const Value: TdcLocation);
  protected
  public
   function ResizeObjectToFitText: boolean; override;
-  property Data: TdcLocation read f_Data write pm_SetData;
+  property Location: TdcLocation read f_Location write pm_SetLocation;
  end;
 
 implementation
@@ -84,13 +84,13 @@ begin
  f_Width := Value;
 end;
 
-procedure TdoLocation.pm_SetData(const Value: TdcLocation);
+procedure TdoLocation.pm_SetLocation(const Value: TdcLocation);
 begin
  if Value <> nil then
  begin
-  f_Data := Value;
-  Strings.Text:= f_Data.Caption;
-  Hint:= f_Data.Hint;
+  f_Location := Value;
+  Strings.Text:= f_Location.Caption;
+  Hint:= f_Location.Hint;
  end; // Value <> nil
 end;
 

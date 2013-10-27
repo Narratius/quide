@@ -44,6 +44,8 @@ uses
 
 function EditLocationEx(aLocation: TdcLocation): Boolean;
 begin
+ if aLocation <> nil then
+ 
  with TLocationEditExDlg.Create(nil) do
  try
   Location:= aLocation;

@@ -1,47 +1,63 @@
 unit ZMHash;
 
-(*
-  ZMHash.pas - Central Directory hash list
-  TZipMaster VCL by Chris Vleghert and Eric W. Engler
-  v1.79
-  Copyright (C) 2009  Russell Peters
+//  ZMHash.pas - Hash list for entries
 
+(* ***************************************************************************
+TZipMaster VCL originally by Chris Vleghert, Eric W. Engler.
+  Present Maintainers and Authors Roger Aelbrecht and Russell Peters.
+Copyright (C) 1997-2002 Chris Vleghert and Eric W. Engler
+Copyright (C) 1992-2008 Eric W. Engler
+Copyright (C) 2009, 2010, 2011, 2012, 2013 Russell Peters and Roger Aelbrecht
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+All rights reserved.
+For the purposes of Copyright and this license "DelphiZip" is the current
+ authors, maintainers and developers of its code:
+  Russell Peters and Roger Aelbrecht.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License (licence.txt) for more details.
+Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+* DelphiZip reserves the names "DelphiZip", "ZipMaster", "ZipBuilder",
+   "DelZip" and derivatives of those names for the use in or about this
+   code and neither those names nor the names of its authors or
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL DELPHIZIP, IT'S AUTHORS OR CONTRIBUTERS BE
+ LIABLE FOR ANYDIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
 
-  contact: problems AT delphizip DOT org
-  updates: http://www.delphizip.org
-
-  modified 2009-04-25
----------------------------------------------------------------------------*)
+contact: problems AT delphizip DOT org
+updates: http://www.delphizip.org
+ *************************************************************************** *)
+//modified 2011-11-19
+{$I   '.\ZipVers.inc'}
 
 interface
 
 uses
-  ZipMstr;
+  ZipMstr, ZMCentral;
 
 const
   HDEBlockEntries = 511; // number of entries per block
 
 type
   PHashedDirEntry = ^THashedDirEntry;
-
   THashedDirEntry = record
     Next: PHashedDirEntry;
-    ZRec: pZipDirEntry;
-    Hash: Cardinal;
+    ZIndex: Integer;
   end;
 
   // for speed and efficiency allocate blocks of entries
@@ -51,121 +67,128 @@ type
     Next: PHDEBlock;
   end;
 
-  TZipDirHashList = class(TObject)
+  TZMDirHashList = class(TObject)
   private
-    fLastBlock: PHDEBlock;
-    fNextEntry: Cardinal;
+    FLastBlock: PHDEBlock;
+    FMyOwner: TZMCentral;
+    FNextEntry: Cardinal;
+    function GetEmpty: boolean;
     function GetSize: Cardinal;
+    procedure SetEmpty(const Value: boolean);
     procedure SetSize(const Value: Cardinal);
   protected
-    fBlocks: Integer;
-    Chains: array of PHashedDirEntry;
+    FChains: array of PHashedDirEntry;
+    FBlocks: Integer;
+    //1 chain of removed nodes
+    FEmpties: PHashedDirEntry;
+    procedure DisposeBlocks;
     function GetEntry: PHashedDirEntry;
     function Same(Entry: PHashedDirEntry; Hash: Cardinal; const Str: String):
         Boolean;
+    property MyOwner: TZMCentral read FMyOwner;
   public
-    function Add(const Rec: pZipDirEntry): pZipDirEntry;
+    constructor Create(aList: TZMCentral);
+    function Add(ZIdx: Integer; AllowDuplicate: Boolean): TZMZRec;
     procedure AfterConstruction; override;
     procedure AutoSize(Req: Cardinal);
     procedure BeforeDestruction; override;
     procedure Clear;
-    function Find(const FileName: String): PZipDirEntry;
+    function Find(const FileName: String; Discarded: boolean): Integer;
+    function FindNextDupName(Index: Integer): Integer;
+//  //1 return true if removed
+//  function Remove(Index: Integer): boolean;
+    property Empty: boolean read GetEmpty write SetEmpty;
     property Size: Cardinal read GetSize write SetSize;
   end;
 
 implementation
 
 uses
-  SysUtils, Windows;
+  SysUtils, Windows, ZMMatch, ZMUtils, ZMIRec;
 
 const
-  ChainsMax = 40961;
-  ChainsMin = 61;
+  __UNIT__ = 17 shl 23;
 
-// P. J. Weinberger Hash function
-function HashFunc(const Str: String): Cardinal;
-var
-  i: Cardinal;
-  x: Cardinal;
+const
+  ChainsMax = 65537;
+  ChainsMin = 61;
+  CapacityMin = 64;
+
+constructor TZMDirHashList.Create(aList: TZMCentral);
 begin
-  Result := 0;
-  for i := 1 to Length(Str) do
-  begin
-    Result := (Result shl 4) + Ord(Str[i]);
-    x := Result and $F0000000;
-    if (x <> 0) then
-      Result := (Result xor (x shr 24)) and $0FFFFFFF;
-  end;
+  inherited Create;
+  FMyOwner := aList;
 end;
 
-function TZipDirHashList.Add(const Rec: pZipDirEntry): pZipDirEntry;
+function TZMDirHashList.Add(ZIdx: Integer; AllowDuplicate: Boolean): TZMZRec;
 var
   Entry: PHashedDirEntry;
   Hash: Cardinal;
   Idx: Integer;
   Parent: PHashedDirEntry;
-  UpperName: String;
+  Rec: TZMZRec;
+  S: String;
 begin
+  Rec := MyOwner[ZIdx];
   Assert(Rec <> nil, 'nil ZipDirEntry');
-  if Chains = nil then
+  if FChains = nil then
     Size := 1283;
   Result := nil;
-  UpperName := UpperCase(Rec^.FileName);
-  Hash := HashFunc(UpperName);
-  Idx := Hash mod Cardinal(Length(Chains));
-  Entry := Chains[Idx];
+  S := Rec.FileName;
+  Hash := Rec.Hash;
+  Idx := Hash mod Cardinal(Length(FChains));
+  Entry := FChains[Idx];
   if Entry = nil then
   begin
     Entry := GetEntry;
-    Entry.Hash := Hash;
-    Entry.ZRec := Rec;
+    Entry.ZIndex := ZIdx + 1;
     Entry.Next := nil;
-    Chains[Idx] := Entry;
+    FChains[Idx] := Entry;
   end
   else
   begin
     repeat
-      if Same(Entry, Hash, UpperName) then
+      if Same(Entry, Hash, S) then
       begin
-        Result := Entry.ZRec;   // duplicate name
-        exit;
+        Result := MyOwner[Entry.ZIndex - 1];   // duplicate name
+        if not AllowDuplicate then
+          exit;
       end;
       Parent := Entry;
       Entry := Entry.Next;
       if Entry = nil then
       begin
         Entry := GetEntry;
-        Entry.ZRec := nil;
+        Entry.ZIndex := 0; // empty
         Parent.Next := Entry;
       end;
-    until (Entry.ZRec = nil);
+    until (Entry.ZIndex <= 0);
     // we have an entry so fill in the details
-    Entry.Hash := Hash;
-    Entry.ZRec := Rec;
+    Entry.ZIndex := ZIdx + 1;
     Entry.Next := nil;
   end;
 end;
 
-procedure TZipDirHashList.AfterConstruction;
+procedure TZMDirHashList.AfterConstruction;
 begin
   inherited;
-  Chains := nil;
-  fBlocks := 0;
-  fLastBlock := nil;
-  fNextEntry := HIGH(Cardinal);
+  FBlocks := 0;
+  FLastBlock := nil;
+  FEmpties := nil;
+  FNextEntry := HIGH(Cardinal);
 end;
 
 // set size to a reasonable prime number
-procedure TZipDirHashList.AutoSize(Req: Cardinal);
+procedure TZMDirHashList.AutoSize(Req: Cardinal);
 const
-  PrimeSizes: array[0..28] of Cardinal =
+  PrimeSizes: array[0..29] of Cardinal =
   (61, 131, 257, 389, 521, 641, 769, 1031, 1283, 1543, 2053, 2579, 3593,
    4099, 5147, 6151, 7177, 8209, 10243, 12289, 14341, 16411, 18433, 20483,
-   22521, 24593, 28687, 32771, 40961);
+   22521, 24593, 28687, 32771, 40961, 65537);
 var
   i: Integer;
 begin
-  if Req < 15000 then
+  if Req < 12000 then
   begin
     // use next higher size
     for i := 0 to HIGH(PrimeSizes) do
@@ -187,88 +210,198 @@ begin
   end;
   SetSize(Req);
 end;
-						   
 
-procedure TZipDirHashList.BeforeDestruction;
+procedure TZMDirHashList.BeforeDestruction;
 begin
   Clear;
   inherited;
 end;
 
-procedure TZipDirHashList.Clear;
+procedure TZMDirHashList.Clear;
+begin
+  DisposeBlocks;
+  FChains := nil;  // empty it
+end;
+
+procedure TZMDirHashList.DisposeBlocks;
 var
   TmpBlock: PHDEBlock;
 begin
-  while fLastBlock <> nil do
+  while FLastBlock <> nil do
   begin
-    TmpBlock := fLastBlock;
-    fLastBlock := TmpBlock^.Next;
+    TmpBlock := FLastBlock;
+    FLastBlock := TmpBlock^.Next;
     Dispose(TmpBlock);
   end;
-  chains := nil;
-  fBlocks := 0;
-  fLastBlock := nil;
-  fNextEntry := HIGH(Cardinal);
+  FBlocks := 0;
+  FLastBlock := nil;
+  FEmpties := nil;
+  FNextEntry := HIGH(Cardinal);
 end;
 
-function TZipDirHashList.Find(const FileName: String): PZipDirEntry;
+function TZMDirHashList.Find(const FileName: String; Discarded: boolean):
+    Integer;
 var
   Entry: PHashedDirEntry;
   Hash: Cardinal;
   idx:  Cardinal;
-  UpperName: string;
 begin
-  Result := nil;
-  if Chains = nil then
+  Result := -1;//nil;
+  if FChains = nil then
     exit;
-  UpperName := UpperCase(FileName);
-  Hash := HashFunc(UpperName);
-  idx  := Hash mod Cardinal(Length(Chains));
-  Entry := Chains[idx];
+  Hash := HashFuncNoCase(FileName);
+  idx  := Hash mod Cardinal(Length(FChains));
+  Entry := FChains[idx];
   // check entries in this chain
   while Entry <> nil do
   begin
-    if Same(Entry, Hash, UpperName) then
+    if Same(Entry, Hash, FileName) and
+     (Discarded or (MyOwner[Entry^.ZIndex - 1].StatusBit[zsbDiscard] = 0)) then
     begin
-      Result := Entry.ZRec;
+      Result := Entry.ZIndex - 1;
       break;
-    end
-    else
+    end;
+//    else
       Entry := Entry.Next;
   end;
 end;
 
+function TZMDirHashList.FindNextDupName(Index: Integer): Integer;
+var
+  Entry: PHashedDirEntry;
+  FileName: String;
+  Hash: Cardinal;
+  idx:  Cardinal;
+begin
+  Result := -1;
+  if Empty or (Index >= MyOwner.Count) then
+    Exit;
+  Hash := MyOwner[Index].Hash;
+  FileName := MyOwner[Index].FileName;
+  idx  := Hash mod Cardinal(Length(FChains));
+  Entry := FChains[idx];
+  Inc(Index);  // adjust to internal
+  // find entry in this chain
+  while Entry <> nil do
+  begin
+    if Entry.ZIndex = Index then
+      Break; // found this entry
+    Entry := Entry.Next;
+  end;
+  if Entry = nil then
+    Exit;  // not found (How?)
+  Entry := Entry.Next;
+  if Entry = nil then
+    Exit;  // no duplicate
+  // find next higher in this chain
+  while Entry <> nil do
+  begin
+    if (Entry.ZIndex > Index) and Same(Entry, Hash, FileName) then
+      break;
+    Entry := Entry.Next;
+  end;
+  if Entry <> nil then
+    Result := Entry.ZIndex - 1;
+end;
+
+function TZMDirHashList.GetEmpty: boolean;
+begin
+  Result := FChains = nil;
+end;
+
 // return address in allocated block
-function TZipDirHashList.GetEntry: PHashedDirEntry;
+function TZMDirHashList.GetEntry: PHashedDirEntry;
 var
   TmpBlock: PHDEBlock;
 begin
-  if (fBlocks < 1) or (fNextEntry >= HDEBlockEntries) then
+  if FEmpties <> nil then
   begin
-    // we need a new block
-    New(TmpBlock);
-    ZeroMemory(TmpBlock, sizeof(THDEBlock));
-    TmpBlock^.Next := fLastBlock;
-    fLastBlock := TmpBlock;
-    Inc(fBlocks);
-    fNextEntry := 0;
+    Result := FEmpties;         // last emptied
+    FEmpties := FEmpties.Next;
+  end
+  else
+  begin
+    if (FBlocks < 1) or (FNextEntry >= HDEBlockEntries) then
+    begin
+      // we need a new block
+      New(TmpBlock);
+      ZeroMemory(TmpBlock, sizeof(THDEBlock));
+      TmpBlock^.Next := FLastBlock;
+      FLastBlock := TmpBlock;
+      Inc(FBlocks);
+      FNextEntry := 0;
+    end;
+    Result := @FLastBlock^.Entries[FNextEntry];
+    Inc(FNextEntry);
   end;
-  Result := @fLastBlock^.Entries[fNextEntry];
-  Inc(fNextEntry);
 end;
 
-function TZipDirHashList.GetSize: Cardinal;
+function TZMDirHashList.GetSize: Cardinal;
 begin
-  Result := Length(Chains);
+  Result := Length(FChains);
 end;
 
-function TZipDirHashList.Same(Entry: PHashedDirEntry; Hash: Cardinal; const Str:
+//function TZMDirHashList.Remove(Index: Integer): boolean;
+//var
+//Entry: PHashedDirEntry;
+////  FileName: String;
+//Hash: Cardinal;
+//Idx: Cardinal;
+//Prev: PHashedDirEntry;
+//Rec: TZMZRec;
+//begin
+//Result := false;
+//if (Index < 0) or (FChains = nil) then
+//  exit;
+//Rec := MyOwner[Index];
+//Hash := Rec.Hash;
+//Inc(Index); // allow for offset
+//Idx := Hash mod Cardinal(Length(FChains));
+//Entry := FChains[Idx];
+//Prev := nil;
+//while Entry <> nil do
+//begin
+//  if Entry.ZIndex = Index then
+//  begin
+//    // we found it so unlink it
+//    if Prev = nil then
+//    begin
+//      // first in chain
+//      FChains[Idx] := Entry.Next; // link to next
+//    end
+//    else
+//      Prev.Next := Entry.Next; // link to next
+//    Entry.Next := FEmpties; // link to removed
+//    FEmpties := Entry;
+//    Entry.ZIndex := 0; // empty
+//    Result := True;
+//    break;
+//  end
+//  else
+//  begin
+//    Prev := Entry;
+//    Entry := Entry.Next;
+//  end;
+//end;
+//end;
+
+function TZMDirHashList.Same(Entry: PHashedDirEntry; Hash: Cardinal; const Str:
     String): Boolean;
+var
+  IRec: TZMZRec;
 begin
-  Result := (Hash = Entry^.Hash) and (CompareText(Str, Entry^.ZRec^.FileName) = 0);
+  IRec := MyOwner[Entry^.ZIndex - 1];
+  Result := (Hash = IRec.Hash) and
+    (FileNameComp(Str, IRec.FileName) = 0);
 end;
 
-procedure TZipDirHashList.SetSize(const Value: Cardinal);
+procedure TZMDirHashList.SetEmpty(const Value: boolean);
+begin
+  if Value then
+    Clear;
+end;
+
+procedure TZMDirHashList.SetSize(const Value: Cardinal);
 var
   TableSize: Integer;
 begin
@@ -282,8 +415,8 @@ begin
     else
     if TableSize > ChainsMax then
       TableSize := ChainsMax;
-    SetLength(Chains, TableSize);
-    ZeroMemory(Chains, Size * sizeof(PHashedDirEntry));
+    SetLength(FChains, TableSize);
+    ZeroMemory(FChains, Size * sizeof(PHashedDirEntry));
   end;
 end;
 

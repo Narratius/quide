@@ -1,9 +1,9 @@
 object LocationEditExDlg: TLocationEditExDlg
   Left = 366
   Top = 194
-  Width = 870
-  Height = 602
   Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1077' '#1083#1086#1082#1072#1094#1080#1080
+  ClientHeight = 564
+  ClientWidth = 854
   Color = clBtnFace
   Constraints.MinHeight = 600
   Constraints.MinWidth = 800
