@@ -313,6 +313,7 @@ begin
  //Caption:= Element['Caption'];
  //if Element.HasAttribute('Caption') then
  // Caption:= Element.Attributes['Caption'];
+ { Нет осознания созданы ли свойства же или их нужно создавать
  Element.SetAttibute('PropertyCount', Count);
  for i:= 0 to Pred(Count) do
  begin
@@ -345,6 +346,7 @@ begin
     end; // case
   end; // with Items[i]
  end; // for i
+ }
 end;
 
 function TqmBase.pm_GetCaption: string;
@@ -820,7 +822,7 @@ begin
     for i:= 0 to Pred(l_node.ChildNodes.Count) do
     begin
      l_C:= l_Node.ChildNodes.Get(i);
-     TdcLocation.Make(l_C, Self);
+     TdcLocation.Make(l_C);
     end;
    end;
    // Инвентарь
@@ -844,8 +846,8 @@ procedure TdcScript.Locations2Strings(aStrings: TStrings);
 var
   I: Integer;
 begin
- for I := 0 to f_Locations.Count - 1 do
-  aStrings.Add((f_Locations[i] as TdcLocation).Caption)
+ for I := 0 to LocationsCount - 1 do
+  aStrings.Add(Locations[i].Caption)
 end;
 
 function TdcScript.NewLocation(aCaption: String): TdcLocation;
@@ -928,7 +930,7 @@ begin
   l_XML.Encoding:= 'Windows-1251';
   with l_XML.AddChild('Quide') do
   begin
-   SetAttribute('Version', '1.0');
+   SetAttribute('Version', '1.0'); // Заменить на константу
    SetAttribute('Date', DateToStr(Date));
    // Описание квеста
    l_Node:= AddChild('Meta');

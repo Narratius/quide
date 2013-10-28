@@ -3,27 +3,27 @@ unit guiActionsFrame;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ActnList, Menus, ExtCtrls, QuestModeler, Contnrs;
 
 type
   TActionFrame = class(TFrame)
+    ActionList1: TActionList;
+    ButtonAction: TAction;
     EditPlace: TScrollBox;
-    PopupMenu1: TPopupMenu;
+    GotoAction: TAction;
+    LogicAction: TAction;
     N1: TMenuItem;
     N2: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
-    N6: TMenuItem;
     N5: TMenuItem;
+    N6: TMenuItem;
     N7: TMenuItem;
-    ActionList1: TActionList;
+    PopupMenu1: TPopupMenu;
     TextAction: TAction;
-    ButtonAction: TAction;
-    VarAction: TAction;
-    LogicAction: TAction;
-    GotoAction: TAction;
     TuneAction: TAction;
+    VarAction: TAction;
     procedure AddTextExecute(Sender: TObject);
     procedure EditPlaceResize(Sender: TObject);
     procedure VarActionExecute(Sender: TObject);
@@ -34,13 +34,11 @@ type
     procedure ControlResize(Sender: TObject);
     procedure CreateAction(anAction: TdcAction);
     procedure CreateButton(anButton: TdcButtonAction);
-    { Private declarations }
   public
     procedure GetLocationData;
     procedure RefreshList;
     property ActionList: TObjectList read f_ActionList write f_ActionList;
     property Script: TdcScript read f_Script write f_Script;
-    { Public declarations }
   end;
 
 implementation
@@ -50,6 +48,9 @@ implementation
 Uses
  dobTextActionEdit, dobGotoAction, dobVarActionFrame;
 
+{
+********************************* TActionFrame *********************************
+}
 procedure TActionFrame.AddTextExecute(Sender: TObject);
 var
  l_A: TdcTextAction;
@@ -83,7 +84,7 @@ begin
      l_Delta:= EditPlace.Controls[i].Top + EditPlace.Controls[i].Height - EditPlace.Controls[i+1].Top;
    end;
   end;
- end; 
+ end;
 end;
 
 procedure TActionFrame.CreateAction(anAction: TdcAction);
