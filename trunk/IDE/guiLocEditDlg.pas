@@ -70,6 +70,7 @@ type
     procedure treeActionsChange(Sender: TObject; Node: TTreeNode);
     procedure VariableActionExecute(Sender: TObject);
   private
+    FScript: TdcScript;
     { Public declarations }
     f_Location: TdcLocation;
     procedure AddAction(aAction: TdcActionClass);
@@ -82,9 +83,11 @@ type
     procedure OnCaptionEdit(Sender: TObject);
     procedure pm_SetLocation(const Value: TdcLocation);
     procedure RefreshList;
+    procedure SetScript(const Value: TdcScript);
     { Private declarations }
   public
     property Location: TdcLocation read f_Location write pm_SetLocation;
+    property Script: TdcScript read FScript write SetScript;
   end;
 
 var
@@ -108,6 +111,7 @@ begin
  // нужно редактировать копию, иначе не отработает Cancel
  l_Dlg:= TLocationDlg.Create(nil);
  try
+  l_dlg.Script:= theModel;
   l_Dlg.Location:= aLocation;
   Result:= IsPositiveResult(l_Dlg.ShowModal);
   if Result then
@@ -182,7 +186,7 @@ begin
  if aAction is TdcGotoAction then
  begin
   l_Frame:= TGotoActionFrame.Create(nil);
-  //TGotoActionFrame(l_Frame).Model:= f_Location.Script;
+  TGotoActionFrame(l_Frame).Model:= Script;
   if TdcGotoAction(aAction).Location <> nil then
    TGotoActionFrame(l_Frame).GotoLocation:= TdcGotoAction(aAction).Location.Caption;
  end
@@ -193,7 +197,7 @@ begin
   if TdcVariableAction(aAction).Variable <> nil then
    TVarActionFrame(l_Frame).Variable:= TdcVariableAction(aAction).Variable;
   TVarActionFrame(l_Frame).Value:= TdcVariableAction(aAction).Value;
-  //TVarActionFrame(l_Frame).Script:= Location.Script;
+  TVarActionFrame(l_Frame).Script:= Script;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
  l_Frame.Parent:= EditPanel;
@@ -209,7 +213,7 @@ begin
  begin
   l_Frame:= TButtonFrame.Create(nil);
   TButtonFrame(l_Frame).editCaption.Text:= TdcButtonAction(aAction).Caption;
-  //TButtonFrame(l_Frame).Script:= f_Location.Script;
+  TButtonFrame(l_Frame).Script:= Script;
   if TdcButtonAction(aAction).Location <> nil then
    TButtonFrame(l_Frame).GotoLocation:= TdcButtonAction(aAction).Location.Caption;
   l_Frame.Name:= 'Frame'+IntToStr(ButtonsPanel.ControlCount);
@@ -276,14 +280,14 @@ begin
   atGoto:
    begin
     l_LocName:= TGotoActionFrame(EditPanel.Controls[Index]).GotoLocation;
-    //TdcGotoAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
+    TdcGotoAction(l_A).Location:= Script.FindLocation(l_LocName);
     aList.Strings[Index]:= TdcGotoAction(l_A).Caption;
    end;
   atButton:
    begin
     TdcButtonAction(l_A).Caption:= TButtonFrame(ButtonsPanel.Controls[Index]).editCaption.Text;
     l_LocName:= TButtonFrame(ButtonsPanel.Controls[Index]).GotoLocation;
-    //TdcButtonAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
+    TdcButtonAction(l_A).Location:= Script.FindLocation(l_LocName);
     aList.Strings[Index]:= TdcButtonAction(l_A).Caption;
    end;
  end;
@@ -321,7 +325,7 @@ begin
    atGoto:
     begin
      l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
-     //TdcGotoAction(l_A).Location:= f_Location.Script.FindLocation(l_LocName);
+     TdcGotoAction(l_A).Location:= Script.FindLocation(l_LocName);
      treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
     end;
    atVariable:
@@ -358,6 +362,7 @@ end;
 
 procedure TLocationDlg.OKBtnClick(Sender: TObject);
 begin
+ Location.Caption:= editCaption.Text;
  GetActionData;
  if ButtonsListBox.ItemIndex <> -1 then
   GetButtonData(ButtonsListBox.ItemIndex, ButtonsListBox.Items);
@@ -402,6 +407,11 @@ begin
  end;
  //ActionListBox.ItemIndex:= 0;
  ButtonsListBox.ItemIndex:= 0;
+end;
+
+procedure TLocationDlg.SetScript(const Value: TdcScript);
+begin
+  FScript := Value;
 end;
 
 procedure TLocationDlg.TextActionExecute(Sender: TObject);

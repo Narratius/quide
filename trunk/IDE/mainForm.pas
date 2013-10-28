@@ -1240,9 +1240,9 @@ procedure TQuestEditorForm.LocationEdit(sender: TObject);
 begin
  if Sender is TdoLocation then
  begin
-  if EditLocationEx(TdoLocation(Sender).Location) then
+  //if EditLocationEx(TdoLocation(Sender).Location) then
 
-  //if EditLocation(TdoLocation(Sender).Location, f_Script) then
+  if EditLocation(TdoLocation(Sender).Location, f_Script) then
   begin
    Changed:= True;
    TdoLOcation(Sender).Strings.Text:= TdoLocation(Sender).Location.Caption;
