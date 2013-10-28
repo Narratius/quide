@@ -47,10 +47,6 @@ object QuestEditorForm: TQuestEditorForm
     Height = 459
     Align = alClient
     TabOrder = 1
-    OnClick = ModelBoxClick
-    OnMouseDown = ModelBoxMouseDown
-    OnMouseMove = ModelBoxMouseMove
-    OnMouseUp = ModelBoxMouseUp
     object PaintBox1: TPaintBox
       Left = 0
       Top = 0
@@ -60,9 +56,6 @@ object QuestEditorForm: TQuestEditorForm
       ParentShowHint = False
       ShowHint = True
       Visible = False
-      OnMouseDown = ModelBoxMouseDown
-      OnMouseMove = ModelBoxMouseMove
-      OnMouseUp = ModelBoxMouseUp
       OnPaint = PaintBox1Paint
       ExplicitHeight = 435
     end
@@ -167,11 +160,9 @@ object QuestEditorForm: TQuestEditorForm
     end
     object SplitPolyButton1: TMenuItem
       Caption = 'Split Polygon Button'
-      OnClick = SplitPolyButton1Click
     end
     object DeletePolyButton1: TMenuItem
       Caption = 'Delete Polygon Button'
-      OnClick = DeletePolyButton1Click
     end
     object SavePictoBMPfile1: TMenuItem
       Action = actSavePicToBMP
@@ -317,7 +308,6 @@ object QuestEditorForm: TQuestEditorForm
     object actBringToFront: TAction
       Caption = 'Bring to Front'
       ShortCut = 16454
-      OnExecute = BringtoFront1Click
     end
     object actProperties: TAction
       Caption = '&Properties'
@@ -339,11 +329,9 @@ object QuestEditorForm: TQuestEditorForm
     end
     object actCopyAsBitmap: TAction
       Caption = 'Copy Objects as Bitmap'
-      OnExecute = CopyAsBitmapClick
     end
     object actCopyAsMetafile: TAction
       Caption = 'Copy Objects as Metafile'
-      OnExecute = actCopyAsMetafileClick
     end
     object actPaste: TAction
       Caption = '&Paste Objects'
@@ -397,7 +385,6 @@ object QuestEditorForm: TQuestEditorForm
     end
     object actFlip: TAction
       Caption = 'Flip &Horizontally'
-      OnExecute = actFlipExecute
     end
     object FileSave: TAction
       Category = 'File'
@@ -408,7 +395,6 @@ object QuestEditorForm: TQuestEditorForm
     end
     object actSavePicToBMP: TAction
       Caption = 'Save Pic to &BMP file ...'
-      OnExecute = actSavePicToBMPClick
     end
     object actAlignLeft: TAction
       Caption = 'Align &Left'
@@ -523,7 +509,7 @@ object QuestEditorForm: TQuestEditorForm
     Left = 488
     Top = 144
     Bitmap = {
-      494C010106000900100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000900140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

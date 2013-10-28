@@ -78,7 +78,7 @@ procedure TActionListDlg.NewButtonClick(Sender: TObject);
 var
  l_Action: TdcGotoAction;
 begin
- l_Action:= TdcGotoAction.Create(nil);
+ l_Action:= TdcGotoAction.Create;
  if EditAction(l_Action, f_Model) then
  begin
   f_ActionList.Add(l_Action);
@@ -106,7 +106,7 @@ procedure TActionListDlg.pm_SetActionList(aValue: TdcActionList);
 begin
  if aValue <> nil then
  begin
-  CloneActions(aValue, f_ActionList, f_Model);
+  CloneActions(aValue, f_ActionList);
   RefreshList;
  end;
 end;

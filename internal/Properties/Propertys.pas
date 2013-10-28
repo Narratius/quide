@@ -72,7 +72,7 @@ uses
 function Property2Control(aProperty: TPropertyType): TControlClass;
 begin
   case aProperty of
-   ptString: Result:= TEdit;
+   ptString: ;// TEdit;
    ptInteger:;   // TEdit
    ptText:;      // TMemo
    ptBoolean:;   // TRadioGroup (TCombobox)

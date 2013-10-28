@@ -163,13 +163,6 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure GrowLine1Click(Sender: TObject);
     procedure HelpAboutExecute(Sender: TObject);
-    procedure ModelBoxClick(Sender: TObject);
-    procedure ModelBoxMouseDown(Sender: TObject; Button: TMouseButton; Shift:
-        TShiftState; X, Y: Integer);
-    procedure ModelBoxMouseMove(Sender: TObject; Shift: TShiftState; X, Y:
-        Integer);
-    procedure ModelBoxMouseUp(Sender: TObject; Button: TMouseButton; Shift:
-        TShiftState; X, Y: Integer);
     procedure New1Click(Sender: TObject);
     procedure PaintBox1Paint(Sender: TObject);
     procedure PasteObject1Click(Sender: TObject);
@@ -802,6 +795,7 @@ end;
 
 procedure TQuestEditorForm.DrawFocusRec(Rec: TRect);
 begin
+ {
   if not Assigned(SelectionShape) then
   begin
     SelectionShape := TShape.create(self);
@@ -811,6 +805,7 @@ begin
   end;
   with Rec do
     SelectionShape.SetBounds(left,top,right-left, bottom-top);
+  }
 end;
 
 procedure TQuestEditorForm.DrawObjDblClick(Sender: TObject);
@@ -819,6 +814,7 @@ var
   btnIdx: integer;
   solid: TSolid;
 begin
+  (*
   //check if there's a TSolid under the cursor point ...
   GetCursorPos(pt);
   solid := GetSolidObjFromScreenPt(pt);
@@ -845,6 +841,7 @@ begin
     //let's give it an arrow too ...
     //TConnector(Sender).Arrow2 := true;
   end;
+  *)
 end;
 
 procedure TQuestEditorForm.DrawObjLoaded(Sender: TObject);
@@ -877,6 +874,7 @@ procedure TQuestEditorForm.DrawObjMouseDown(Sender: TObject; Button:
 var
   i: integer;
 begin
+ (*
   if not (ssShift in Shift) and not TDrawObject(Sender).Focused then
       ClearAllDrawObjFocuses;
 
@@ -893,6 +891,7 @@ begin
 
         AddControlToDragList(Controls[i]);
       end;
+  *)
 end;
 
 procedure TQuestEditorForm.DrawObjMouseMove(Sender: TObject; Shift: TShiftState;
@@ -1093,7 +1092,7 @@ begin
   if Key = #27 then
   begin
     //Escape key will cancel any impending rubberband selection ...
-    if Assigned(SelectionShape) then FreeAndNil(SelectionShape);
+    //if Assigned(SelectionShape) then FreeAndNil(SelectionShape);
   end;
 end;
 
@@ -1255,47 +1254,6 @@ begin
  end;
 end;
 
-procedure TQuestEditorForm.ModelBoxClick(Sender: TObject);
-begin
-  ClearAllDrawObjFocuses;
-end;
-
-procedure TQuestEditorForm.ModelBoxMouseDown(Sender: TObject; Button:
-    TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if not (ssLeft in Shift) then exit;
-  SelectionRec := Rect(X,Y,X,Y);
-  DrawFocusRec(SelectionRec);
-end;
-
-procedure TQuestEditorForm.ModelBoxMouseMove(Sender: TObject; Shift:
-    TShiftState; X, Y: Integer);
-begin
-  if not Assigned(SelectionShape) then exit;
-  SelectionRec.Right := X;
-  SelectionRec.Bottom := Y;
-  DrawFocusRec(NormalizeRect(SelectionRec));
-end;
-
-procedure TQuestEditorForm.ModelBoxMouseUp(Sender: TObject; Button:
-    TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  i: integer;
-  dummyRec: TRect;
-begin
-  if Assigned(SelectionShape) then
-  begin
-    FreeAndNil(SelectionShape);
-    SelectionRec := NormalizeRect(SelectionRec);
-    with SelectionRec, ModelBox do
-      for i := 0 to ControlCount -1 do
-        if (Controls[i] is TDrawObject) then
-          with TDrawObject(Controls[i]) do
-            Focused := Visible and
-              IntersectRect(dummyRec, SelectionRec, BoundsRect);
-  end;
-end;
-
 procedure TQuestEditorForm.New1Click(Sender: TObject);
 var
   i: integer;
@@ -1312,7 +1270,7 @@ begin
    for i := controlCount -1 downto 0 do
      if Controls[i] is TDrawObject then Controls[i].free;
  Freeandnil(f_Script);
- f_Script:= TdoModel.Create(nil);
+ f_Script:= TdoModel.Create;
  Changed:= False;
  caption := f_Script.Caption + ' - ' + Application.title;
  SaveDialog1.FileName := '';

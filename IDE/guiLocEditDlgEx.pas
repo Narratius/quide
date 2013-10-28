@@ -73,7 +73,7 @@ end;
 
 procedure TLocationEditExDlg.LogicActionExecute(Sender: TObject);
 begin
- f_ActionFrame.Add(TdcLogicAction.Create(Location.Script));
+ f_ActionFrame.Add(TdcLogicAction.Create);
 end;
 
 function TLocationEditExDlg.pm_GetLocation: TdcLocation;
@@ -87,17 +87,16 @@ end;
 
 procedure TLocationEditExDlg.pm_SetLocation(const Value: TdcLocation);
 begin
- f_Location := Value.Clone(Value.Script);
+ f_Location := Value.Clone;
  editCaption.Text:= f_Location.Caption;
  HintEdit.Text:= f_Location.Hint;
  Caption:= IfThen(f_Location.Caption = '', 'Новая локация', f_Location.Caption);
- f_ActionFrame.Script:= f_Location.Script;
  f_ActionFrame.Actions:= f_Location.ActionList;
 end;
 
 procedure TLocationEditExDlg.TextActionExecute(Sender: TObject);
 begin
- f_ActionFrame.Add(TdcTextAction.Create(Location.Script));
+ f_ActionFrame.Add(TdcTextAction.Create);
 end;
 
 end.
