@@ -1,17 +1,19 @@
 object ActionFrame: TActionFrame
   Left = 0
   Top = 0
-  Width = 559
-  Height = 214
+  Width = 451
+  Height = 304
   Align = alClient
   TabOrder = 0
   object EditPlace: TScrollBox
     Left = 0
     Top = 0
-    Width = 559
-    Height = 214
+    Width = 451
+    Height = 304
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 559
+    ExplicitHeight = 214
   end
   object PopupMenu1: TPopupMenu
     Left = 24

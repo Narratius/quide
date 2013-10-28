@@ -13,8 +13,7 @@ uses
   guiVariablesListDlg in 'guiVariablesListDlg.pas' {VariablesListDlg},
   guiLocEditDlgEx in 'guiLocEditDlgEx.pas' {LocationEditExDlg},
   guiActionsFrame in 'guiActionsFrame.pas' {ActionFrame: TFrame},
-  guiEnumEditDlg in 'guiEnumEditDlg.pas' {OKRightDlg},
-  guiLogicActionFrame in 'guiLogicActionFrame.pas' {LogicActionFrame: TFrame};
+  guiEnumEditDlg in 'guiEnumEditDlg.pas' {OKRightDlg};
 
 {$R *.res}
 
