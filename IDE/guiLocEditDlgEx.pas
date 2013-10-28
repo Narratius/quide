@@ -8,13 +8,13 @@ uses
 
 type
   TLocationEditExDlg = class(TForm)
-    Panel2: TPanel;
-    Label1: TLabel;
-    editCaption: TEdit;
-    Label2: TLabel;
-    HintEdit: TEdit;
-    OKButton: TButton;
     CancelButton: TButton;
+    editCaption: TEdit;
+    HintEdit: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    OKButton: TButton;
+    Panel2: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LogicActionExecute(Sender: TObject);
@@ -24,10 +24,8 @@ type
     f_Location: TdcLocation;
     function pm_GetLocation: TdcLocation;
     procedure pm_SetLocation(const Value: TdcLocation);
-    { Private declarations }
   public
     property Location: TdcLocation read pm_GetLocation write pm_SetLocation;
-    { Public declarations }
   end;
 
 function EditLocationEx(aLocation: TdcLocation): Boolean;
@@ -45,7 +43,7 @@ uses
 function EditLocationEx(aLocation: TdcLocation): Boolean;
 begin
  if aLocation <> nil then
- 
+
  with TLocationEditExDlg.Create(nil) do
  try
   Location:= aLocation;
@@ -57,6 +55,9 @@ begin
  end;
 end;
 
+{
+****************************** TLocationEditExDlg ******************************
+}
 procedure TLocationEditExDlg.FormCreate(Sender: TObject);
 begin
  f_ActionFrame:= TqcActionsScrollBox.Create(Self);
