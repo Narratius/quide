@@ -113,11 +113,13 @@
         <DCCReference Include="guiLocEditDlgEx.pas">
             <Form>LocationEditExDlg</Form>
         </DCCReference>
-        <DCCReference Include="guiEnumEditDlg.pas">
-            <Form>EnumEditDlg</Form>
+        <DCCReference Include="guiActionsFrame.pas">
+            <Form>ActionFrame</Form>
+            <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="guiUtils.pas"/>
-        <DCCReference Include="quideControls.pas"/>
+        <DCCReference Include="guiEnumEditDlg.pas">
+            <Form>OKRightDlg</Form>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

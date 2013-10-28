@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ActnList, Menus, ExtCtrls, QuestModeler, Contnrs;
+  Dialogs, ActnList, Menus, ExtCtrls, QuestModeler, Contnrs, System.Actions;
 
 type
   TActionFrame = class(TFrame)
@@ -56,7 +56,7 @@ var
  l_A: TdcTextAction;
 begin
  // Добавить фрейм для редактирования текста
- l_A:= TdcTextAction.Create(f_Script);
+ l_A:= TdcTextAction.Create;
  f_ActionList.Add(l_A);
  CreateAction(l_A);
 end;
@@ -192,7 +192,7 @@ procedure TActionFrame.VarActionExecute(Sender: TObject);
 var
  l_A: TdcAction;
 begin
- l_A:= TdcVariableAction.Create(f_Script);
+ l_A:= TdcVariableAction.Create;
  f_ActionList.Add(l_A);
  CreateAction(l_A);
 end;

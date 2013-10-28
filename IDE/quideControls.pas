@@ -55,7 +55,7 @@ type
     property Value: Variant read pm_GetValue write pm_SetValue;
   end;
 
-function Property2Control(aActionType)
+//function Property2Control(aActionType)
 
 implementation
 
@@ -166,27 +166,27 @@ end;
 
 procedure TqcActionsScrollBox.InsertButtonAction(Sender: TObject);
 begin
- Add(TdcButtonAction.Create(Script));
+ Add(TdcButtonAction.Create);
 end;
 
 procedure TqcActionsScrollBox.InsertGotoAction(Sender: TObject);
 begin
- Add(TdcGotoAction.Create(Script));
+ Add(TdcGotoAction.Create);
 end;
 
 procedure TqcActionsScrollBox.InsertLogicAction(Sender: TObject);
 begin
- Add(TdcLogicAction.Create(Script));
+ Add(TdcLogicAction.Create);
 end;
 
 procedure TqcActionsScrollBox.InsertTextAction(Sender: TObject);
 begin
- Add(TdcTextAction.Create(Script));
+ Add(TdcTextAction.Create);
 end;
 
 procedure TqcActionsScrollBox.InsertVarAction(Sender: TObject);
 begin
- Add(TdcVariableAction.Create(Script));
+ Add(TdcVariableAction.Create);
 end;
 
 function TqcActionPanel.GetActionControls: TControlsArray;
@@ -201,11 +201,11 @@ begin
   atText:
    begin
     SetLength(Result, Action.Count);
-    Action.IterateAll()
+    //Action.IterateAll()
     for i:= 0 to Action.Count-1 do
     begin
      Result[i]:= cDefControlRec;
-     Result[i].ControlClass:= Action[i].;
+     //Result[i].ControlClass:= Action[i].;
     end;
    end;
   atVariable: ;
