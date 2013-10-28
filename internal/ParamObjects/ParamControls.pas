@@ -7,24 +7,24 @@ uses
 
 type
   TControlRec = record
-    Caption     : String;
+    Caption: string;
     ControlClass: TControlClass;
-    Position    : TControlPosition;
-    Size        : TControlSize;
-    Height      : Integer;
-    Tag         : Integer;
-    Event       : TNotifyEvent;
+    Position: TControlPosition;
+    Size: TControlSize;
+    Height: Integer;
+    Tag: Integer;
+    Event: TNotifyEvent;
   end;
+
   TControlsArray = array of TControlRec;
 
- TControlPanel = class(TSizeablePanel)
- private
- protected
-  procedure ClearControls;
-  procedure TuneupControl(aControl: TControl); virtual;
- public
-  procedure CreateControls(aControls: TControlsArray);
- end;
+  TControlPanel = class(TSizeablePanel)
+  protected
+    procedure ClearControls;
+    procedure TuneupControl(aControl: TControl); virtual;
+  public
+    procedure CreateControls(aControls: TControlsArray);
+  end;
 
 const
  cDefControlRec : TControlRec = (ControlClass: TSizeableMemo; Position: cpNewLine; Size: csAutoSize; Height: 0; Event: nil);
@@ -34,6 +34,9 @@ implementation
 uses
  SysUtils, StdCtrls;
 
+{
+******************************** TControlPanel *********************************
+}
 procedure TControlPanel.ClearControls;
 begin
  // Удалить все контролы

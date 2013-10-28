@@ -8,35 +8,38 @@ type
   //1 Панель для редактирования одного объекта
   TPropertiesPanel = class(TControlPanel)
   private
-   f_Properties: TProperties;
-   function MakePropertyControl(aProperty: TProperty): Boolean;
-   procedure pm_SetProperties(const Value: TProperties);
+    f_Properties: TProperties;
+    function MakePropertyControl(aProperty: TProperty): Boolean;
+    procedure pm_SetProperties(const Value: TProperties);
   protected
-   f_Controls: TControlsArray;
-   procedure AddDefControl;
-   function FillControls: TControlsArray; virtual;
-   procedure GetLastControl(var aRec: TControlRec);
-   procedure MakeActionControl(aProperty: TProperty); virtual;
-   procedure MakeBooleanControl(aProperty: TProperty); virtual;
-   procedure MakeChoiceControl(aProperty: TProperty); virtual;
-   procedure MakeCustomControl(aControlClass: TControlClass);
-   procedure MakeIntegerControl(aProperty: TProperty); virtual;
-   procedure MakePropertiesControl(aProperty: TProperty); virtual;
-   procedure MakeStringControl(aProperty: TProperty); virtual;
-   procedure MakeTextControl(aProperty: TProperty); virtual;
-   procedure TuneupControl(aControl: TControl); override;
+    f_Controls: TControlsArray;
+    procedure AddDefControl;
+    function FillControls: TControlsArray; virtual;
+    procedure GetLastControl(var aRec: TControlRec);
+    procedure MakeActionControl(aProperty: TProperty); virtual;
+    procedure MakeBooleanControl(aProperty: TProperty); virtual;
+    procedure MakeChoiceControl(aProperty: TProperty); virtual;
+    procedure MakeCustomControl(aControlClass: TControlClass);
+    procedure MakeIntegerControl(aProperty: TProperty); virtual;
+    procedure MakePropertiesControl(aProperty: TProperty); virtual;
+    procedure MakeStringControl(aProperty: TProperty); virtual;
+    procedure MakeTextControl(aProperty: TProperty); virtual;
+    procedure TuneupControl(aControl: TControl); override;
   public
-   procedure CorrectControl(aControlRec: TControlRec); virtual;
-   procedure MakeControls;
-   procedure SetValues;
-   procedure GetValues;
-   property Properties: TProperties read f_Properties write pm_SetProperties;
+    procedure CorrectControl(aControlRec: TControlRec); virtual;
+    procedure GetValues;
+    procedure MakeControls;
+    procedure SetValues;
+    property Properties: TProperties read f_Properties write pm_SetProperties;
   end;
 
 implementation
 
 uses SizeableTypes;
 
+{
+******************************* TPropertiesPanel *******************************
+}
 procedure TPropertiesPanel.AddDefControl;
 begin
  SetLength(f_Controls, Length(f_Controls)+1);
@@ -55,31 +58,14 @@ begin
  Result:= f_Controls;
 end;
 
-procedure TPropertiesPanel.MakeControls;
+procedure TPropertiesPanel.GetLastControl(var aRec: TControlRec);
 begin
- ClearControls;
- CreateControls(FillControls);
- SetValues;
-end;
-
-procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
-begin
- f_Properties := Value;
-end;
-
-procedure TPropertiesPanel.SetValues;
-begin
- // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
+ aRec:= f_Controls[Length(f_Controls)-1];
 end;
 
 procedure TPropertiesPanel.GetValues;
 begin
  // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
-end;
-
-procedure TPropertiesPanel.GetLastControl(var aRec: TControlRec);
-begin
- aRec:= f_Controls[Length(f_Controls)-1];
 end;
 
 procedure TPropertiesPanel.MakeActionControl(aProperty: TProperty);
@@ -106,6 +92,13 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TComboBox);
+end;
+
+procedure TPropertiesPanel.MakeControls;
+begin
+ ClearControls;
+ CreateControls(FillControls);
+ SetValues;
 end;
 
 procedure TPropertiesPanel.MakeCustomControl(aControlClass: TControlClass);
@@ -153,7 +146,7 @@ begin
    f_Controls[i].Tag:= aProperty.ID;
    f_Controls[i].Event:= aProperty.Event;
   end;
- end; // aProperty.Visible 
+ end; // aProperty.Visible
 end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TProperty);
@@ -170,6 +163,16 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TSizeableMemo);
+end;
+
+procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
+begin
+ f_Properties := Value;
+end;
+
+procedure TPropertiesPanel.SetValues;
+begin
+ // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
 end;
 
 procedure TPropertiesPanel.TuneupControl(aControl: TControl);

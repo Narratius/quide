@@ -40,22 +40,24 @@ type
   private
     f_Changed: Boolean;
     function FindProperty(aAlias: String): TProperty;
-    function pm_GetItems(Index: Integer): TProperty;
     function pm_GetAliasItems(Alias: String): TProperty;
+    function pm_GetItems(Index: Integer): TProperty;
     function pm_GetValues(Alias: String): string;
+    procedure pm_SetAliasItems(Alias: String; aValue: TProperty);
     procedure pm_SetChanged(const Value: Boolean);
     procedure pm_SetItems(Index: Integer; aValue: TProperty);
-    procedure pm_SetAliasItems(Alias: String; aValue: TProperty);
     procedure pm_SetValues(Alias: String; const Value: string);
   public
     constructor Create;
     function Add: TProperty;
-    procedure Define(const aAlias, aCaption: String; aType: TPropertyType; aVisible: Boolean = True;
-        aEvent: TNotifyEvent = nil);
+    procedure Define(const aAlias, aCaption: String; aType: TPropertyType;
+        aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
     procedure IterateAll(aFunc: TPropertyFunc);
+    property AliasItems[Alias: String]: TProperty read pm_GetAliasItems write
+        pm_SetAliasItems; default;
     property Changed: Boolean read f_Changed write pm_SetChanged;
-    property Items[Index: Integer]: TProperty read pm_GetItems write pm_SetItems;
-    property AliasItems[Alias: String]: TProperty read pm_GetAliasItems write pm_SetAliasItems; default;
+    property Items[Index: Integer]: TProperty read pm_GetItems write
+        pm_SetItems;
     property Values[Alias: String]: string read pm_GetValues write pm_SetValues;
   end;
 
@@ -96,6 +98,9 @@ begin
    inherited;
 end;
 
+{
+********************************* TProperties **********************************
+}
 constructor TProperties.Create;
 begin
  inherited Create(TProperty);
@@ -106,8 +111,8 @@ begin
  Result := TProperty(inherited Add);
 end;
 
-procedure TProperties.Define(const aAlias, aCaption: String; aType: TPropertyType; aVisible:
-    Boolean = True; aEvent: TNotifyEvent = nil);
+procedure TProperties.Define(const aAlias, aCaption: String; aType:
+    TPropertyType; aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
 var
  l_P: TProperty;
 begin
@@ -119,9 +124,6 @@ begin
  l_P.Event:= aEvent;
 end;
 
-{
-********************************* TProperties **********************************
-}
 function TProperties.FindProperty(aAlias: String): TProperty;
 var
   i: Integer;
@@ -149,29 +151,19 @@ begin
   end;
 end;
 
-function TProperties.pm_GetItems(Index: Integer): TProperty;
-begin
-  Result:= TProperty(Inherited GetItem(Index));
-end;
-
 function TProperties.pm_GetAliasItems(Alias: String): TProperty;
 begin
   Result:= FindProperty(Alias);
 end;
 
+function TProperties.pm_GetItems(Index: Integer): TProperty;
+begin
+  Result:= TProperty(Inherited GetItem(Index));
+end;
+
 function TProperties.pm_GetValues(Alias: String): string;
 begin
  Result := AliasItems[Alias].Value;
-end;
-
-procedure TProperties.pm_SetChanged(const Value: Boolean);
-begin
- f_Changed := Value;
-end;
-
-procedure TProperties.pm_SetItems(Index: Integer; aValue: TProperty);
-begin
- inherited Items[Index]:= aValue;
 end;
 
 procedure TProperties.pm_SetAliasItems(Alias: String; aValue: TProperty);
@@ -182,6 +174,16 @@ begin
   if l_Prop = nil then
    l_Prop:= Add;
   l_Prop.Assign(aValue);
+end;
+
+procedure TProperties.pm_SetChanged(const Value: Boolean);
+begin
+ f_Changed := Value;
+end;
+
+procedure TProperties.pm_SetItems(Index: Integer; aValue: TProperty);
+begin
+ inherited Items[Index]:= aValue;
 end;
 
 procedure TProperties.pm_SetValues(Alias: String; const Value: string);
