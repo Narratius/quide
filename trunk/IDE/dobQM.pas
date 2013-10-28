@@ -16,7 +16,7 @@ type
  protected
   function CreateLocation: TdcLocation; override;
  public
-  constructor Create(aModel: TdcScript);
+  constructor Create;
   destructor Destroy; override;
   procedure GetFreePosition(var aLeft, aTop: Integer);
   property Height: Integer read f_Height write pm_SetHeight;
@@ -43,7 +43,7 @@ const
  cLocationHeight = 50;
  cSpace          = 20;
 
-constructor TdoModel.Create(aModel: TdcScript);
+constructor TdoModel.Create;
 begin
  inherited;
  f_Height:= 1000;
@@ -58,7 +58,7 @@ end;
 
 function TdoModel.CreateLocation: TdcLocation;
 begin
- Result:= TdcLocation.Create(Self);
+ Result:= TdcLocation.Create;
 end;
 
 procedure TdoModel.GetFreePosition(var aLeft, aTop: Integer);

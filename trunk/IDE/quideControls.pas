@@ -4,7 +4,7 @@ interface
 Uses
  QuestModeler,
  ParamControls, SizeableControls,
- Forms, ExtCtrls, Classes, Menus, Propertys, Controls;
+ Forms, ExtCtrls, Classes, Menus, Propertys;
 
 type
  TqcActionPanel = class(TControlPanel)
@@ -55,10 +55,12 @@ type
     property Value: Variant read pm_GetValue write pm_SetValue;
   end;
 
+function Property2Control(aActionType)
+
 implementation
 
 Uses
- SysUtils, StdCtrls, Graphics, SizeableTypes;
+ SysUtils, Controls, StdCtrls, Graphics, SizeableTypes;
 
 { TqcActionsScrollBox }
 
@@ -199,11 +201,11 @@ begin
   atText:
    begin
     SetLength(Result, Action.Count);
-    //Action.IterateAll(); !!!  потом вернуть
+    Action.IterateAll()
     for i:= 0 to Action.Count-1 do
     begin
      Result[i]:= cDefControlRec;
-     Result[i].ControlClass:= Property2Control(Action.Items[i].PropertyType); !!! Потом вернуть
+     Result[i].ControlClass:= Action[i].;
     end;
    end;
   atVariable: ;

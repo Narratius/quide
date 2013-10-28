@@ -15,10 +15,10 @@ Type
     function pm_GetCaption: string;
     procedure pm_SetCaption(const Value: string);
   public
-    constructor Create; override;
+    constructor Create; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
-    function Clone(aModel: TdcScript): Pointer;
+    function Clone: Pointer;
     procedure Load(Element: IXMLNode); virtual;
     //1 Сохранение ВСЕХ свойств
     procedure Save(Element: IXMLNode); virtual;
@@ -178,7 +178,7 @@ Type
   protected
     function CreateLocation: TdcLocation; virtual;
   public
-    constructor Create;
+    constructor Create; override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     function CheckLocation(aCaption: String): TdcLocation;
@@ -235,8 +235,7 @@ Type
     property Items[Index: Integer]: TdcAction read pm_GetItems; default;
   end;
 
-procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
-    aModel: TdcScript);
+procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList);
 
 function FindInList(theList: TObjectList; const aCaption: String): TqmBase;
 
@@ -291,20 +290,17 @@ end;
 
 procedure TqmBase.Assign(Source: TPersistent);
 begin
-  if Source is TqmBase then
-  begin
-   inherited;
-   f_Script:= (Source as TqmBase).Script;
-  end
-  else
-   inherited;
+ if Source is TqmBase then
+
+ else
+  inherited Assign(Source);
 end;
 
-function TqmBase.Clone(aModel: TdcScript): Pointer;
+function TqmBase.Clone: Pointer;
 type
  RBase = class of TqmBase;
 begin
- Result := RBase(ClassType).Create(aModel);
+ Result := RBase(ClassType).Create;
  TqmBase(Result).Assign(Self);
 end;
 
@@ -370,7 +366,7 @@ begin
  //Element.SetAttribute('Caption', Caption);
  // Сохраняем все свойства, которые есть
  // Атомарные свойства записываем в атрибуты, составные - в детей
- Element.SetAttibute('PropertyCount', Count);
+ Element.SetAttribute('PropertyCount', Count);
  for i:= 0 to Pred(Count) do
  begin
   with Items[i] do
@@ -387,7 +383,7 @@ begin
           l_Strings.Text:= Value;
           l_E.SetAttribute('TextCount', l_Strings.Count);
           for j:= 0 to Pred(l_Strings.Count) do
-           l_E.AddChild('Text'):= l_Strings[j];
+           l_E.AddChild('Text').Text:= l_Strings[j];
          finally
           FreeAndNil(l_Strings);
          end;
@@ -395,10 +391,10 @@ begin
         l_E:= nil;
        end;
       end;
-     ptBoolean: : Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
-     ptChoice,    // TComboBox
-     ptAction,    // TButton
-     ptProperties // TScrollBox (Вложенные свойства)
+     ptBoolean: Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
+     ptChoice:;    // TComboBox
+     ptAction:;    // TButton
+     ptProperties:; // TScrollBox (Вложенные свойства)
     end; // case
   end; // with Items[i]
  end; // for i
@@ -437,7 +433,7 @@ begin
  if Source is TdcLocation then
  begin
   Hint:=  TdcLocation(Source).Hint;
-  CloneActions((Source as TdcLocation).ActionList, f_ActionList, Script);
+  CloneActions((Source as TdcLocation).ActionList, f_ActionList);
  end;
 end;
 
@@ -483,13 +479,13 @@ begin
  for i:= 0 to l_Node.ChildNodes.Count - 1 do
  begin
   l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Script));
+  AddAction(TdcAction.Make(l_E));
  end; // for i
  l_Node:= Element.ChildNodes.FindNode('Buttons');
  for i:= 0 to l_Node.ChildNodes.Count - 1 do
  begin
   l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Script));
+  AddAction(TdcAction.Make(l_E));
  end; // for i
  if Element.HasAttribute('Hint') then
   Hint:= element.GetAttribute('Hint');
@@ -543,7 +539,7 @@ end;
 
 procedure TdcLocation.pm_SetActionList(aValue: TdcActionList);
 begin
- CloneActions(aValue, f_ActionList, Script);
+ CloneActions(aValue, f_ActionList);
 end;
 
 procedure TdcLocation.Save(Element: IXMLNode);
@@ -566,15 +562,14 @@ begin
  Element.SetAttribute('Hint', Hint);
 end;
 
-procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
-    aModel: TdcScript);
+procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList);
 var
  i: Integer;
 begin
   aDestination.Clear;
   for I := 0 to aSource.Count - 1 do
   begin
-   aDestination.Add((aSource[i] as TdcAction).Clone(aModel));
+   aDestination.Add((aSource[i] as TdcAction).Clone);
   end;
 end;
 
@@ -661,9 +656,8 @@ end;
 procedure TdcGotoAction.Load(Element: IXMLNode);
 begin
  inherited;
- Assert(Script <> nil);
- if Element.HasAttribute('Target') then
-  Location:= Script.CheckLocation(Element.Attributes['Target']);
+ //if Element.HasAttribute('Target') then
+ // Location:= {Script.CheckLocation}(Element.Attributes['Target']);
 end;
 
 procedure TdcGotoAction.Save(Element: IXMLNode);
@@ -822,9 +816,10 @@ begin
     for i:= 0 to Pred(l_node.ChildNodes.Count) do
     begin
      l_C:= l_Node.ChildNodes.Get(i);
-     TdcLocation.Make(l_C);
+     TdcLocation.Make(l_C, Self);
     end;
    end;
+   // Нужно вызвать CheckLocation
    // Инвентарь
    l_Node:= ChildNodes.FindNode('Inventory');
    if l_Node <> nil then
@@ -855,8 +850,8 @@ begin
  Result:= CreateLocation;
  if Result <> nil then
  begin
-  if Result.Script = nil then
-   Result.Script:= Self;
+  //if Result.Script = nil then
+  // Result.Script:= Self;
   if aCaption = '' then
    Result.Caption:= GenerateCaption
   else
@@ -867,7 +862,7 @@ end;
 
 function TdcScript.NewVariable(const aCaption: String): TdcVariable;
 begin
- Result:= TdcVariable.Create(self);
+ Result:= TdcVariable.Create;
  Result.Caption:= aCaption;
  f_Variables.Add(Result);
 end;
@@ -1083,9 +1078,9 @@ begin
  inherited;
  if Element.HasAttribute('Variable') then
  begin
-  Variable:= f_Script.CheckVariable(element.GetAttribute('Variable'));
-  if (Variable <> nil) and Element.HasAttribute('Value') then
-   Value:= Element.GetAttribute('Value');
+  //Variable:= f_Script.CheckVariable(element.GetAttribute('Variable'));
+  //if (Variable <> nil) and Element.HasAttribute('Value') then
+  // Value:= Element.GetAttribute('Value');
  end;
 end;
 
