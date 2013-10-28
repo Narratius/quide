@@ -42,7 +42,8 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition: TControlPosition); stdcall;
+    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition:
+        TControlPosition); stdcall;
     procedure ResizeControls;
     procedure SizeChanged; stdcall;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
@@ -68,7 +69,8 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition: TControlPosition); stdcall;
+    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition:
+        TControlPosition); stdcall;
     procedure SelfResize(Sender: TObject);
     procedure SizeChanged; stdcall;
     property Value: Variant read pm_GetValue write pm_SetValue;
@@ -158,7 +160,7 @@ begin
 end;
 
 {
-******************************* TSizeableMemo ********************************
+******************************** TSizeableMemo *********************************
 }
 constructor TSizeableMemo.Create(aOwner: TComponent);
 begin
@@ -217,7 +219,7 @@ begin
 end;
 
 {
-******************************* TSizeablePanel *******************************
+******************************** TSizeablePanel ********************************
 }
 constructor TSizeablePanel.Create(aOwner: TComponent);
 begin
@@ -235,8 +237,8 @@ begin
   inherited Destroy;
 end;
 
-procedure TSizeablePanel.AddControl(aControl: TControl; aSize: TControlSize; aPosition:
-    TControlPosition);
+procedure TSizeablePanel.AddControl(aControl: TControl; aSize: TControlSize;
+    aPosition: TControlPosition);
 begin
  AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aPosition);
 end;
@@ -293,7 +295,7 @@ end;
 { TSizeableScrollBox }
 
 {
-***************************** TSizeableScrollBox *****************************
+****************************** TSizeableScrollBox ******************************
 }
 constructor TSizeableScrollBox.Create(aOwner: TComponent);
 begin
@@ -311,8 +313,8 @@ begin
  inherited Destroy;
 end;
 
-procedure TSizeableScrollBox.AddControl(aControl: TControl; aSize: TControlSize; aPosition:
-    TControlPosition);
+procedure TSizeableScrollBox.AddControl(aControl: TControl; aSize: TControlSize;
+    aPosition: TControlPosition);
 begin
  AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aPosition);
  f_EnableResize:= True;

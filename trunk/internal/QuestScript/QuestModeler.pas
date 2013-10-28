@@ -10,55 +10,52 @@ uses
 Type
  TdcScript = class;
  TdcVariable = class;
- TqmBase = class(TProperties)
- private
-  f_Script: TdcScript;
-  function pm_GetCaption: string;
-  procedure pm_SetCaption(const Value: string);
- public
-  constructor Create(aModel: TdcScript); reintroduce; virtual;
-  destructor Destroy; override;
-  procedure Assign(Source: TPersistent); override;
-  function Clone(aModel: TdcScript): Pointer;
-  procedure Load(Element: IXMLNode); virtual;
-  procedure Save(Element: IXMLNode); virtual;
-  property Caption: string read pm_GetCaption write pm_SetCaption;
-  property Script: TdcScript read f_Script write f_Script;
- end;
+  TqmBase = class(TProperties)
+  private
+    function pm_GetCaption: string;
+    procedure pm_SetCaption(const Value: string);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    function Clone(aModel: TdcScript): Pointer;
+    procedure Load(Element: IXMLNode); virtual;
+    //1 Сохранение ВСЕХ свойств
+    procedure Save(Element: IXMLNode); virtual;
+    property Caption: string read pm_GetCaption write pm_SetCaption;
+  end;
 
  TdcAction = class;
  TdcButtonAction = class;
  TdcActionList = class;
- TdcLocation = class(TqmBase)
- private
-  f_ActionList: TdcActionList;
-  f_Hint: String;
-  procedure GenerateCaption(aAction: TdcAction);
-  function pm_GetActions(Index: Integer): TdcAction;
-  function pm_GetActionsCount: Integer;
-  function pm_GetButtons(Index: Integer): TdcButtonAction;
-  function pm_GetButtonsCount: Integer;
-  procedure pm_SetActionList(aValue: TdcActionList);
- public
-  constructor Create(aModel: TdcScript); override;
-  destructor Destroy; override;
-  procedure AddAction(aAction: TdcAction);
-  procedure Assign(Source: TPersistent); override;
-  procedure Load(Element: IXMLNode); override;
-  class function Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
-  procedure Save(Element: IXMLNode); override;
-  property ActionList: TdcActionList
-   read f_ActionList
-   write pm_SetActionList;
-  property Actions[Index: Integer]: TdcAction read pm_GetActions;
-  property ActionsCount: Integer read pm_GetActionsCount;
-  property Buttons[Index: Integer]: TdcButtonAction read pm_GetButtons;
-  property ButtonsCount: Integer read pm_GetButtonsCount;
-  property Hint: String read f_Hint write f_Hint;
- end;
+  TdcLocation = class(TqmBase)
+  private
+    f_ActionList: TdcActionList;
+    f_Hint: string;
+    procedure GenerateCaption(aAction: TdcAction);
+    function pm_GetActions(Index: Integer): TdcAction;
+    function pm_GetActionsCount: Integer;
+    function pm_GetButtons(Index: Integer): TdcButtonAction;
+    function pm_GetButtonsCount: Integer;
+    procedure pm_SetActionList(aValue: TdcActionList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure AddAction(aAction: TdcAction);
+    procedure Assign(Source: TPersistent); override;
+    procedure Load(Element: IXMLNode); override;
+    class function Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
+    procedure Save(Element: IXMLNode); override;
+    property ActionList: TdcActionList read f_ActionList write pm_SetActionList;
+    property Actions[Index: Integer]: TdcAction read pm_GetActions;
+    property ActionsCount: Integer read pm_GetActionsCount;
+    property Buttons[Index: Integer]: TdcButtonAction read pm_GetButtons;
+    property ButtonsCount: Integer read pm_GetButtonsCount;
+    property Hint: string read f_Hint write f_Hint;
+  end;
 
- TdcInventory = class(TqmBase)
- end;
+  TdcInventory = class(TqmBase)
+  end;
 
 { Виды действия:
 а. Вывести текст
@@ -74,172 +71,169 @@ Type
 }
  { Базовый предок }
  TdcActionType = (atNone, atGoto, atInventory, atLogic, atText, atVariable, atButton);
- TdcAction = class(TqmBase)
- private
-  f_ActionType: TdcActionType;
-  function pm_GetTagName: String;
- public
-  constructor Create(aModel: TdcScript); override;
-  procedure Load(Element: IXMLNode); override;
-  class function Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
-  procedure Save(Element: IXMLNode); override;
-  property ActionType: TdcActionType
-   read f_ActionType
-   write f_ActionType;
-  property TagName: String read pm_GetTagName;
- end;
+  TdcAction = class(TqmBase)
+  private
+    f_ActionType: TdcActionType;
+    function pm_GetTagName: string;
+  public
+    constructor Create; override;
+    procedure Load(Element: IXMLNode); override;
+    class function Make(aElement: IXMLNode): TdcAction;
+    procedure Save(Element: IXMLNode); override;
+    property ActionType: TdcActionType read f_ActionType write f_ActionType;
+    property TagName: string read pm_GetTagName;
+  end;
 
  TdcActionClass = class of TdcAction;
 
  { Отображение текста }
- TdcTextAction = class(TdcAction)
- // Текст берется из Description
- private
-  f_Description: TStrings;
-  procedure pm_SetDescription(aValue: TStrings);
- public
-  constructor Create(aModel: TdcScript); override;
-  procedure Assign(Source: TPersistent); override;
-  procedure Load(Element: IXMLNode); override;
-  procedure Save(Element: IXMLNode); override;
-  property Description: TStrings read f_Description write pm_SetDescription;
- end;
+  TdcTextAction = class(TdcAction)
+  private
+    f_Description: TStrings;
+    procedure pm_SetDescription(aValue: TStrings);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Load(Element: IXMLNode); override;
+    procedure Save(Element: IXMLNode); override;
+    property Description: TStrings read f_Description write pm_SetDescription;
+  end;
 
  { Условное действие }
- TdcLogicAction = class(TdcAction)
-
- protected
-  procedure ButtonClick(Sender: TObject);
-  procedure MakePopupmenu(Sender: TObject);
- public
-  constructor Create(aModel: TdcScript); override;
- end;
+  TdcLogicAction = class(TdcAction)
+  protected
+    procedure ButtonClick(Sender: TObject);
+    procedure MakePopupmenu(Sender: TObject);
+  public
+    constructor Create; override;
+  end;
 
  { Действие с инвентарем }
- TdcInventoryAction = class(TdcAction)
- private
-  f_Inventory: TdcInventory;
- public
-  constructor Create(aModel: TdcScript); override;
-  procedure AddObject(aObjectName: String);
-  procedure DeleteObject(aObjectName: String);
-  function CheckObject(aObjectName: String): Boolean;
-  property Inventory: TdcInventory read f_Inventory write f_Inventory;
- end;
+  TdcInventoryAction = class(TdcAction)
+  private
+    f_Inventory: TdcInventory;
+  public
+    constructor Create; override;
+    procedure AddObject(aObjectName: String);
+    function CheckObject(aObjectName: String): Boolean;
+    procedure DeleteObject(aObjectName: String);
+    property Inventory: TdcInventory read f_Inventory write f_Inventory;
+  end;
 
  { Действие с переменными }
- TdcVariableAction = class(TdcAction)
-
- private
-  f_Value: String;
-  f_Variable: TdcVariable;
- public
-  constructor Create(aModel: TdcScript); override;
-  procedure Assign(Source: TPersistent); override;
-  procedure Load(Element: IXMLNode); override;
-  procedure Save(Element: IXMLNode); override;
-  property Value: String read f_Value write f_Value;
-  property Variable: TdcVariable read f_Variable write f_Variable;
- end;
+  TdcVariableAction = class(TdcAction)
+  private
+    f_Value: string;
+    f_Variable: TdcVariable;
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Load(Element: IXMLNode); override;
+    procedure Save(Element: IXMLNode); override;
+    property Value: string read f_Value write f_Value;
+    property Variable: TdcVariable read f_Variable write f_Variable;
+  end;
 
  { Переход на локацию }
- TdcGotoAction = class(TdcAction)
- private
-  f_Location: TdcLocation;
- public
-  constructor Create(aModel: TdcScript); override;
-  procedure Assign(Source: TPersistent); override;
-  procedure Load(Element: IXMLNode); override;
-  procedure Save(Element: IXMLNode); override;
-  property Location: TdcLocation
-   read f_Location
-   write f_Location;
- end;
+  TdcGotoAction = class(TdcAction)
+  private
+    f_Location: TdcLocation;
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Load(Element: IXMLNode); override;
+    procedure Save(Element: IXMLNode); override;
+    property Location: TdcLocation read f_Location write f_Location;
+  end;
 
  { переход на локацию с предварительным выбором }
- TdcButtonAction = class(TdcGotoAction)
+  TdcButtonAction = class(TdcGotoAction)
+  public
+    constructor Create; override;
+  end;
 
- public
-   constructor Create(aModel: TdcScript); override;
- end;
 
+  //1 Сценарий игры
+  {{
+  Сценарий игры. 
+  Владеет локациями, переменными, инвентарем
+  }
+  TdcScript = class(TqmBase)
+  private
+    f_Author: string;
+    f_Description: TStrings;
+    f_Locations: TObjectList;
+    f_NotValidConditions: string;
+    f_StartLocation: string;
+    f_Variables: TObjectList;
+    f_Version: string;
+    function pm_GetIsValid: Boolean;
+    function pm_GetLocations(Index: Integer): TdcLocation;
+    function pm_GetLocationsCount: Integer;
+    function pm_GetObjectsCount: Integer;
+    function pm_GetVariables(Index: Integer): TdcVariable;
+    function pm_GetVariablesCount: Integer;
+    procedure pm_SetDescription(aValue: TStrings);
+    procedure pm_SetStartLocation(const Value: string);
+  protected
+    function CreateLocation: TdcLocation; virtual;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    function CheckLocation(aCaption: String): TdcLocation;
+    function CheckVariable(const aCaption: String): TdcVariable;
+    function FindLocation(const aCaption: String): TdcLocation;
+    function GenerateCaption: string;
+    procedure GetLocationsNames(aStrings: TStrings);
+    procedure LoadFromStream(aStream: TStream);
+    procedure Locations2Strings(aStrings: TStrings);
+    function NewLocation(aCaption: String): TdcLocation;
+    function NewVariable(const aCaption: String): TdcVariable;
+    procedure SaveToStream(aStream: TStream);
+    property Author: string read f_Author write f_Author;
+    property Description: TStrings read f_Description write pm_SetDescription;
+    property IsValid: Boolean read pm_GetIsValid;
+    property Locations[Index: Integer]: TdcLocation read pm_GetLocations;
+    property LocationsCount: Integer read pm_GetLocationsCount;
+    property NotValidConditions: string read f_NotValidConditions;
+    property ObjectsCount: Integer read pm_GetObjectsCount;
+    property StartLocation: string read f_StartLocation write
+        pm_SetStartLocation;
+    property Variables[Index: Integer]: TdcVariable read pm_GetVariables;
+    property VariablesCount: Integer read pm_GetVariablesCount;
+    property Version: string read f_Version write f_Version;
+  end;
 
- TdcScript = class(TqmBase)
- private
-  f_Author: String;
-  f_Description: TStrings;
-  f_Locations: TObjectList;
-  f_NotValidConditions: string;
-  f_StartLocation: string;
-  f_Variables: TObjectList;
-  f_Version: string;
-  function pm_GetIsValid: Boolean;
-  function pm_GetLocations(Index: Integer): TdcLocation;
-  function pm_GetLocationsCount: Integer;
-  function pm_GetObjectsCount: Integer;
-  function pm_GetVariables(Index: Integer): TdcVariable;
-  function pm_GetVariablesCount: Integer;
-  procedure pm_SetDescription(aValue: TStrings);
-  procedure pm_SetStartLocation(const Value: string);
- protected
-  function CreateLocation: TdcLocation; virtual;
- public
-  constructor Create(aModel: TdcScript);
-  destructor Destroy; override;
-  procedure Assign(Source: TPersistent); override;
-  function CheckLocation(aCaption: String): TdcLocation;
-  function CheckVariable(const aCaption: String): TdcVariable;
-  function FindLocation(const aCaption: String): TdcLocation;
-  function GenerateCaption: string;
-  procedure GetLocationsNames(aStrings: TStrings);
-  procedure LoadFromStream(aStream: TStream);
-  procedure Locations2Strings(aStrings: TStrings);
-  function NewLocation(aCaption: String): TdcLocation;
-  function NewVariable(const aCaption: String): TdcVariable;
-  procedure SaveToStream(aStream: TStream);
-  property Author: String read f_Author write f_Author;
-  property Description: TStrings read f_Description write pm_SetDescription;
-  property IsValid: Boolean read pm_GetIsValid;
-  property Locations[Index: Integer]: TdcLocation read pm_GetLocations;
-  property LocationsCount: Integer read pm_GetLocationsCount;
-  property NotValidConditions: string read f_NotValidConditions;
-  property ObjectsCount: Integer read pm_GetObjectsCount;
-  property StartLocation: string read f_StartLocation write pm_SetStartLocation;
-  property Variables[Index: Integer]: TdcVariable read pm_GetVariables;
-  property VariablesCount: Integer read pm_GetVariablesCount;
-  property Version: string read f_Version write f_Version;
- end;
-
- TdcInventoryItem = class(TqmBase)
- end;
+  TdcInventoryItem = class(TqmBase)
+  end;
 
  TdcVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
- TdcVariable = class(TqmBase)
- private
-  f_Enum: TStrings;
-  f_Value: string;
-  f_VarType: TdcVariableType;
-  function pm_GetTagName: String;
-  procedure pm_SetEnum(const Value: TStrings);
- public
-  constructor Create(aModel: TdcScript); override;
-  destructor Destroy; override;
-  procedure Load(Element: IXMLNode); override;
-  procedure Save(Element: IXMLNode); override;
-  property Enum: TStrings read f_Enum write pm_SetEnum;
-  property TagName: String read pm_GetTagName;
-  property Value: string read f_Value write f_Value;
-  property VarType: TdcVariableType read f_VarType write f_VarType;
- end;
+  TdcVariable = class(TqmBase)
+  private
+    f_Enum: TStrings;
+    f_Value: string;
+    f_VarType: TdcVariableType;
+    function pm_GetTagName: string;
+    procedure pm_SetEnum(const Value: TStrings);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Load(Element: IXMLNode); override;
+    procedure Save(Element: IXMLNode); override;
+    property Enum: TStrings read f_Enum write pm_SetEnum;
+    property TagName: string read pm_GetTagName;
+    property Value: string read f_Value write f_Value;
+    property VarType: TdcVariableType read f_VarType write f_VarType;
+  end;
 
 
- TdcActionList = class(TObjectList)
- private
-  function pm_GetItems(Index: Integer): TdcAction;
- public
-   property Items[Index: Integer]: TdcAction
-    read pm_GetItems; default;
- end;
+  TdcActionList = class(TObjectList)
+  private
+    function pm_GetItems(Index: Integer): TdcAction;
+  public
+    property Items[Index: Integer]: TdcAction read pm_GetItems; default;
+  end;
 
 procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
     aModel: TdcScript);
@@ -281,6 +275,20 @@ begin
 end;
 
 
+{
+*********************************** TqmBase ************************************
+}
+constructor TqmBase.Create;
+begin
+ inherited Create;
+ Define('Caption', 'Название', ptString, False);
+end;
+
+destructor TqmBase.Destroy;
+begin
+ inherited;
+end;
+
 procedure TqmBase.Assign(Source: TPersistent);
 begin
   if Source is TqmBase then
@@ -290,18 +298,6 @@ begin
   end
   else
    inherited;
-end;
-
-constructor TqmBase.Create(aModel: TdcScript);
-begin
- inherited Create;
- f_Script:= aModel;
- Define('Caption', 'Название', ptString, False);
-end;
-
-destructor TqmBase.Destroy;
-begin
- inherited;
 end;
 
 function TqmBase.Clone(aModel: TdcScript): Pointer;
@@ -315,8 +311,40 @@ end;
 procedure TqmBase.Load(Element: IXMLNode);
 begin
  //Caption:= Element['Caption'];
- if Element.HasAttribute('Caption') then
-  Caption:= Element.Attributes['Caption'];
+ //if Element.HasAttribute('Caption') then
+ // Caption:= Element.Attributes['Caption'];
+ Element.SetAttibute('PropertyCount', Count);
+ for i:= 0 to Pred(Count) do
+ begin
+  with Items[i] do
+  begin
+    case PropertyType of
+     ptString: Element.SetAttribute(Alias, Value);    // TEdit
+     ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
+     ptText :  // TMemo
+      begin
+       l_E:= Element.AddChild('Texts');
+       try
+         l_Strings:= TStringList.Create;
+         try
+          l_Strings.Text:= Value;
+          l_E.SetAttribute('TextCount', l_Strings.Count);
+          for j:= 0 to Pred(l_Strings.Count) do
+           l_E.AddChild('Text'):= l_Strings[j];
+         finally
+          FreeAndNil(l_Strings);
+         end;
+       finally
+        l_E:= nil;
+       end;
+      end;
+     ptBoolean: : Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
+     ptChoice,    // TComboBox
+     ptAction,    // TButton
+     ptProperties // TScrollBox (Вложенные свойства)
+    end; // case
+  end; // with Items[i]
+ end; // for i
 end;
 
 function TqmBase.pm_GetCaption: string;
@@ -330,15 +358,76 @@ begin
 end;
 
 procedure TqmBase.Save(Element: IXMLNode);
+var
+  i: Integer;
+  l_Strings: TStrings;
+  j: Integer;
+  l_E: IXMLNode;
 begin
  //Element.AddChild('Caption').Text:= Caption;
- Element.SetAttribute('Caption', Caption);
+ //Element.SetAttribute('Caption', Caption);
+ // Сохраняем все свойства, которые есть
+ // Атомарные свойства записываем в атрибуты, составные - в детей
+ Element.SetAttibute('PropertyCount', Count);
+ for i:= 0 to Pred(Count) do
+ begin
+  with Items[i] do
+  begin
+    case PropertyType of
+     ptString: Element.SetAttribute(Alias, Value);    // TEdit
+     ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
+     ptText :  // TMemo
+      begin
+       l_E:= Element.AddChild('Texts');
+       try
+         l_Strings:= TStringList.Create;
+         try
+          l_Strings.Text:= Value;
+          l_E.SetAttribute('TextCount', l_Strings.Count);
+          for j:= 0 to Pred(l_Strings.Count) do
+           l_E.AddChild('Text'):= l_Strings[j];
+         finally
+          FreeAndNil(l_Strings);
+         end;
+       finally
+        l_E:= nil;
+       end;
+      end;
+     ptBoolean: : Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
+     ptChoice,    // TComboBox
+     ptAction,    // TButton
+     ptProperties // TScrollBox (Вложенные свойства)
+    end; // case
+  end; // with Items[i]
+ end; // for i
 end;
 
 
 
 
 { TdcLocation }
+
+{
+********************************* TdcLocation **********************************
+}
+constructor TdcLocation.Create;
+begin
+ inherited;
+ f_ActionList:= TdcActionList.Create;
+end;
+
+destructor TdcLocation.Destroy;
+begin
+  f_ActionList.Free;
+  inherited;
+end;
+
+procedure TdcLocation.AddAction(aAction: TdcAction);
+begin
+ Assert(aAction <> nil, 'Нельзя добавлять пустое действие');
+ GenerateCaption(aAction);
+ f_ActionList.Add(aAction);
+end;
 
 procedure TdcLocation.Assign(Source: TPersistent);
 begin
@@ -348,6 +437,131 @@ begin
   Hint:=  TdcLocation(Source).Hint;
   CloneActions((Source as TdcLocation).ActionList, f_ActionList, Script);
  end;
+end;
+
+procedure TdcLocation.GenerateCaption(aAction: TdcAction);
+var
+ l_Template: string;
+ l_Count: Integer;
+begin
+ if aAction.Caption = '' then
+ begin
+   l_Count:= 1;
+   if aAction is TdcTextAction then
+    l_Template:= 'Текст'
+   else
+   if (aAction is TdcGotoAction) and not (aAction is TdcButtonAction) then
+    l_Template:= 'Переход'
+   else
+   if aAction is TdcInventoryAction then
+    l_Template:= 'Инвентарь'
+   else
+   if aAction is TdcLogicAction then
+    l_Template:= 'Условие'
+   else
+   if aAction is TdcVariableAction then
+    l_Template:= 'Переменная'
+   else
+   if aAction is TdcButtonAction then
+    l_Template:= 'Кнопка';
+
+   while FindInList(f_ActionList, l_Template + IntToStr(l_Count)) <> nil do
+    Inc(l_Count);
+   aAction.Caption:= l_Template + IntToStr(l_Count);
+ end;
+end;
+
+procedure TdcLocation.Load(Element: IXMLNode);
+var
+ l_Count, i, j: Integer;
+ l_Node, l_E, l_a: IXMLNode;
+begin
+ inherited;
+ l_Node:= Element.ChildNodes.FindNode('Actions');
+ for i:= 0 to l_Node.ChildNodes.Count - 1 do
+ begin
+  l_E:= l_Node.ChildNodes.Get(i);
+  AddAction(TdcAction.Make(l_E, Script));
+ end; // for i
+ l_Node:= Element.ChildNodes.FindNode('Buttons');
+ for i:= 0 to l_Node.ChildNodes.Count - 1 do
+ begin
+  l_E:= l_Node.ChildNodes.Get(i);
+  AddAction(TdcAction.Make(l_E, Script));
+ end; // for i
+ if Element.HasAttribute('Hint') then
+  Hint:= element.GetAttribute('Hint');
+end;
+
+class function TdcLocation.Make(aElement: IXMLNode; aModel: TdcScript):
+    TdcLocation;
+begin
+ Result:= nil;
+ if aElement.HasAttribute('Caption') then
+  Result:= aModel.CheckLocation(aElement.GetAttribute('Caption'))
+ else
+  Result:= aModel.NewLocation('');
+ if Result <> nil then
+  Result.Load(aElement);
+end;
+
+function TdcLocation.pm_GetActions(Index: Integer): TdcAction;
+begin
+ Result := f_ActionList.Items[Index] as TdcAction;
+end;
+
+function TdcLocation.pm_GetActionsCount: Integer;
+begin
+ Result := f_ActionList.Count;
+end;
+
+function TdcLocation.pm_GetButtons(Index: Integer): TdcButtonAction;
+var
+ l_B, i: Integer;
+begin
+ l_B:= -1;
+ for i:= 0 to Pred(ActionsCount) do
+  if Actions[i].ActionType = atButton then
+  begin
+   Inc(l_B);
+   if l_B = Index then
+    Result := Actions[i] as TdcButtonAction;
+  end;
+end;
+
+function TdcLocation.pm_GetButtonsCount: Integer;
+var
+ i: Integer;
+begin
+ Result:= 0;
+ for i:= 0 to Pred(ActionsCount) do
+  if Actions[i].ActionType = atButton then
+   Inc(Result);
+end;
+
+procedure TdcLocation.pm_SetActionList(aValue: TdcActionList);
+begin
+ CloneActions(aValue, f_ActionList, Script);
+end;
+
+procedure TdcLocation.Save(Element: IXMLNode);
+var
+ i: Integer;
+ l_Node: IXMLNode;
+begin
+ inherited;
+ with Element.AddChild('Actions') do
+ begin
+  for i:= 0 to Pred(ActionsCount) do
+   if Actions[i].ActionType <> atButton then
+    Actions[i].Save(AddChild(Actions[i].TagName));
+ end; // with Element.AddChild('Actions')
+ with Element.AddChild('Buttons') do
+ begin
+  for i:= 0 to Pred(ButtonsCount) do
+   Buttons[i].Save(AddChild('Button'));
+ end; // with Element.AddChild('Buttons')
+ Element.SetAttribute('Hint', Hint);
 end;
 
 procedure CloneActions(aSource: TdcActionList; var aDestination: TdcActionList;
@@ -426,156 +640,15 @@ begin
 end;
 
 
-constructor TdcLocation.Create(aModel: TdcScript);
-begin
- inherited;
- f_ActionList:= TdcActionList.Create;
-end;
-
-destructor TdcLocation.Destroy;
-begin
-  f_ActionList.Free;
-  inherited;
-end;
-
-procedure TdcLocation.AddAction(aAction: TdcAction);
-begin
- Assert(aAction <> nil, 'Нельзя добавлять пустое действие');
- GenerateCaption(aAction);
- f_ActionList.Add(aAction);
-end;
-
-procedure TdcLocation.GenerateCaption(aAction: TdcAction);
-var
- l_Template: string;
- l_Count: Integer;
-begin
- if aAction.Caption = '' then
- begin
-   l_Count:= 1;
-   if aAction is TdcTextAction then
-    l_Template:= 'Текст'
-   else
-   if (aAction is TdcGotoAction) and not (aAction is TdcButtonAction) then
-    l_Template:= 'Переход'
-   else
-   if aAction is TdcInventoryAction then
-    l_Template:= 'Инвентарь'
-   else
-   if aAction is TdcLogicAction then
-    l_Template:= 'Условие'
-   else
-   if aAction is TdcVariableAction then
-    l_Template:= 'Переменная'
-   else
-   if aAction is TdcButtonAction then
-    l_Template:= 'Кнопка';
-
-   while FindInList(f_ActionList, l_Template + IntToStr(l_Count)) <> nil do
-    Inc(l_Count);
-   aAction.Caption:= l_Template + IntToStr(l_Count);
- end;
-end;
-
-procedure TdcLocation.Load(Element: IXMLNode);
-var
- l_Count, i, j: Integer;
- l_Node, l_E, l_a: IXMLNode;
-begin
- inherited;
- l_Node:= Element.ChildNodes.FindNode('Actions');
- for i:= 0 to l_Node.ChildNodes.Count - 1 do
- begin
-  l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Script));
- end; // for i
- l_Node:= Element.ChildNodes.FindNode('Buttons');
- for i:= 0 to l_Node.ChildNodes.Count - 1 do
- begin
-  l_E:= l_Node.ChildNodes.Get(i);
-  AddAction(TdcAction.Make(l_E, Script));
- end; // for i
- if Element.HasAttribute('Hint') then
-  Hint:= element.GetAttribute('Hint');
-end;
-
-class function TdcLocation.Make(aElement: IXMLNode; aModel: TdcScript): TdcLocation;
-begin
- Result:= nil;
- if aElement.HasAttribute('Caption') then
-  Result:= aModel.CheckLocation(aElement.GetAttribute('Caption'))
- else
-  Result:= aModel.NewLocation('');
- if Result <> nil then
-  Result.Load(aElement);
-end;
-
-function TdcLocation.pm_GetActions(Index: Integer): TdcAction;
-begin
- Result := f_ActionList.Items[Index] as TdcAction;
-end;
-
-function TdcLocation.pm_GetActionsCount: Integer;
-begin
- Result := f_ActionList.Count;
-end;
-
-function TdcLocation.pm_GetButtons(Index: Integer): TdcButtonAction;
-var
- l_B, i: Integer;
-begin
- l_B:= -1;
- for i:= 0 to Pred(ActionsCount) do
-  if Actions[i].ActionType = atButton then
-  begin
-   Inc(l_B);
-   if l_B = Index then
-    Result := Actions[i] as TdcButtonAction;
-  end;
-end;
-
-function TdcLocation.pm_GetButtonsCount: Integer;
-var
- i: Integer;
-begin
- Result:= 0;
- for i:= 0 to Pred(ActionsCount) do
-  if Actions[i].ActionType = atButton then
-   Inc(Result);
-end;
-
-procedure TdcLocation.pm_SetActionList(aValue: TdcActionList);
-begin
- CloneActions(aValue, f_ActionList, Script);
-end;
-
-procedure TdcLocation.Save(Element: IXMLNode);
-var
- i: Integer;
- l_Node: IXMLNode;
-begin
- inherited;
- with Element.AddChild('Actions') do
- begin
-  for i:= 0 to Pred(ActionsCount) do
-   if Actions[i].ActionType <> atButton then
-    Actions[i].Save(AddChild(Actions[i].TagName));
- end; // with Element.AddChild('Actions')
- with Element.AddChild('Buttons') do
- begin
-  for i:= 0 to Pred(ButtonsCount) do
-   Buttons[i].Save(AddChild('Button'));
- end; // with Element.AddChild('Buttons')
- Element.SetAttribute('Hint', Hint);
-end;
-
-constructor TdcGotoAction.Create(aModel: TdcScript);
+{
+******************************** TdcGotoAction *********************************
+}
+constructor TdcGotoAction.Create;
 begin
  inherited;
  ActionType:= atGoto;
 end;
 
-{ TdcGotoAction }
 procedure TdcGotoAction.Assign(Source: TPersistent);
 begin
  inherited;
@@ -597,8 +670,12 @@ begin
  Element.SetAttribute('Target', Location.Caption);
 end;
 
+{ TdcGotoAction }
 
-constructor TdcInventoryAction.Create(aModel: TdcScript);
+{
+****************************** TdcInventoryAction ******************************
+}
+constructor TdcInventoryAction.Create;
 begin
  inherited;
  ActionType:= atInventory;
@@ -609,20 +686,23 @@ begin
  // TODO -cMM: TdcInventoryAction.AddObject необходимо написать реализацию
 end;
 
-procedure TdcInventoryAction.DeleteObject(aObjectName: String);
-begin
- // TODO -cMM: TdcInventoryAction.AddObject необходимо написать реализацию
-end;
-
 function TdcInventoryAction.CheckObject(aObjectName: String): Boolean;
 begin
  Result := False;
  // TODO -cMM: TdcInventoryAction.CheckObject необходимо написать реализацию
 end;
 
+procedure TdcInventoryAction.DeleteObject(aObjectName: String);
+begin
+ // TODO -cMM: TdcInventoryAction.AddObject необходимо написать реализацию
+end;
+
 { TdcChapter }
 
-constructor TdcScript.Create(aModel: TdcScript);
+{
+********************************** TdcScript ***********************************
+}
+constructor TdcScript.Create;
 begin
  inherited;
  f_Locations:= TObjectList.Create;
@@ -703,7 +783,7 @@ begin
  try
   l_XMl.Active:= True;
   l_XML.Options:= l_XML.Options + [doNodeAutoCreate, doAttrNull];
-  l_XML.Encoding:= 'Windows-1251';  
+  l_XML.Encoding:= 'Windows-1251';
   l_XML.LoadFromStream(aStream);
   with l_XML.ChildNodes.FindNode('Quide') do
   begin
@@ -875,7 +955,10 @@ begin
  end;
 end;
 
-constructor TdcTextAction.Create(aModel: TdcScript);
+{
+******************************** TdcTextAction *********************************
+}
+constructor TdcTextAction.Create;
 begin
  inherited;
  f_Description:= TStringList.Create;
@@ -909,7 +992,10 @@ begin
  Element.Text:= f_Description.Text;
 end;
 
-constructor TdcAction.Create(aModel: TdcScript);
+{
+********************************** TdcAction ***********************************
+}
+constructor TdcAction.Create;
 begin
  inherited;
  ActionType:= atNone;
@@ -923,22 +1009,22 @@ begin
   ActionType:= StringToActionType(Element.NodeName);
 end;
 
-class function TdcAction.Make(aElement: IXMLNode; aModel: TdcScript): TdcAction;
+class function TdcAction.Make(aElement: IXMLNode): TdcAction;
 begin
  Result:= nil;
   case StringToActionType(aElement.Attributes['Type']) of
-    atGoto: Result:= TdcGotoAction.Create(aModel);
-    atInventory: Result:= TdcInventoryAction.Create(aModel);
-    atLogic: Result:= TdcLogicAction.Create(aModel);
-    atText: Result:= TdcTextAction.Create(aModel);
-    atVariable: Result:= TdcVariableAction.Create(aModel);
-    atButton: Result:= TdcButtonAction.Create(aModel);
+    atGoto: Result:= TdcGotoAction.Create;
+    atInventory: Result:= TdcInventoryAction.Create;
+    atLogic: Result:= TdcLogicAction.Create;
+    atText: Result:= TdcTextAction.Create;
+    atVariable: Result:= TdcVariableAction.Create;
+    atButton: Result:= TdcButtonAction.Create;
   end;
   if Result <> nil then
    Result.Load(aElement);
 end;
 
-function TdcAction.pm_GetTagName: String;
+function TdcAction.pm_GetTagName: string;
 begin
  Result := ActionTypeToStr(ActionType);
 end;
@@ -948,7 +1034,10 @@ begin
  inherited;
 end;
 
-constructor TdcLogicAction.Create(aModel: TdcScript);
+{
+******************************** TdcLogicAction ********************************
+}
+constructor TdcLogicAction.Create;
 begin
  inherited;
  ActionType:= atLogic;
@@ -968,7 +1057,10 @@ begin
  // TODO -cMM: Меню для добавления сущностей
 end;
 
-constructor TdcVariableAction.Create(aModel: TdcScript);
+{
+****************************** TdcVariableAction *******************************
+}
+constructor TdcVariableAction.Create;
 begin
  inherited;
  ActionType:= atVariable;
@@ -1002,16 +1094,22 @@ begin
  begin
   Element.setAttribute('Variable', Variable.Caption);
   Element.SetAttribute('Value', Value);
- end; 
+ end;
 end;
 
-constructor TdcButtonAction.Create(aModel: TdcScript);
+{
+******************************* TdcButtonAction ********************************
+}
+constructor TdcButtonAction.Create;
 begin
  inherited;
  ActionType:= atButton;
 end;
 
-constructor TdcVariable.Create(aModel: TdcScript);
+{
+********************************* TdcVariable **********************************
+}
+constructor TdcVariable.Create;
 begin
  inherited;
  f_Enum:= TStringList.Create;
@@ -1039,7 +1137,7 @@ begin
  end;
 end;
 
-function TdcVariable.pm_GetTagName: String;
+function TdcVariable.pm_GetTagName: string;
 begin
  Result := varType2String(VarType);
 end;
@@ -1064,6 +1162,9 @@ end;
 
 { TdcActionList }
 
+{
+******************************** TdcActionList *********************************
+}
 function TdcActionList.pm_GetItems(Index: Integer): TdcAction;
 begin
   Result:= TdcAction(inherited Items[Index])
