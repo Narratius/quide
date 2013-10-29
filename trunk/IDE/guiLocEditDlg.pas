@@ -10,58 +10,58 @@ uses
 
 type
   TLocationDlg = class(TForm)
-    OKBtn: TButton;
-    CancelBtn: TButton;
-    Bevel1: TBevel;
-    Label1: TLabel;
-    editCaption: TEdit;
-    ActionsPanel: TPanel;
-    EditPanel: TPanel;
-    ToolBar1: TToolBar;
-    Label3: TLabel;
-    ToolButton1: TToolButton;
-    TypeDropDown: TPopupMenu;
-    ToolButton2: TToolButton;
-    N1: TMenuItem;
-    N2: TMenuItem;
-    ToolButton3: TToolButton;
-    ToolButton4: TToolButton;
     ActionList1: TActionList;
-    TextAction: TAction;
+    ActionsPanel: TPanel;
+    Bevel1: TBevel;
+    ButtonAction: TAction;
+    ButtonDelete: TAction;
+    ButtonDown: TAction;
+    ButtonsListBox: TListBox;
+    ButtonsPanel: TPanel;
+    ButtonUp: TAction;
+    CancelBtn: TButton;
     DelAction: TAction;
-    MoveUpAction: TAction;
-    MoveDownAction: TAction;
-    NewAction: TAction;
+    editCaption: TEdit;
+    EditPanel: TPanel;
     GotoAction: TAction;
     ImageList1: TImageList;
     InventaryAction: TAction;
-    VariableAction: TAction;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
     LogicalAction: TAction;
+    MoveDownAction: TAction;
+    MoveUpAction: TAction;
+    N1: TMenuItem;
+    N2: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
     N5: TMenuItem;
+    NewAction: TAction;
+    OKBtn: TButton;
     Panel1: TPanel;
+    TextAction: TAction;
+    ToolBar1: TToolBar;
     ToolBar2: TToolBar;
-    Label2: TLabel;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
     ToolButton5: TToolButton;
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
-    ButtonsListBox: TListBox;
-    ButtonsPanel: TPanel;
-    ButtonAction: TAction;
-    ButtonDelete: TAction;
-    ButtonUp: TAction;
-    ButtonDown: TAction;
     treeActions: TTreeView;
-    procedure FormDestroy(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    TypeDropDown: TPopupMenu;
+    VariableAction: TAction;
     procedure ActionListBoxClick(Sender: TObject);
     procedure ActionListBoxDblClick(Sender: TObject);
     procedure ButtonActionExecute(Sender: TObject);
     procedure ButtonsListBoxClick(Sender: TObject);
     procedure DelButtonClick(Sender: TObject);
     procedure editCaptionChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure GotoActionExecute(Sender: TObject);
     procedure MoveDownActionExecute(Sender: TObject);
     procedure MoveUpActionExecute(Sender: TObject);
@@ -71,20 +71,18 @@ type
     procedure VariableActionExecute(Sender: TObject);
   private
     FScript: TdcScript;
-    { Public declarations }
     f_Location: TdcLocation;
     procedure AddAction(aAction: TdcActionClass);
     procedure AddAction2ListBox(aAction: TdcAction);
     procedure AddButton2ListBox(aAction: TdcAction);
-    procedure ClearEditFrame;
-    procedure GetButtonData(Index: Integer; aList: TStrings);
     procedure ButtonsIndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
+    procedure ClearEditFrame;
     procedure GetActionData;
+    procedure GetButtonData(Index: Integer; aList: TStrings);
     procedure OnCaptionEdit(Sender: TObject);
     procedure pm_SetLocation(const Value: TdcLocation);
     procedure RefreshList;
     procedure SetScript(const Value: TdcScript);
-    { Private declarations }
   public
     property Location: TdcLocation read f_Location write pm_SetLocation;
     property Script: TdcScript read FScript write SetScript;
@@ -121,19 +119,9 @@ begin
  end;
 end;
 
-procedure TLocationDlg.FormDestroy(Sender: TObject);
-begin
- f_Location.Free;
-end;
-
-procedure TLocationDlg.FormCreate(Sender: TObject);
-begin
- //ActionListBox.OnChange:= ActionListBoxClick;
- //ActionListBox.OnItemIndexChange:= IndexChange;
- ButtonsListBox.OnChange:= ButtonsListBoxClick;
- ButtonsListBox.OnItemIndexChange:= ButtonsIndexChange;
-end;
-
+{
+********************************* TLocationDlg *********************************
+}
 procedure TLocationDlg.ActionListBoxClick(Sender: TObject);
 begin
  MoveUpAction.Enabled:= treeActions.Items.Count > 0;//ActionListBox.ItemIndex > 0;
@@ -233,6 +221,16 @@ begin
  AddButton2ListBox(l_A);
 end;
 
+procedure TLocationDlg.ButtonsIndexChange(Sender: TObject; OldIndex, NewIndex:
+    Integer);
+begin
+ // Нужно забрать данные из текущего элемента
+ if OldIndex <> -1 then
+ begin
+  GetButtonData(OldIndex, ButtonsListBox.Items);
+ end;
+end;
+
 procedure TLocationDlg.ButtonsListBoxClick(Sender: TObject);
 var
  l_Frame: TFrame;
@@ -269,6 +267,45 @@ begin
  f_Location.Caption:= editCaption.Text;
 end;
 
+procedure TLocationDlg.FormCreate(Sender: TObject);
+begin
+ //ActionListBox.OnChange:= ActionListBoxClick;
+ //ActionListBox.OnItemIndexChange:= IndexChange;
+ ButtonsListBox.OnChange:= ButtonsListBoxClick;
+ ButtonsListBox.OnItemIndexChange:= ButtonsIndexChange;
+end;
+
+procedure TLocationDlg.FormDestroy(Sender: TObject);
+begin
+ f_Location.Free;
+end;
+
+procedure TLocationDlg.GetActionData;
+var
+ l_A: TdcAction;
+ l_LocName: string;
+begin
+ if treeActions.Selected <> nil then
+ begin
+  l_A:= TdcAction(treeActions.Selected.Data);
+  case l_A.ActionType of
+   atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[treeActions.Selected.Index] as TdobTextFrame).TextMemo.Lines;
+   atGoto:
+    begin
+     l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
+     TdcGotoAction(l_A).Location:= Script.FindLocation(l_LocName);
+     treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
+    end;
+   atVariable:
+    with TdcVariableAction(l_A) do
+    begin
+     Variable:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Variable;
+     Value:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Value;
+    end;
+  end;
+ end;
+end;
+
 procedure TLocationDlg.GetButtonData(Index: Integer; aList: TStrings);
 var
  l_LocName: String;
@@ -303,41 +340,6 @@ begin
  AddAction(TdcGotoAction);
 end;
 
-procedure TLocationDlg.ButtonsIndexChange(Sender: TObject; OldIndex, NewIndex: Integer);
-begin
- // Нужно забрать данные из текущего элемента
- if OldIndex <> -1 then
- begin
-  GetButtonData(OldIndex, ButtonsListBox.Items);
- end;
-end;
-
-procedure TLocationDlg.GetActionData;
-var
- l_A: TdcAction;
- l_LocName: string;
-begin
- if treeActions.Selected <> nil then
- begin
-  l_A:= TdcAction(treeActions.Selected.Data);
-  case l_A.ActionType of
-   atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[treeActions.Selected.Index] as TdobTextFrame).TextMemo.Lines;
-   atGoto:
-    begin
-     l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
-     TdcGotoAction(l_A).Location:= Script.FindLocation(l_LocName);
-     treeActions.Selected.Text:= TdcGotoAction(l_A).Caption;
-    end;
-   atVariable:
-    with TdcVariableAction(l_A) do
-    begin
-     Variable:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Variable;
-     Value:= TVarActionFrame(EditPanel.Controls[treeActions.Selected.Index]).Value;
-    end;
-  end;
- end;
-end;
-
 procedure TLocationDlg.MoveDownActionExecute(Sender: TObject);
 var
  l_Index: Integer;
@@ -370,7 +372,6 @@ end;
 
 procedure TLocationDlg.OnCaptionEdit(Sender: TObject);
 begin
-
 end;
 
 procedure TLocationDlg.pm_SetLocation(const Value: TdcLocation);
@@ -386,6 +387,7 @@ var
   I: Integer;
   l_C: TControl;
 begin
+ // Сначала все удаляем
  treeActions.Items.Clear;
  ButtonsListBox.Items.Clear;
  while EditPanel.ControlCount > 0 do
@@ -394,6 +396,7 @@ begin
   EditPanel.RemoveControl(l_C);
   FreeAndNil(l_C);
  end; // while EditPanel.ControlCount > 0
+ // Теперь заполняем списки
  for I := 0 to Location.ActionsCount - 1 do
  begin
   if Location.Actions[i].ActionType = atButton then
