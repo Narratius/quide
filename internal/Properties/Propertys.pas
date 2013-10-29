@@ -50,6 +50,7 @@ type
   public
     constructor Create;
     function Add: TProperty;
+    procedure Assign(Source: TPersistent); override;
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType;
         aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
     procedure IterateAll(aFunc: TPropertyFunc);
@@ -109,6 +110,28 @@ end;
 function TProperties.Add: TProperty;
 begin
  Result := TProperty(inherited Add);
+end;
+
+procedure TProperties.Assign(Source: TPersistent);
+var
+  I: Integer;
+begin
+  if Source is TProperties then
+  begin
+    BeginUpdate;
+    try
+      // Replaces call to Clear to avoid BeginUpdate/try/finally/EndUpdate block
+      while Count > 0 do
+        Items[Count - 1].DisposeOf;
+
+      for I := 0 to TProperties(Source).Count - 1 do
+        Add.Assign(TProperties(Source).Items[I]);
+    finally
+      EndUpdate;
+    end;
+    Exit;
+  end;
+  inherited Assign(Source);
 end;
 
 procedure TProperties.Define(const aAlias, aCaption: String; aType:

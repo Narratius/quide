@@ -291,9 +291,6 @@ end;
 
 procedure TqmBase.Assign(Source: TPersistent);
 begin
- if Source is TqmBase then
-
- else
   inherited Assign(Source);
 end;
 
