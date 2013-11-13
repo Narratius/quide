@@ -95,7 +95,7 @@ begin
   atText:
    begin
     l_Frame:= TDobTextFrame.Create(nil);
-    TDobTextFrame(l_Frame).TextMemo.Lines:= TdcTextAction(anAction).Description;
+    TDobTextFrame(l_Frame).TextMemo.Lines.Text:= TdcTextAction(anAction).Description;
    end;
   atGoto:
    begin
@@ -150,7 +150,7 @@ begin
  begin
   l_A:= f_ActionList[i] as TdcAction;
   case l_A.ActionType of
-   atText: TdcTextAction(l_A).Description:= (EditPlace.Controls[i] as TdobTextFrame).TextMemo.Lines;
+   atText: TdcTextAction(l_A).Description:= (EditPlace.Controls[i] as TdobTextFrame).TextMemo.Lines.Text;
    atGoto:
     begin
      l_LocName:= TGotoActionFrame(EditPlace.Controls[i]).GotoLocation;

@@ -168,7 +168,7 @@ begin
  if aAction is TdcTextAction then
  begin
   l_Frame:= TDobTextFrame.Create(nil);
-  TDobTextFrame(l_Frame).TextMemo.Lines:= TdcTextAction(aAction).Description;
+  TDobTextFrame(l_Frame).TextMemo.Lines.Text:= TdcTextAction(aAction).Description;
  end
  else
  if aAction is TdcGotoAction then
@@ -188,6 +188,7 @@ begin
   TVarActionFrame(l_Frame).Script:= Script;
  end;
  l_Frame.Name:= 'Frame'+IntToStr(EditPanel.ControlCount);
+ l_Frame.Align:= alClient;
  l_Frame.Parent:= EditPanel;
  l_Frame.Hide;
 end;
@@ -205,6 +206,7 @@ begin
   if TdcButtonAction(aAction).Location <> nil then
    TButtonFrame(l_Frame).GotoLocation:= TdcButtonAction(aAction).Location.Caption;
   l_Frame.Name:= 'Frame'+IntToStr(ButtonsPanel.ControlCount);
+  l_Frame.Align:= alClient;
   l_Frame.Parent:= ButtonsPanel;
   l_Frame.Hide;
  end;
@@ -289,7 +291,7 @@ begin
  begin
   l_A:= TdcAction(treeActions.Selected.Data);
   case l_A.ActionType of
-   atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[treeActions.Selected.Index] as TdobTextFrame).TextMemo.Lines;
+   atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[treeActions.Selected.Index] as TdobTextFrame).TextMemo.Lines.Text;
    atGoto:
     begin
      l_LocName:= TGotoActionFrame(EditPanel.Controls[treeActions.Selected.Index]).GotoLocation;
@@ -313,7 +315,7 @@ var
 begin
  l_A:= aList.Objects[Index] as TdcAction;
  case l_A.ActionType of
-  atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[Index] as TdobTextFrame).TextMemo.Lines;
+  atText: TdcTextAction(l_A).Description:= (EditPanel.Controls[Index] as TdobTextFrame).TextMemo.Lines.Text;
   atGoto:
    begin
     l_LocName:= TGotoActionFrame(EditPanel.Controls[Index]).GotoLocation;
@@ -408,7 +410,8 @@ begin
   //if ActionListBox.Items.IndexOf(Location.Actions[i].Caption) = -1 then
    AddAction2ListBox(Location.Actions[i]);
  end;
- //ActionListBox.ItemIndex:= 0;
+ if treeActions.Items.Count > 0 then
+   treeActions.Selected:= treeActions.Items.GetFirstNode;
  ButtonsListBox.ItemIndex:= 0;
 end;
 
