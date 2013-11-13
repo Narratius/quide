@@ -89,14 +89,14 @@ Type
  { Отображение текста }
   TdcTextAction = class(TdcAction)
   private
-    f_Description: TStrings;
-    procedure pm_SetDescription(aValue: TStrings);
+    function pm_GetDescription: string;
+    procedure pm_SetDescription(const aValue: string);
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Load(Element: IXMLNode); override;
     procedure Save(Element: IXMLNode); override;
-    property Description: TStrings read f_Description write pm_SetDescription;
+    property Description: string read pm_GetDescription write pm_SetDescription;
   end;
 
  { Условное действие }
@@ -303,44 +303,36 @@ begin
 end;
 
 procedure TqmBase.Load(Element: IXMLNode);
+var
+  i: Integer;
+  l_Strings: TStrings;
+  j: Integer;
 begin
- //Caption:= Element['Caption'];
- //if Element.HasAttribute('Caption') then
- // Caption:= Element.Attributes['Caption'];
- { Нет осознания созданы ли свойства же или их нужно создавать
- Element.SetAttibute('PropertyCount', Count);
  for i:= 0 to Pred(Count) do
  begin
   with Items[i] do
   begin
     case PropertyType of
-     ptString: Element.SetAttribute(Alias, Value);    // TEdit
-     ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
+     ptString: Value:= Element.GetAttribute(Alias);    // TEdit
+     ptInteger: Value:= Element.GetAttribute(Alias);   // TEdit
      ptText :  // TMemo
       begin
-       l_E:= Element.AddChild('Texts');
+       l_Strings:= TStringList.Create;
        try
-         l_Strings:= TStringList.Create;
-         try
-          l_Strings.Text:= Value;
-          l_E.SetAttribute('TextCount', l_Strings.Count);
-          for j:= 0 to Pred(l_Strings.Count) do
-           l_E.AddChild('Text'):= l_Strings[j];
-         finally
-          FreeAndNil(l_Strings);
-         end;
+        l_Strings.Text:= Value;
+        for j:= 0 to Pred(Element.ChildNodes.Count) do
+         l_Strings.Add(Element.ChildNodes.Get(j).Text);
        finally
-        l_E:= nil;
+        FreeAndNil(l_Strings);
        end;
       end;
-     ptBoolean: : Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
-     ptChoice,    // TComboBox
-     ptAction,    // TButton
-     ptProperties // TScrollBox (Вложенные свойства)
+     ptBoolean: Value:= Element.GetAttribute(Alias);   // TRadioGroup (TCombobox)
+     ptChoice:;    // TComboBox
+     ptAction:;    // TButton
+     ptProperties:; // TScrollBox (Вложенные свойства)
     end; // case
   end; // with Items[i]
  end; // for i
- }
 end;
 
 function TqmBase.pm_GetCaption: string;
@@ -358,13 +350,7 @@ var
   i: Integer;
   l_Strings: TStrings;
   j: Integer;
-  l_E: IXMLNode;
 begin
- //Element.AddChild('Caption').Text:= Caption;
- //Element.SetAttribute('Caption', Caption);
- // Сохраняем все свойства, которые есть
- // Атомарные свойства записываем в атрибуты, составные - в детей
- Element.SetAttribute('PropertyCount', Count);
  for i:= 0 to Pred(Count) do
  begin
   with Items[i] do
@@ -374,19 +360,13 @@ begin
      ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
      ptText :  // TMemo
       begin
-       l_E:= Element.AddChild('Texts');
+       l_Strings:= TStringList.Create;
        try
-         l_Strings:= TStringList.Create;
-         try
-          l_Strings.Text:= Value;
-          l_E.SetAttribute('TextCount', l_Strings.Count);
-          for j:= 0 to Pred(l_Strings.Count) do
-           l_E.AddChild('Text').Text:= l_Strings[j];
-         finally
-          FreeAndNil(l_Strings);
-         end;
+        l_Strings.Text:= Value;
+        for j:= 0 to Pred(l_Strings.Count) do
+         Element.AddChild('Line').Text:= l_Strings[j];
        finally
-        l_E:= nil;
+        FreeAndNil(l_Strings);
        end;
       end;
      ptBoolean: Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
@@ -956,7 +936,6 @@ end;
 constructor TdcTextAction.Create;
 begin
  inherited;
- f_Description:= TStringList.Create;
  ActionType:= atText;
  Define('Description', 'Текст', ptText);
 end;
@@ -964,27 +943,30 @@ end;
 procedure TdcTextAction.Assign(Source: TPersistent);
 begin
  inherited;
- if Source is TdcTextAction then
- begin
-  f_Description.Assign(TdcTextAction(Source).Description);
- end;
 end;
 
 procedure TdcTextAction.Load(Element: IXMLNode);
 begin
   inherited;
-  f_Description.Text:= Element.ChildValues['Description'];
+  //f_Description.Text:= Element.ChildValues['Description'];
 end;
 
-procedure TdcTextAction.pm_SetDescription(aValue: TStrings);
+function TdcTextAction.pm_GetDescription: string;
 begin
- f_Description.Assign(aValue);
+  // TODO -cMM: TdcTextAction.pm_GetDescription default body inserted
+  Result := Values['Description'];
+end;
+
+procedure TdcTextAction.pm_SetDescription(const aValue: string);
+begin
+ Values['Description']:= aValue;
 end;
 
 procedure TdcTextAction.Save(Element: IXMLNode);
 begin
  inherited;
- Element.Text:= f_Description.Text;
+ // Не сохраняется...
+ //Element.Text:= f_Description.Text;
 end;
 
 {
