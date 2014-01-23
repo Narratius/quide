@@ -36,7 +36,7 @@ type
 
 
   TPropertyFunc = function (aItem: TProperty): Boolean of object;
-  TProperties = class(TCollection)
+  TProperties = class(TCollection, IquideStore)
   private
     f_Changed: Boolean;
     function FindProperty(aAlias: String): TProperty;
@@ -54,6 +54,8 @@ type
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType;
         aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
     procedure IterateAll(aFunc: TPropertyFunc);
+    procedure Load(aStream: TStream);
+    procedure Save(aStream: TStream);
     property AliasItems[Alias: String]: TProperty read pm_GetAliasItems write
         pm_SetAliasItems; default;
     property Changed: Boolean read f_Changed write pm_SetChanged;
@@ -174,6 +176,43 @@ begin
   end;
 end;
 
+procedure TProperties.Load(aStream: TStream);
+var
+  i: Integer;
+begin
+  for i:= 0 to Pred(Count) do
+  begin
+   with Items[i] do
+   begin
+     case PropertyType of
+      ptString: Value:= Element.GetAttribute(Alias);    // TEdit
+      ptInteger: Value:= Element.GetAttribute(Alias);   // TEdit
+      ptText :  // TMemo
+       begin
+        l_E:= Element.AddChild('Texts');
+        try
+          l_Strings:= TStringList.Create;
+          try
+           l_Strings.Text:= Value;
+           l_E.SetAttribute('TextCount', l_Strings.Count);
+           for j:= 0 to Pred(l_Strings.Count) do
+            l_E.AddChild('Text'):= l_Strings[j];
+          finally
+           FreeAndNil(l_Strings);
+          end;
+        finally
+         l_E:= nil;
+        end;
+       end;
+      ptBoolean: : Value:= Element.GetAttribute(Alias);   // TRadioGroup (TCombobox)
+      ptChoice,    // TComboBox
+      ptAction,    // TButton
+      ptProperties // TScrollBox (Вложенные свойства)
+     end; // case
+   end; // with Items[i]
+  end; // for i
+end;
+
 function TProperties.pm_GetAliasItems(Alias: String): TProperty;
 begin
   Result:= FindProperty(Alias);
@@ -195,7 +234,7 @@ var
 begin
   l_Prop:= FindProperty(Alias);
   if l_Prop = nil then
-   l_Prop:= Add;
+   raise Exception.CreateFmt('Отсутствует указанное свойство %s', [Alias]);
   l_Prop.Assign(aValue);
 end;
 
@@ -214,6 +253,43 @@ begin
  // TODO -cMM: TProperties.pm_SetValues необходимо написать реализацию
  AliasItems[Alias].Value:= Value;
  Changed:= True;
+end;
+
+procedure TProperties.Save(aStream: TStream);
+var
+  i: Integer;
+begin
+  for i:= 0 to Pred(Count) do
+  begin
+   with Items[i] do
+   begin
+     case PropertyType of
+      ptString: Element.SetAttribute(Alias, Value);    // TEdit
+      ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
+      ptText :  // TMemo
+       begin
+        l_E:= Element.AddChild('Texts');
+        try
+          l_Strings:= TStringList.Create;
+          try
+           l_Strings.Text:= Value;
+           l_E.SetAttribute('TextCount', l_Strings.Count);
+           for j:= 0 to Pred(l_Strings.Count) do
+            l_E.AddChild('Text'):= l_Strings[j];
+          finally
+           FreeAndNil(l_Strings);
+          end;
+        finally
+         l_E:= nil;
+        end;
+       end;
+      ptBoolean: : Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
+      ptChoice,    // TComboBox
+      ptAction,    // TButton
+      ptProperties // TScrollBox (Вложенные свойства)
+     end; // case
+   end; // with Items[i]
+  end; // for i
 end;
 
 

@@ -257,14 +257,8 @@ type
     procedure FormatAlignRightExecute(Sender: TObject);
     procedure HelpAboutExecute(Sender: TObject);
     procedure ObjectsNoneExecute(Sender: TObject);
-    procedure ObjectsRectangleExecute(Sender: TObject);
     procedure ObjectsRoundRectExecute(Sender: TObject);
-    procedure ObjectsEllipseExecute(Sender: TObject);
-    procedure ObjectsTriangleExecute(Sender: TObject);
     procedure ObjectsLinkExecute(Sender: TObject);
-    procedure ObjectsRhomboidExecute(Sender: TObject);
-    procedure ObjectsPentagonExecute(Sender: TObject);
-    procedure ObjectsHexagonExecute(Sender: TObject);
     procedure ViewZoomInExecute(Sender: TObject);
     procedure ViewZoomOutExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject;var CanClose: Boolean);
@@ -389,14 +383,15 @@ uses
   AboutDelphiArea, AlignDlg, SizeDlg;
 
 resourcestring
-  SSaveChanges   = 'Graph has been changed, would you like to save changes?';
+  SAppTitle      = 'Quest IDE 2014';
+  SSaveChanges   = 'Сценарий был изменен, Вы хотите сохранить его?';
   SViewOnly      = 'View Only';
   SEditing       = 'Editing';
   SPan           = 'Pan Mode';
   SInsertingLink = 'Inserting Link/Line';
   SInsertingNode = 'Inserting Node';
-  SModified      = 'Modified';
-  SUntitled      = 'Untitled';
+  SModified      = 'Изменен';
+  SUntitled      = 'Без названия';
   SMultiSelect   = '%d objects selected';
   SNumOfPoints   = '%d point(s)';
   SStartPoint    = 'startpoint';
@@ -544,6 +539,7 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  Application.Title:= SAppTitle;
   Application.OnHint := ShowHint;
   SimpleGraphCommandModeChange(nil);
   SimpleGraphZoomChange(nil);
@@ -553,7 +549,9 @@ begin
     SimpleGraph.LoadFromFile(ParamStr(1));
     SaveDialog.FileName := ExpandFileName(ParamStr(1));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
-  end;
+  end
+  else
+   Caption:= Application.Title;
 end;
 
 procedure TMainForm.FileNewExecute(Sender: TObject);
@@ -965,12 +963,6 @@ begin
     SimpleGraph.CommandMode := cmEdit;
 end;
 
-procedure TMainForm.ObjectsRectangleExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := TRectangularNode;
-  SimpleGraph.CommandMode := cmInsertNode;
-end;
-
 procedure TMainForm.ObjectsRoundRectUpdate(Sender: TObject);
 begin
   ObjectsRoundRect.Checked :=(SimpleGraph.CommandMode = cmInsertNode) and
@@ -983,7 +975,8 @@ var
  B: TRect;
  N1, N2: TGraphNode;
 begin
- (*
+ // сначала вызываем окно редактирования локации, потом добавляем визуалку
+ (*  Original
   SimpleGraph.DefaultNodeClass := TRoundRectangularNode;
   SimpleGraph.CommandMode := cmInsertNode;
  *)
@@ -992,36 +985,6 @@ begin
  b.Create(10, 100, 110, 150);
  N2:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
  SimpleGraph.InsertLink(N1, N2);
-end;
-
-procedure TMainForm.ObjectsEllipseExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := TEllipticNode;
-  SimpleGraph.CommandMode := cmInsertNode;
-end;
-
-procedure TMainForm.ObjectsTriangleExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := TTriangularNode;
-  SimpleGraph.CommandMode := cmInsertNode;
-end;
-
-procedure TMainForm.ObjectsRhomboidExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := TRhomboidalNode;
-  SimpleGraph.CommandMode := cmInsertNode;
-end;
-
-procedure TMainForm.ObjectsPentagonExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := TPentagonalNode;
-  SimpleGraph.CommandMode := cmInsertNode;
-end;
-
-procedure TMainForm.ObjectsHexagonExecute(Sender: TObject);
-begin
-  SimpleGraph.DefaultNodeClass := THexagonalNode;
-  SimpleGraph.CommandMode := cmInsertNode;
 end;
 
 procedure TMainForm.ObjectsLinkExecute(Sender: TObject);
