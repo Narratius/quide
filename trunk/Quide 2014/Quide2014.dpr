@@ -11,7 +11,8 @@ uses
   UsageHelp in 'UsageHelp.pas' {HelpOnActions},
   MarginsProp in 'MarginsProp.pas' {MarginDialog},
   AlignDlg in 'AlignDlg.pas' {AlignDialog},
-  SizeDlg in 'SizeDlg.pas' {SizeDialog};
+  SizeDlg in 'SizeDlg.pas' {SizeDialog},
+  quideGUILink in 'quideGUILink.pas';
 
 {$R *.res}
 

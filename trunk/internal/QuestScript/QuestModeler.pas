@@ -20,7 +20,6 @@ Type
     procedure Assign(Source: TPersistent); override;
     function Clone: Pointer;
     procedure Load(Element: IXMLNode); virtual;
-    //1 Сохранение ВСЕХ свойств
     procedure Save(Element: IXMLNode); virtual;
     property Caption: string read pm_GetCaption write pm_SetCaption;
   end;
