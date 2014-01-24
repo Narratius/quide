@@ -82,6 +82,7 @@
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <DCC_UnitSearchPath>$(libi)\Properties;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Build>1</VerInfo_Build>
         <VerInfo_MajorVer>2014</VerInfo_MajorVer>
         <VerInfo_Release>1</VerInfo_Release>

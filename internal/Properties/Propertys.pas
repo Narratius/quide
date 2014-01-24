@@ -3,7 +3,8 @@ unit Propertys;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs,
+  PropertyIntf;
 
 type
  TPropertyType = (ptString,    // TEdit
