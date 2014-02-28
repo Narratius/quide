@@ -70,7 +70,8 @@ type
     function pm_GetCount: Integer;
   public
     constructor Create;
-    function Add: TProperty;
+    function Add: TProperty; overload;
+    function Add(aProp: TProperty): TProperty; overload;
     procedure Assign(Source: TProperties);
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType;
         aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
@@ -119,6 +120,11 @@ function TProperties.Add: TProperty;
 begin
  Result := TProperty.Create;
  Result.ID:= f_Items.Add(Result) + propBase;
+end;
+
+function TProperties.Add(aProp: TProperty): TProperty;
+begin
+ Result:= f_Items.Add(aProp);
 end;
 
 procedure TProperties.Assign(Source: TProperties);
@@ -308,8 +314,8 @@ end;
 
 constructor TPropertyLink.Create(aItem: TProperty; aNext: TPropertyLink);
 begin
- Item:= aItem;
- aNext:= aNext;
+ FItem:= aItem;
+ FNext:= aNext;
 end;
 
 procedure TPropertyLink.SetItem(const Value: TProperty);
@@ -324,14 +330,18 @@ end;
 
 procedure TProperty.SetItem(aItem: TPropertyLink);
 var
- l_I: TProperty;
+ l_I: TPropertyLink;
+ l_L: TPropertyLink;
 begin
  FreeAndNil(f_Item);
  f_Item:= TProperties.Create;
  l_I:= aItem;
  while l_I <> nil do
  begin
-   f_Item.I
+   f_Item.Add(aItem.Item);
+   l_L:= l_I;
+   l_I:= l_I.Next;
+   FreeAndNil(l_L);
  end;
 end;
 
