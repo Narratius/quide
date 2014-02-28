@@ -16,6 +16,7 @@ type
     procedure AddDefControl;
     function FillControls: TControlsArray; virtual;
     procedure GetLastControl(var aRec: TControlRec);
+    // Создание контролов
     procedure MakeActionControl(aProperty: TProperty); virtual;
     procedure MakeBooleanControl(aProperty: TProperty); virtual;
     procedure MakeChoiceControl(aProperty: TProperty); virtual;
@@ -24,7 +25,27 @@ type
     procedure MakePropertiesControl(aProperty: TProperty); virtual;
     procedure MakeStringControl(aProperty: TProperty); virtual;
     procedure MakeTextControl(aProperty: TProperty); virtual;
+    // Установка значений в контролы
+    procedure SetActionValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetBooleanValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetChoiceValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetIntegerValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetPropertiesValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetStringValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetTextValue(aProperty: TProperty; aControl: TControl); virtual;
+    // Чтение значений из контролов
+    procedure GetActionValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetBooleanValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetChoiceValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetIntegerValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetPropertiesValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetStringValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetTextValue(aProperty: TProperty; aControl: TControl); virtual;
+    // Вспомогательные функции
     procedure TuneupControl(aControl: TControl); override;
+    function SetOneValue(aProperty: TProperty): Boolean;
+    function GetOneValue(aProperty: TProperty): Boolean;
+    function ControlByTag(aTag: Integer): TControl;
   public
     procedure CorrectControl(aControlRec: TControlRec); virtual;
     procedure GetValues;
@@ -46,6 +67,19 @@ begin
  f_Controls[Length(f_Controls)-1]:= cDefControlRec;
 end;
 
+function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
+var
+ i: Integer;
+begin
+ Result:= nil;
+ for i:= 0 to Pred(ControlCount) do
+  if (Controls[i].Tag = aTag) and not (Controls[i] is TLabel) then
+  begin
+   Result:= Controls[i];
+   break;
+  end;
+end;
+
 procedure TPropertiesPanel.CorrectControl(aControlRec: TControlRec);
 begin
 end;
@@ -58,14 +92,79 @@ begin
  Result:= f_Controls;
 end;
 
+procedure TPropertiesPanel.GetActionValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ // Кнопка
+end;
+
+procedure TPropertiesPanel.GetBooleanValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ if aControl is TCheckBox then
+  aProperty.Value:= TCheckBox(aControl).Checked;
+end;
+
+procedure TPropertiesPanel.GetChoiceValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ if aControl is TComboBox then
+  aProperty.Value:= TComboBox(aControl).ItemIndex;
+end;
+
+procedure TPropertiesPanel.GetIntegerValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ if aControl is TEdit then
+  aProperty.Value:= TEdit(aControl).Text;
+end;
+
 procedure TPropertiesPanel.GetLastControl(var aRec: TControlRec);
 begin
  aRec:= f_Controls[Length(f_Controls)-1];
 end;
 
+function TPropertiesPanel.GetOneValue(aProperty: TProperty): Boolean;
+var
+ l_C: TControl;
+begin
+ l_C:= ControlByTag(aProperty.ID);
+ if l_C <> nil then
+    case aProperty.PropertyType of
+      ptString: GetStringValue(aProperty, l_C);
+      ptInteger: GetIntegerValue(aProperty, l_C);
+      ptText: GetTextValue(aProperty, l_C);
+      ptBoolean: GetBooleanValue(aProperty, l_C);
+      ptChoice: GetChoiceValue(aProperty, l_C);
+      ptAction: GetActionValue(aProperty, l_C);
+      ptProperties: GetPropertiesValue(aProperty, l_C);
+    end;
+ Result:= True;
+end;
+
+procedure TPropertiesPanel.GetPropertiesValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+
+end;
+
+procedure TPropertiesPanel.GetStringValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ if aControl is TEdit then
+  aProperty.Value:= TEdit(aControl).Text;
+end;
+
+procedure TPropertiesPanel.GetTextValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+ if aControl is TMemo then
+  aProperty.Value:= TMemo(aControl).Text;
+end;
+
 procedure TPropertiesPanel.GetValues;
 begin
- // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
+ f_Properties.IterateAll(GetOneValue);
 end;
 
 procedure TPropertiesPanel.MakeActionControl(aProperty: TProperty);
@@ -80,10 +179,12 @@ end;
 
 procedure TPropertiesPanel.MakeBooleanControl(aProperty: TProperty);
 begin
- MakeCustomControl(TLabel);
+ // Почему комбобокс?!
+ //MakeCustomControl(TLabel);
+ MakeCustomControl(TCheckBox);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TComboBox);
+ //MakeCustomControl(TComboBox);
 end;
 
 procedure TPropertiesPanel.MakeChoiceControl(aProperty: TProperty);
@@ -92,6 +193,7 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TComboBox);
+ // нужно заполнить список элементов
 end;
 
 procedure TPropertiesPanel.MakeControls;
@@ -168,18 +270,82 @@ end;
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
+ MakeControls;
+end;
+
+procedure TPropertiesPanel.SetActionValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Кнопка - значение отсутствует
+end;
+
+procedure TPropertiesPanel.SetBooleanValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Чекбокс
+ if aControl is TCheckbox then
+  TCheckBox(aControl).Checked:= aProperty.Value;
+end;
+
+procedure TPropertiesPanel.SetChoiceValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Комбобокс
+ if aControl is TComboBox then
+  TComboBox(aControl).ItemIndex:= aProperty.Value;
+end;
+
+procedure TPropertiesPanel.SetIntegerValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Пока Строка ввода
+ if aControl is TEdit then
+  TEdit(aControl).Text:= aProperty.Value;
+end;
+
+function TPropertiesPanel.SetOneValue(aProperty: TProperty): Boolean;
+var
+ l_C: TControl;
+begin
+ l_C:= ControlByTag(aProperty.ID);
+ if l_C <> nil then
+    case aProperty.PropertyType of
+      ptString: SetStringValue(aProperty, l_C);
+      ptInteger: SetIntegerValue(aProperty, l_C);
+      ptText: SetTextValue(aProperty, l_C);
+      ptBoolean: SetBooleanValue(aProperty, l_C);
+      ptChoice: SetChoiceValue(aProperty, l_C);
+      ptAction: SetActionValue(aProperty, l_C);
+      ptProperties: SetPropertiesValue(aProperty, l_C);
+    end;
+ Result:= True;
+end;
+
+procedure TPropertiesPanel.SetPropertiesValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Панель
+end;
+
+procedure TPropertiesPanel.SetStringValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Строка ввода
+ if aControl is TEdit then
+  TEdit(aControl).Text:= aProperty.Value;
+end;
+
+procedure TPropertiesPanel.SetTextValue(aProperty: TProperty; aControl: TControl);
+begin
+ // Мемо
+ if aControl is TMemo then
+  TMemo(aControl).Text:= aProperty.Value;
 end;
 
 procedure TPropertiesPanel.SetValues;
 begin
- // TODO -cMM: TPropertiesPanel.SetValues необходимо написать реализацию
+ f_Properties.IterateAll(SetOneValue);
 end;
 
 procedure TPropertiesPanel.TuneupControl(aControl: TControl);
 var
  l_Property: TProperty;
 begin
- l_Property:= TProperty(f_Properties.FindItemID(aControl.Tag));
+ l_Property:= TProperty(f_Properties.Items[aControl.Tag - propBase]);{ TODO : Переделать на поиск по ID }
  if l_Property <> nil then
  begin
  end;
