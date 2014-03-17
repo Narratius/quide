@@ -48,6 +48,7 @@ type
     property Value: Variant read f_Value write f_Value;
     property Visible: Boolean read f_Visible write f_Visible;
     property Event: TNotifyEvent read f_Event write f_Event;
+    property Item: TProperties read f_Item;
     property Items[Index: Integer]: TProperties read pm_GetItems;
     property ItemsCount: Integer read pm_GetItemsCount;
   end;
@@ -79,6 +80,10 @@ type
     procedure pm_SetChanged(const Value: Boolean);
     procedure pm_SetValues(Alias: String; const Value: Variant);
     function pm_GetCount: Integer;
+    procedure SaveValues(Element: IXMLNode);
+    procedure LoadValues(Element: IXMLNode);
+    procedure SaveHeader(Element: IXMLNode);
+    procedure LoadHeader(Element: IXMLNode);
   public
     constructor Create;
     function Add: TProperty; overload;
@@ -116,8 +121,34 @@ const
                   ptText,      // TMemo
                   ptBoolean];   // TRadioGroup (TCombobox)
 
+function PropertyType2String(aType: TPropertyType): String;
+
+function String2PropertyType(const aText: String): TPropertyType;
 
 implementation
+
+
+const
+ PropertyTypeNames: Array[TPropertyType] of String = (
+  'String', 'Integer', 'Text', 'Boolean', 'Choice', 'Action', 'List', 'Properties');
+
+function PropertyType2String(aType: TPropertyType): String;
+begin
+ Result:= PropertyTypeNames[aType];
+end;
+
+function String2PropertyType(const aText: String): TPropertyType;
+var
+ i: TPropertyType;
+begin
+ Result:= ptString;
+ for I := Low(i) to High(i) do
+  if AnsiSameText(aText, PropertyTypeNames[i]) then
+  begin
+    Result:= i;
+    break;
+  end;
+end;
 
 {
 ********************************** TProperty ***********************************
@@ -234,44 +265,28 @@ begin
 end;
 
 procedure TProperties.LoadFromXML(Element: IXMLNode);
+begin
+ LoadHeader(Element);
+ LoadValues(Element);
+end;
+
+
+procedure TProperties.LoadHeader(Element: IXMLNode);
+begin
+  // Загрузка структуры элемента и создание элементов
+end;
+
+procedure TProperties.LoadValues(Element: IXMLNode);
 var
   i, j: Integer;
   l_E: IXMLNode;
   l_Strings: TStrings;
+  l_Item, l_Value: IXMLNode;
+  l_Prop: TProperty;
+  l_Type: TPropertyType;
 begin
-  for i:= 0 to Pred(Count) do
-  begin
-   with Items[i] do
-   begin
-     case PropertyType of
-      ptString: Value:= Element.GetAttribute(Alias);    // TEdit
-      ptInteger: Value:= Element.GetAttribute(Alias);   // TEdit
-      ptText :  // TMemo
-       begin
-        l_E:= Element.AddChild('Texts');
-        try
-          l_Strings:= TStringList.Create;
-          try
-           l_Strings.Text:= Value;
-           l_E.SetAttribute('TextCount', l_Strings.Count);
-           for j:= 0 to Pred(l_Strings.Count) do
-            l_E.AddChild('Text').Text:= l_Strings[j];
-          finally
-           FreeAndNil(l_Strings);
-          end;
-        finally
-         l_E:= nil;
-        end;
-       end;
-      ptBoolean: Value:= Element.GetAttribute(Alias);   // TRadioGroup (TCombobox)
-      ptChoice,    // TComboBox
-      ptAction,    // TButton
-      ptProperties: ; // TScrollBox (Вложенные свойства)
-     end; // case
-   end; // with Items[i]
-  end; // for i
+ // Загрузка значений элементов
 end;
-
 
 function TProperties.pm_GetAliasItems(Alias: String): TProperty;
 begin
@@ -314,22 +329,43 @@ begin
  Changed:= True;
 end;
 
+procedure TProperties.SaveHeader(Element: IXMLNode);
+begin
+ // Сохраение структуры элемента
+end;
+
 procedure TProperties.SaveToXML(Element: IXMLNode);
+begin
+ SaveHeader(Element);
+ SaveValues(Element);
+end;
+
+
+
+procedure TProperties.SaveValues(Element: IXMLNode);
 var
   i, j: Integer;
   l_E: IXMLNode;
   l_Strings: TStrings;
+  l_Item, l_Value: IXMLNode;
 begin
+ // Сохранение значений элементов
   for i:= 0 to Pred(Count) do
   begin
    with Items[i] do
    begin
+    l_Item:= Element.AddChild('Property');
+    l_Item.AddChild('Alias').Text:= Alias;
+    l_Item.AddChild('Caption').Text:= Caption;
+    l_Item.AddChild('Visible').Text:= BoolToStr(Visible, True);
+    l_Item.AddChild('Type').Text:= PropertyType2String(PropertyType);
+    l_Value:= l_Item.AddChild('Value');
      case PropertyType of
-      ptString: Element.SetAttribute(Alias, Value);    // TEdit
-      ptInteger: Element.SetAttribute(Alias, Value);   // TEdit
+      ptString: l_Value.Text:= Value;    // TEdit
+      ptInteger: l_Value.Text:= Value;   // TEdit
       ptText :  // TMemo
        begin
-        l_E:= Element.AddChild('Texts');
+        l_E:= l_Value.AddChild('Texts');
         try
           l_Strings:= TStringList.Create;
           try
@@ -344,16 +380,20 @@ begin
          l_E:= nil;
         end;
        end;
-      ptBoolean: Element.SetAttribute(Alias, Value);   // TRadioGroup (TCombobox)
+      ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
       ptChoice,    // TComboBox
-      ptAction,    // TButton
+      ptAction:;    // TButton
+      ptList:
+       begin
+        Item.SaveToXML(l_Item.AddChild('Properties'));
+        for j := 0 to Count-1 do
+         Items[j].SaveToXML(l_Value.AddChild('Item'));
+       end; // ptList
       ptProperties: ; // TScrollBox (Вложенные свойства)
      end; // case
    end; // with Items[i]
   end; // for i
 end;
-
-
 
 { TPropertyLink }
 
