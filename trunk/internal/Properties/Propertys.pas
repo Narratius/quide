@@ -31,9 +31,6 @@ type
     f_Item: TProperties;
     f_SubItems: TObjectList;
     function pm_GetItemsCount: Integer;
-    function pm_GetItemsValue(Index: Integer; const aAlias: String): Variant;
-    procedure pm_SetItemsValue(Index: Integer; const aAlias: String;
-      const Value: Variant);
     procedure pm_SetPropertyType(const Value: TPropertyType);
     function pm_GetOrdinalType: Boolean;
     function pm_GetItems(Index: Integer): TProperties;
@@ -53,7 +50,6 @@ type
     property Event: TNotifyEvent read f_Event write f_Event;
     property Items[Index: Integer]: TProperties read pm_GetItems;
     property ItemsCount: Integer read pm_GetItemsCount;
-    property ItemsValue[Index: Integer; const aAlias: String]: Variant read pm_GetItemsValue write pm_SetItemsValue;
   end;
 
 
@@ -398,21 +394,9 @@ begin
   Result:= -1;
 end;
 
-function TProperty.pm_GetItemsValue(Index: Integer;
-  const aAlias: String): Variant;
-begin
- Result:= Items[Index].Values['aAlias'];
-end;
-
 function TProperty.pm_GetOrdinalType: Boolean;
 begin
  Result:= f_PropertyType in propOrdinals;
-end;
-
-procedure TProperty.pm_SetItemsValue(Index: Integer; const aAlias: String;
-  const Value: Variant);
-begin
- Items[Index].Values['aAlias']:= Value;
 end;
 
 procedure TProperty.pm_SetPropertyType(const Value: TPropertyType);
@@ -424,18 +408,18 @@ end;
 
 procedure TProperty.SetItem(aItem: TPropertyLink);
 var
- l_I: TPropertyLink;
- l_L: TPropertyLink;
+ l_Item: TPropertyLink;
+ l_Next: TPropertyLink;
 begin
  FreeAndNil(f_Item);
  f_Item:= TProperties.Create;
- l_I:= aItem;
- while l_I <> nil do
+ l_Next:= aItem;
+ while l_Next <> nil do
  begin
-   f_Item.Add(aItem.Item);
-   l_L:= l_I;
-   l_I:= l_I.Next;
-   FreeAndNil(l_L);
+   f_Item.Add(l_Next.Item);
+   l_Item:= l_Next;
+   l_Next:= l_Item.Next;
+   FreeAndNil(l_Item);
  end;
 end;
 
@@ -460,6 +444,11 @@ procedure TPropertyList.SetValues(Index: Integer; Alias: String;
 begin
  if Self.PropertyType = ptList then
   Self.Items[Index].Values[Alias]:= Value;
+(* ^     ^            ^
+   |     |             `-- Values
+   |      `--------------- TProperties
+   `---------------------- TProperty
+ *)
 end;
 
 end.
