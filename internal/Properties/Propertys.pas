@@ -34,6 +34,7 @@ type
     procedure pm_SetPropertyType(const Value: TPropertyType);
     function pm_GetOrdinalType: Boolean;
     function pm_GetItems(Index: Integer): TProperties;
+    procedure pm_SetItem(const Value: TProperties);
   public
     destructor Destroy; override;
     function AddItem: Integer;
@@ -48,7 +49,7 @@ type
     property Value: Variant read f_Value write f_Value;
     property Visible: Boolean read f_Visible write f_Visible;
     property Event: TNotifyEvent read f_Event write f_Event;
-    property Item: TProperties read f_Item;
+    property Item: TProperties read f_Item write pm_SetItem;
     property Items[Index: Integer]: TProperties read pm_GetItems;
     property ItemsCount: Integer read pm_GetItemsCount;
   end;
@@ -92,7 +93,7 @@ type
     function Clone: Pointer;
     procedure Define(const aAlias, aCaption: String; aType: TPropertyType;
         aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
-    procedure DefineList(const aAlias, aCaption: String; aItem: TPropertyLink; aVisible: Boolean = True);
+    procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TPropertyLink = nil);
     procedure IterateAll(aFunc: TPropertyFunc);
     procedure LoadFromXML(Element: IXMLNode);
     procedure SaveToXML(Element: IXMLNode);
@@ -227,8 +228,8 @@ begin
  l_P.Event:= aEvent;
 end;
 
-procedure TProperties.DefineList(const aAlias, aCaption: String;
-  aItem: TPropertyLink; aVisible: Boolean);
+procedure TProperties.DefineList(const aAlias, aCaption: String; aVisible: Boolean;
+  aItem: TPropertyLink);
 var
  l_P: TProperty;
 begin
@@ -283,9 +284,78 @@ var
   l_Strings: TStrings;
   l_Item, l_Value: IXMLNode;
   l_Prop: TProperty;
+  l_SubItem: TProperties;
   l_Type: TPropertyType;
+  l_Alias, l_Caption: String;
+  l_Visible: Boolean;
 begin
  // Загрузка значений элементов
+  for i:= 0 to Pred(Element.ChildNodes.Count) do
+  begin
+
+    l_Item:= Element.ChildNodes.Nodes[i];
+    if l_Item.NodeName = 'Property' then
+    begin
+      l_Alias:= l_Item.ChildValues['Alias'];
+      l_Caption:= l_Item.ChildValues['Caption'];
+      if not TryStrToBool(l_Item.ChildValues['Visible'], l_Visible) then
+       l_Visible:= True; // Или False
+      l_Type:= String2PropertyType(l_Item.ChildValues['Type']);
+      if l_Type in propOrdinals then
+      begin
+       Define(l_Alias, l_Caption, l_Type, l_Visible);
+       Values[l_Alias]:= l_Item.ChildValues['Value'];
+      end
+      else
+      if l_Type = ptList then
+      begin
+       DefineList(l_Alias, l_Caption, l_Visible);
+       l_E:= l_Item.ChildNodes.FindNode('Properties');
+       l_SubItem:= TProperties.Create;
+       try
+        l_SubItem.LoadFromXML(l_E);
+        AliasItems[l_Alias].Item:= l_SubItem;
+       finally
+        FreeAndNil(l_SubItem);
+       end;
+       // Прочитать сам список
+      end;
+    end;
+    (*
+    Value:= l_Item.AddChild('Value');
+     case PropertyType of
+      ptString: l_Value.Text:= Value;    // TEdit
+      ptInteger: l_Value.Text:= Value;   // TEdit
+      ptText :  // TMemo
+       begin
+        l_E:= l_Value.AddChild('Texts');
+        try
+          l_Strings:= TStringList.Create;
+          try
+           l_Strings.Text:= Value;
+           l_E.SetAttribute('TextCount', l_Strings.Count);
+           for j:= 0 to Pred(l_Strings.Count) do
+            l_E.AddChild('Text').Text:= l_Strings[j];
+          finally
+           FreeAndNil(l_Strings);
+          end;
+        finally
+         l_E:= nil;
+        end;
+       end;
+      ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
+      ptChoice,    // TComboBox
+      ptAction:;    // TButton
+      ptList:
+       begin
+        Item.SaveToXML(l_Item.AddChild('Properties'));
+        for j := 0 to Count-1 do
+         Items[j].SaveToXML(l_Value.AddChild('Item'));
+       end; // ptList
+      ptProperties: ; // TScrollBox (Вложенные свойства)
+     end; // case
+    *)
+  end; // for i
 end;
 
 function TProperties.pm_GetAliasItems(Alias: String): TProperty;
@@ -437,6 +507,18 @@ end;
 function TProperty.pm_GetOrdinalType: Boolean;
 begin
  Result:= f_PropertyType in propOrdinals;
+end;
+
+procedure TProperty.pm_SetItem(const Value: TProperties);
+begin
+ if (PropertyType = ptList) then
+ begin
+  if f_Item = nil then
+   f_Item:= TProperties.Create;
+  f_Item.Assign(Value);
+ end
+ else
+  raise Exception.Create('Свойство не ptList'); // Добавить ошибку
 end;
 
 procedure TProperty.pm_SetPropertyType(const Value: TPropertyType);
