@@ -279,7 +279,7 @@ end;
 
 procedure TProperties.LoadValues(Element: IXMLNode);
 var
-  i, j: Integer;
+  i, j, k: Integer;
   l_E: IXMLNode;
   l_Strings: TStrings;
   l_Item, l_Value: IXMLNode;
@@ -294,7 +294,7 @@ begin
   begin
 
     l_Item:= Element.ChildNodes.Nodes[i];
-    if l_Item.NodeName = 'Property' then
+    if AnsiSameText(l_Item.NodeName, 'Property') then
     begin
       l_Alias:= l_Item.ChildValues['Alias'];
       l_Caption:= l_Item.ChildValues['Caption'];
@@ -310,6 +310,7 @@ begin
       if l_Type = ptList then
       begin
        DefineList(l_Alias, l_Caption, l_Visible);
+       // Прочитать описание элемента списка
        l_E:= l_Item.ChildNodes.FindNode('Properties');
        l_SubItem:= TProperties.Create;
        try
@@ -319,42 +320,24 @@ begin
         FreeAndNil(l_SubItem);
        end;
        // Прочитать сам список
-      end;
-    end;
-    (*
-    Value:= l_Item.AddChild('Value');
-     case PropertyType of
-      ptString: l_Value.Text:= Value;    // TEdit
-      ptInteger: l_Value.Text:= Value;   // TEdit
-      ptText :  // TMemo
+       l_E:= l_Item.ChildNodes.FindNode('Value');
+       for j := 0 to l_E.ChildNodes.Count-1 do
        begin
-        l_E:= l_Value.AddChild('Texts');
-        try
-          l_Strings:= TStringList.Create;
+         if AnsiSameText(l_E.ChildNodes.Get(j).NodeName, 'Item') then
+         begin
+          // В принципе, можно считывать только Value - все остальное у нас уже есть
+          k:= AliasItems[l_Alias].AddItem;
+          l_SubItem:= TProperties.Create; // потом вынести за скобки
           try
-           l_Strings.Text:= Value;
-           l_E.SetAttribute('TextCount', l_Strings.Count);
-           for j:= 0 to Pred(l_Strings.Count) do
-            l_E.AddChild('Text').Text:= l_Strings[j];
+           l_SubItem.LoadFromXML(l_E.ChildNodes.Get(j));
+           AliasItems[l_Alias].Items[k].Assign(l_SubItem);
           finally
-           FreeAndNil(l_Strings);
+           FreeAndNil(l_SubItem);
           end;
-        finally
-         l_E:= nil;
-        end;
-       end;
-      ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
-      ptChoice,    // TComboBox
-      ptAction:;    // TButton
-      ptList:
-       begin
-        Item.SaveToXML(l_Item.AddChild('Properties'));
-        for j := 0 to Count-1 do
-         Items[j].SaveToXML(l_Value.AddChild('Item'));
-       end; // ptList
-      ptProperties: ; // TScrollBox (Вложенные свойства)
-     end; // case
-    *)
+         end; // Item
+       end; // for j
+      end; // ptList
+    end; // Property
   end; // for i
 end;
 
