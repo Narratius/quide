@@ -22,6 +22,7 @@ type
     procedure MakeChoiceControl(aProperty: TProperty); virtual;
     procedure MakeCustomControl(aControlClass: TControlClass);
     procedure MakeIntegerControl(aProperty: TProperty); virtual;
+    procedure MakeListControl(aProperty: TProperty); virtual;
     procedure MakePropertiesControl(aProperty: TProperty); virtual;
     procedure MakeStringControl(aProperty: TProperty); virtual;
     procedure MakeTextControl(aProperty: TProperty); virtual;
@@ -30,6 +31,7 @@ type
     procedure SetBooleanValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure SetChoiceValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure SetIntegerValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure SetListValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure SetPropertiesValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure SetStringValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure SetTextValue(aProperty: TProperty; aControl: TControl); virtual;
@@ -38,6 +40,7 @@ type
     procedure GetBooleanValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure GetChoiceValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure GetIntegerValue(aProperty: TProperty; aControl: TControl); virtual;
+    procedure GetListValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure GetPropertiesValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure GetStringValue(aProperty: TProperty; aControl: TControl); virtual;
     procedure GetTextValue(aProperty: TProperty; aControl: TControl); virtual;
@@ -56,7 +59,8 @@ type
 
 implementation
 
-uses SizeableTypes;
+uses
+ SizeableTypes, PropertiesListControl;
 
 {
 ******************************* TPropertiesPanel *******************************
@@ -124,6 +128,12 @@ begin
  aRec:= f_Controls[Length(f_Controls)-1];
 end;
 
+procedure TPropertiesPanel.GetListValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+
+end;
+
 function TPropertiesPanel.GetOneValue(aProperty: TProperty): Boolean;
 var
  l_C: TControl;
@@ -137,6 +147,7 @@ begin
       ptBoolean: GetBooleanValue(aProperty, l_C);
       ptChoice: GetChoiceValue(aProperty, l_C);
       ptAction: GetActionValue(aProperty, l_C);
+      ptList: GetListValue(aProperty, l_C);
       ptProperties: GetPropertiesValue(aProperty, l_C);
     end;
  Result:= True;
@@ -218,6 +229,14 @@ begin
  MakeCustomControl(TEdit);
 end;
 
+procedure TPropertiesPanel.MakeListControl(aProperty: TProperty);
+begin
+ { TGroupBox, в который встроены TListBox и три TButton  }
+  MakeCustomControl(TPropertiesListControl);
+  with f_Controls[Length(f_Controls)-1] do
+    Caption:= aProperty.Caption;
+end;
+
 procedure TPropertiesPanel.MakePropertiesControl(aProperty: TProperty);
 begin
  MakeCustomControl(TLabel);
@@ -241,6 +260,7 @@ begin
     ptBoolean: MakeBooleanControl(aProperty);
     ptChoice: MakeChoiceControl(aProperty);
     ptAction: MakeActionControl(aProperty);
+    ptList: MakeListControl(aProperty);
     ptProperties: MakePropertiesControl(aProperty);
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
@@ -297,6 +317,12 @@ begin
  // Пока Строка ввода
  if aControl is TEdit then
   TEdit(aControl).Text:= aProperty.Value;
+end;
+
+procedure TPropertiesPanel.SetListValue(aProperty: TProperty;
+  aControl: TControl);
+begin
+
 end;
 
 function TPropertiesPanel.SetOneValue(aProperty: TProperty): Boolean;
