@@ -322,7 +322,8 @@ end;
 procedure TPropertiesPanel.SetListValue(aProperty: TProperty;
   aControl: TControl);
 begin
-
+ if aControl is TPropertiesListControl then
+  TPropertiesListControl(aControl).Value:= aProperty;
 end;
 
 function TPropertiesPanel.SetOneValue(aProperty: TProperty): Boolean;
