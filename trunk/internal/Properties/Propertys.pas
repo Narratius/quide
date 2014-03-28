@@ -36,8 +36,13 @@ type
     function pm_GetItems(Index: Integer): TProperties;
     procedure pm_SetItem(const Value: TProperties);
   public
+    constructor Create(const aAlias, aCaption: String; aType: TPropertyType;
+        aVisible: Boolean = True; aEvent: TNotifyEvent = nil); reintroduce;
+    constructor MakeClone(aSource: TProperty);
     destructor Destroy; override;
-    function AddItem: Integer;
+    function AddItem: Integer; overload;
+    function AddItem(aItem: TProperties): Integer; overload;
+    procedure DeleteItem(Index: Integer);
     procedure Assign(Source: TPersistent); override;
     procedure SetItem(aItem: TPropertyLink);
     property Alias: string read f_Alias write f_Alias;
@@ -87,7 +92,8 @@ type
     procedure LoadHeader(Element: IXMLNode);
   public
     constructor Create;
-    function Add: TProperty; overload;
+    function Add(const aAlias, aCaption: String; aType: TPropertyType;
+        aVisible: Boolean = True; aEvent: TNotifyEvent = nil): TProperty; overload;
     function Add(aProp: TProperty): TProperty; overload;
     procedure Assign(Source: TProperties);
     function Clone: Pointer;
@@ -166,6 +172,16 @@ begin
  end;
 end;
 
+function TProperty.AddItem(aItem: TProperties): Integer;
+begin
+ Result:= f_SubItems.Add(aItem);
+end;
+
+procedure TProperty.DeleteItem(Index: Integer);
+begin
+ f_SubItems.Delete(Index);
+end;
+
 procedure TProperty.Assign(Source: TPersistent);
 begin
   if Source is TProperty then
@@ -174,10 +190,35 @@ begin
    f_Caption:= TProperty(Source).Caption;
    f_PropertyType:= TProperty(Source).PropertyType;
    f_Value:= TProperty(Source).Value;
+   f_Visible:= TProperty(Source).Visible;
+   f_ID:= TProperty(Source).ID; // ?
+   if PropertyType = ptList then
+   begin
+    Item:= TProperty(Source).Item;
+    // SubItems
+   end;
   end
   else
    inherited;
 end;
+
+constructor TProperty.Create;
+begin
+  inherited Create;
+  Alias:= aAlias;
+  Caption:= aCaption;
+  PropertyType:= aType;
+  Visible:= aVisible;
+  Event:= aEvent;
+end;
+
+
+constructor TProperty.MakeClone(aSource: TProperty);
+begin
+ Create(aSource.Alias, aSource.Caption, aSource.PropertyType, aSource.Visible, aSource.Event);
+ Assign(aSource);
+end;
+
 
 {
 ********************************* TProperties **********************************
@@ -187,9 +228,10 @@ begin
  F_Items := TObjectList.Create(True);
 end;
 
-function TProperties.Add: TProperty;
+function TProperties.Add(const aAlias, aCaption: String; aType: TPropertyType;
+        aVisible: Boolean = True; aEvent: TNotifyEvent = nil): TProperty;
 begin
- Result := TProperty.Create;
+ Result := TProperty.Create(aAlias, aCaption, aType, aVisible, aEvent);
  Result.ID:= f_Items.Add(Result) + propBase;
 end;
 
@@ -201,11 +243,15 @@ end;
 procedure TProperties.Assign(Source: TProperties);
 var
   I: Integer;
+  l_Prop: TProperty;
 begin
   f_Items.Clear; //
 
   for I := 0 to TProperties(Source).Count - 1 do
-   Add.Assign(TProperties(Source).Items[I]);
+  begin
+   l_Prop:= TProperty.MakeClone(TProperties(Source).Items[I]);
+   Add(l_Prop);
+  end;
 end;
 
 function TProperties.Clone;
@@ -220,12 +266,7 @@ var
  l_P: TProperty;
 begin
  // Проверить валидность Alias - не должна начинаться с цифры
- l_P:= Add;
- l_P.Alias:= aAlias;
- l_P.Caption:= aCaption;
- l_P.PropertyType:= aType;
- l_P.Visible:= aVisible;
- l_P.Event:= aEvent;
+ l_P:= Add(aAlias, aCaption, aType, aVisible, aEvent);
 end;
 
 procedure TProperties.DefineList(const aAlias, aCaption: String; aVisible: Boolean;

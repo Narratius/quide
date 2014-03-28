@@ -60,6 +60,7 @@ type
 implementation
 
 uses
+ Variants,
  SizeableTypes, PropertiesListControl;
 
 {
@@ -316,14 +317,14 @@ procedure TPropertiesPanel.SetIntegerValue(aProperty: TProperty; aControl: TCont
 begin
  // Пока Строка ввода
  if aControl is TEdit then
-  TEdit(aControl).Text:= aProperty.Value;
+  TEdit(aControl).Text:= VarToStr(aProperty.Value);
 end;
 
 procedure TPropertiesPanel.SetListValue(aProperty: TProperty;
   aControl: TControl);
 begin
  if aControl is TPropertiesListControl then
-  TPropertiesListControl(aControl).Value:= aProperty;
+  TPropertiesListControl(aControl).Prop:= aProperty;
 end;
 
 function TPropertiesPanel.SetOneValue(aProperty: TProperty): Boolean;
@@ -339,6 +340,7 @@ begin
       ptBoolean: SetBooleanValue(aProperty, l_C);
       ptChoice: SetChoiceValue(aProperty, l_C);
       ptAction: SetActionValue(aProperty, l_C);
+      ptList: SetListValue(aProperty, l_C);
       ptProperties: SetPropertiesValue(aProperty, l_C);
     end;
  Result:= True;
@@ -353,14 +355,14 @@ procedure TPropertiesPanel.SetStringValue(aProperty: TProperty; aControl: TContr
 begin
  // Строка ввода
  if aControl is TEdit then
-  TEdit(aControl).Text:= aProperty.Value;
+  TEdit(aControl).Text:= VarToStr(aProperty.Value);
 end;
 
 procedure TPropertiesPanel.SetTextValue(aProperty: TProperty; aControl: TControl);
 begin
  // Мемо
  if aControl is TMemo then
-  TMemo(aControl).Text:= aProperty.Value;
+  TMemo(aControl).Text:= VarToStr(aProperty.Value);
 end;
 
 procedure TPropertiesPanel.SetValues;

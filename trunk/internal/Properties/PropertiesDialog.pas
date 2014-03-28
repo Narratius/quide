@@ -56,6 +56,7 @@ end;
 
 function TPropDialog.GetProperties: TProperties;
 begin
+ f_WorkPanel.GetValues;
  Result:= f_WorkPanel.Properties;
 end;
 
