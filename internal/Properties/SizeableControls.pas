@@ -106,6 +106,10 @@ begin
     end;
    cpInline:
     begin
+     { TODO -oДД -cУлучшение на будущее : Тут может быть больше одного элемента }
+     aControl.Top:= TControl(aControls[aControls.Count-1]).Top;
+     aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
+     aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
     end;
   end;
  end
@@ -115,7 +119,7 @@ begin
   aControl.Left:= cIndent;
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
- if (aSize = csAutoSize) then
+ if (aSize = csAutoSize) and (aPosition = cpNewLine) then
  begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
   aControl.Anchors:= aControl.Anchors + [akRight];

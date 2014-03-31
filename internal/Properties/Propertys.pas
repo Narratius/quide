@@ -134,6 +134,8 @@ function String2PropertyType(const aText: String): TPropertyType;
 
 implementation
 
+Uses
+ Variants;
 
 const
  PropertyTypeNames: Array[TPropertyType] of String = (
@@ -308,8 +310,11 @@ end;
 
 procedure TProperties.LoadFromXML(Element: IXMLNode);
 begin
- LoadHeader(Element);
- LoadValues(Element);
+ if Element <> nil then
+ begin
+   LoadHeader(Element);
+   LoadValues(Element);
+ end;
 end;
 
 
@@ -377,7 +382,12 @@ begin
           end;
          end; // Item
        end; // for j
-      end; // ptList
+      end // ptList
+      else
+      if l_Type = ptChoice then
+      begin
+       Define(l_Alias, l_Caption, l_Type, l_Visible);
+      end;
     end; // Property
   end; // for i
 end;
@@ -455,15 +465,15 @@ begin
     l_Item.AddChild('Type').Text:= PropertyType2String(PropertyType);
     l_Value:= l_Item.AddChild('Value');
      case PropertyType of
-      ptString: l_Value.Text:= Value;    // TEdit
-      ptInteger: l_Value.Text:= Value;   // TEdit
+      ptString: l_Value.Text:= VarToStr(Value);    // TEdit
+      ptInteger: l_Value.Text:= VarToStr(Value);   // TEdit
       ptText :  // TMemo
        begin
         l_E:= l_Value.AddChild('Texts');
         try
           l_Strings:= TStringList.Create;
           try
-           l_Strings.Text:= Value;
+           l_Strings.Text:= VarToStr(Value);
            l_E.SetAttribute('TextCount', l_Strings.Count);
            for j:= 0 to Pred(l_Strings.Count) do
             l_E.AddChild('Text').Text:= l_Strings[j];
@@ -475,7 +485,10 @@ begin
         end;
        end;
       ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
-      ptChoice,    // TComboBox
+      ptChoice: // TComboBox
+       begin
+
+       end;
       ptAction:;    // TButton
       ptList:
        begin

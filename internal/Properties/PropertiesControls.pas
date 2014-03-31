@@ -9,11 +9,14 @@ type
   TPropertiesPanel = class(TControlPanel)
   private
     f_Properties: TProperties;
+    FLabelTop: Boolean;
     function MakePropertyControl(aProperty: TProperty): Boolean;
     procedure pm_SetProperties(const Value: TProperties);
+    procedure SetLabelTop(const Value: Boolean);
   protected
     f_Controls: TControlsArray;
     procedure AddDefControl;
+    procedure AdjustControls;
     function FillControls: TControlsArray; virtual;
     procedure GetLastControl(var aRec: TControlRec);
     // Создание контролов
@@ -50,11 +53,13 @@ type
     function GetOneValue(aProperty: TProperty): Boolean;
     function ControlByTag(aTag: Integer): TControl;
   public
+    constructor Create(aOwner: TComponent); override;
     procedure CorrectControl(aControlRec: TControlRec); virtual;
     procedure GetValues;
     procedure MakeControls;
     procedure SetValues;
     property Properties: TProperties read f_Properties write pm_SetProperties;
+    property LabelTop: Boolean read FLabelTop write SetLabelTop;
   end;
 
 implementation
@@ -72,6 +77,14 @@ begin
  f_Controls[Length(f_Controls)-1]:= cDefControlRec;
 end;
 
+procedure TPropertiesPanel.AdjustControls;
+var
+ i: Integer;
+begin
+ for I := 0 to Pred(ControlCount) do
+
+end;
+
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
 var
  i: Integer;
@@ -87,6 +100,12 @@ end;
 
 procedure TPropertiesPanel.CorrectControl(aControlRec: TControlRec);
 begin
+end;
+
+constructor TPropertiesPanel.Create(aOwner: TComponent);
+begin
+  inherited;
+  fLabelTop:= False;
 end;
 
 function TPropertiesPanel.FillControls: TControlsArray;
@@ -205,6 +224,9 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TComboBox);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   Position:= cpInline;
  // нужно заполнить список элементов
 end;
 
@@ -228,6 +250,9 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TEdit);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   Position:= cpInline;
 end;
 
 procedure TPropertiesPanel.MakeListControl(aProperty: TProperty);
@@ -278,6 +303,9 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TEdit);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   Position:= cpInline;
 end;
 
 procedure TPropertiesPanel.MakeTextControl(aProperty: TProperty);
@@ -292,6 +320,7 @@ procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
  MakeControls;
+ AdjustControls;
 end;
 
 procedure TPropertiesPanel.SetActionValue(aProperty: TProperty; aControl: TControl);
@@ -318,6 +347,11 @@ begin
  // Пока Строка ввода
  if aControl is TEdit then
   TEdit(aControl).Text:= VarToStr(aProperty.Value);
+end;
+
+procedure TPropertiesPanel.SetLabelTop(const Value: Boolean);
+begin
+  FLabelTop := Value;
 end;
 
 procedure TPropertiesPanel.SetListValue(aProperty: TProperty;

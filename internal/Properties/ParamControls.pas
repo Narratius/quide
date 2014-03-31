@@ -19,6 +19,8 @@ type
   TControlsArray = array of TControlRec;
 
   TControlPanel = class(TSizeablePanel)
+  private
+    f_LeftIndent: Integer;
   protected
     procedure ClearControls;
     procedure TuneupControl(aControl: TControl); virtual;
@@ -32,7 +34,7 @@ const
 implementation
 
 uses
- SysUtils, StdCtrls;
+ SysUtils, StdCtrls, Math;
 
 {
 ******************************** TControlPanel *********************************
@@ -40,6 +42,7 @@ uses
 procedure TControlPanel.ClearControls;
 begin
  // Удалить все контролы
+ f_LeftIndent:= -1;
 end;
 
 procedure TControlPanel.CreateControls(aControls: TControlsArray);
@@ -57,7 +60,7 @@ begin
 
    if (aControls[i].Size = csFixed) and (aControls[i].Height > 0) then
     l_C.Height:= aControls[i].Height;
-   AddControl(l_C, aControls[i].Size, aControls[i].Position);
+   //AddControl(l_C, aControls[i].Size, aControls[i].Position);
    if l_C is TLabel then
     TLabel(l_C).Caption:= aControls[i].Caption
    else
@@ -82,6 +85,9 @@ begin
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);
    end;
+   AddControl(l_C, aControls[i].Size, aControls[i].Position);
+   f_LeftIndent:= Max(f_LeftIndent, l_C.Left);
+   // Тут можно запомнить Макс. левую позицию контрола
    TuneupControl(l_C)
   end; // for i
  finally
