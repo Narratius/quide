@@ -80,9 +80,19 @@ end;
 procedure TPropertiesPanel.AdjustControls;
 var
  i: Integer;
+ l_Ctrl: TControl;
 begin
  for I := 0 to Pred(ControlCount) do
-
+  if (f_Controls[i].Position = cpInline) then
+  begin
+   l_Ctrl:= ControlByTag(f_Controls[i].Tag);
+   //Сдвигать только тех, у кого Inline
+   if (l_Ctrl.Left <> LeftIndent) then
+   begin
+    l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
+    l_Ctrl.Left:= LeftIndent;
+   end;
+  end;
 end;
 
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;

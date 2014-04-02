@@ -94,6 +94,7 @@ procedure AddInnerControl(aParent: TWinControl; aControls: TList; aMyControlResi
     aControl: TControl; aSize: TControlSize; aPosition: TControlPosition);
 var
   l_IC: ISizeableControl;
+  l_Delta: Integer;
 begin
  if aControls.Count > 0 then
  begin
@@ -110,6 +111,11 @@ begin
      aControl.Top:= TControl(aControls[aControls.Count-1]).Top;
      aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
      aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
+     l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
+     if l_Delta > 0 then
+     begin
+      aParent.Height:= aParent.Height + l_Delta + cIndent;
+     end;
     end;
   end;
  end
