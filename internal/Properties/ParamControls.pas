@@ -82,7 +82,10 @@ begin
      TComboBox(l_C).Style:= csDropDownList
     else
     if l_C is TMemo then
-     TMemo(l_C).Text:= '';
+     TMemo(l_C).Text:= ''
+    else
+    if l_C is TCheckBox then
+     TCheckBox(l_C).Caption:= aControls[i].Caption;
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);
    end;

@@ -125,7 +125,8 @@ const
  propBase = 100;
  propOrdinals : Set of TPropertyType = [ptString,    // TEdit
                   ptInteger,   // TEdit
-                  ptText,      // TMemo
+                  //ptText,      // TMemo
+                  ptAction, // Tbutton
                   ptBoolean];   // TRadioGroup (TCombobox)
 
 function PropertyType2String(aType: TPropertyType): String;
@@ -351,6 +352,26 @@ begin
       begin
        Define(l_Alias, l_Caption, l_Type, l_Visible);
        Values[l_Alias]:= l_Item.ChildValues['Value'];
+      end
+      else
+      if l_Type = ptText then
+      begin
+        Define(l_Alias, l_Caption, l_Type, l_Visible);
+        l_E:= l_Item.ChildNodes.FindNode('Texts');
+        if l_E <> nil then
+        try
+          l_Strings:= TStringList.Create;
+          try
+           for j:= 0 to Pred(l_E.ChildNodes.Count) do
+            if AnsiSameText(l_E.ChildNodes.Nodes[j].NodeName, 'Text') then
+            l_Strings.Add(l_E.ChildValues[j]);
+           Values[l_Alias]:= l_Strings.Text;
+          finally
+           FreeAndNil(l_Strings);
+          end;
+        finally
+         l_E:= nil;
+        end;
       end
       else
       if l_Type = ptList then
