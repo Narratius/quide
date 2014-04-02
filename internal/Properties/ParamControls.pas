@@ -26,6 +26,7 @@ type
     procedure TuneupControl(aControl: TControl); virtual;
   public
     procedure CreateControls(aControls: TControlsArray);
+    property LeftIndent: Integer read f_LeftIndent;
   end;
 
 const
