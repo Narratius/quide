@@ -341,7 +341,7 @@ end;
 procedure TPropertiesPanel.SetBooleanValue(aProperty: TProperty; aControl: TControl);
 begin
  // Чекбокс
- if aControl is TCheckbox then
+ if (aControl is TCheckbox) and (aProperty.Value <> Null) then
   TCheckBox(aControl).Checked:= aProperty.Value;
 end;
 
