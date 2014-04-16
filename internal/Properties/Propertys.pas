@@ -121,6 +121,10 @@ type
     property Values[Index: Integer; Alias: String]: Variant read GetValues write SetValues;
   end;
 
+  TComboBoxProperty = class helper for TProperty
+   procedure AddChoice(const aText: String);
+  end;
+
 const
  propBase = 100;
  propOrdinals : Set of TPropertyType = [ptString,    // TEdit
@@ -351,7 +355,11 @@ begin
       if l_Type in propOrdinals then
       begin
        Define(l_Alias, l_Caption, l_Type, l_Visible);
+       try
        Values[l_Alias]:= l_Item.ChildValues['Value'];
+       except
+       Values[l_Alias]:= l_Item.ChildValues['Value'];
+       end;
       end
       else
       if l_Type = ptText then
@@ -629,6 +637,16 @@ begin
    |      `--------------- TProperties
    `---------------------- TProperty
  *)
+end;
+
+{ TComboBoxProperty }
+
+procedure TComboBoxProperty.AddChoice(const aText: String);
+begin
+ if Self.PropertyType = ptChoice then
+ begin
+   //
+ end;
 end;
 
 end.
