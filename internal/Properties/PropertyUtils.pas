@@ -5,7 +5,7 @@ interface
 Uses
  Propertys;
 
-function NewProperty(const aAlias, aCaption: String; aPropertyType: TPropertyType; aNext: TPropertyLink = nil): TPropertyLink;
+function NewProperty(const aAlias, aCaption: String; aPropertyType: TddPropertyType; aNext: TddPropertyLink = nil): TddPropertyLink;
 
 function ShowPropDialog(const aCaption: String; aProperties: TProperties): Boolean;
 
@@ -15,12 +15,12 @@ Uses
  Forms, UITypes,
  PropertiesDialog;
 
-function NewProperty(const aAlias, aCaption: String; aPropertyType: TPropertyType; aNext: TPropertyLink = nil): TPropertyLink;
+function NewProperty(const aAlias, aCaption: String; aPropertyType: TddPropertyType; aNext: TddPropertyLink = nil): TddPropertyLink;
 var
- l_I: TProperty;
+ l_I: TddProperty;
 begin
- l_I:= TProperty.Create(aAlias, aCaption, aPropertyType);
- Result:= TPropertyLink.Create(l_I, aNext);
+ l_I:= TddProperty.Create(aAlias, aCaption, aPropertyType);
+ Result:= TddPropertyLink.Create(l_I, aNext);
 end;
 
 function ShowPropDialog(const aCaption: String; aProperties: TProperties): Boolean;
