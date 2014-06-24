@@ -28,8 +28,8 @@ type
     f_Value: Variant;
     f_Visible: Boolean;
     f_ID: Integer;
-    f_Item: TProperties;
-    f_SubItems: TObjectList;
+    f_ListItem: TProperties;      // Эталонный элемент списка
+    f_ListItems: TObjectList;  // Элементы списка
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
@@ -54,9 +54,9 @@ type
     property Value: Variant read f_Value write f_Value;
     property Visible: Boolean read f_Visible write f_Visible;
     property Event: TNotifyEvent read f_Event write f_Event;
-    property Item: TProperties read f_Item write pm_SetItem;
-    property Items[Index: Integer]: TProperties read pm_GetItems;
-    property ItemsCount: Integer read pm_GetItemsCount;
+    property ListItem: TProperties read f_ListItem write pm_SetItem;
+    property ListItems[Index: Integer]: TProperties read pm_GetItems;
+    property ListItemsCount: Integer read pm_GetItemsCount;
   end;
 
 
@@ -174,24 +174,24 @@ end;
 }
 function TddProperty.AddItem: Integer;
 var
- l_SubItem: TProperties;
+ l_ListItem: TProperties;
 begin
  Result:= -1;
  if PropertyType = ptList then
  begin
-   l_SubItem:= f_Item.Clone;
-   Result:= f_SubItems.Add(l_SubItem);
+   l_ListItem:= f_ListItem.Clone;
+   Result:= f_ListItems.Add(l_ListItem);
  end;
 end;
 
 function TddProperty.AddItem(aItem: TProperties): Integer;
 begin
- Result:= f_SubItems.Add(aItem);
+ Result:= f_ListItems.Add(aItem);
 end;
 
 procedure TddProperty.DeleteItem(Index: Integer);
 begin
- f_SubItems.Delete(Index);
+ f_ListItems.Delete(Index);
 end;
 
 procedure TddProperty.Assign(Source: TPersistent);
@@ -206,7 +206,7 @@ begin
    f_ID:= TddProperty(Source).ID; // ?
    if PropertyType = ptList then
    begin
-    Item:= TddProperty(Source).Item;
+    ListItem:= TddProperty(Source).ListItem;
     // SubItems
    end;
   end
@@ -395,7 +395,7 @@ begin
        l_SubItem:= TProperties.Create;
        try
         l_SubItem.LoadFromXML(l_E);
-        AliasItems[l_Alias].Item:= l_SubItem;
+        AliasItems[l_Alias].ListItem:= l_SubItem;
        finally
         FreeAndNil(l_SubItem);
        end;
@@ -410,7 +410,7 @@ begin
           l_SubItem:= TProperties.Create; // потом вынести за скобки
           try
            l_SubItem.LoadFromXML(l_E.ChildNodes.Get(j));
-           AliasItems[l_Alias].Items[k].Assign(l_SubItem);
+           AliasItems[l_Alias].ListItems[k].Assign(l_SubItem);
           finally
            FreeAndNil(l_SubItem);
           end;
@@ -526,10 +526,11 @@ begin
       ptAction:;    // TButton
       ptList:
        begin
-        Item.SaveToXML(l_Item.AddChild('Properties'));
-        Тут какая-то фигня с Count
-        for j := 0 to Items[i].Count-1 do
-         Items[j].SaveToXML(l_Value.AddChild('Item'));
+        // Записываем описание эталонного элемента
+        ListItem.SaveToXML(l_Item.AddChild('Properties'));
+        // Теперь скидываем все элементы списка
+        for j := 0 to ListItemsCount-1 do
+         ListItems[j].SaveToXML(l_Value.AddChild('Item'));
        end; // ptList
       ptProperties: ; // TScrollBox (Вложенные свойства)
      end; // case
@@ -557,8 +558,8 @@ end;
 
 destructor TddProperty.Destroy;
 begin
- FreeAndNil(f_SubItems);
- FreeAndNil(f_Item);
+ FreeAndNil(f_ListItems);
+ FreeAndNil(f_ListItem);
  inherited;
 end;
 
@@ -567,16 +568,16 @@ begin
  Result:= nil;
  if PropertyType = ptList then
  try
-  Result:= TProperties(f_SubItems[index])
+  Result:= TProperties(f_ListItems[index])
  except
-  Result:= TProperties(f_SubItems[index])
+  Result:= TProperties(f_ListItems[index])
  end;
 end;
 
 function TddProperty.pm_GetItemsCount: Integer;
 begin
  if PropertyType = ptList then
-  Result:= f_SubItems.Count
+  Result:= f_ListItems.Count
  else
   Result:= -1;
 end;
@@ -590,9 +591,9 @@ procedure TddProperty.pm_SetItem(const Value: TProperties);
 begin
  if (PropertyType = ptList) then
  begin
-  if f_Item = nil then
-   f_Item:= TProperties.Create;
-  f_Item.Assign(Value);
+  if f_ListItem = nil then
+   f_ListItem:= TProperties.Create;
+  f_ListItem.Assign(Value);
  end
  else
   raise Exception.Create('Свойство не ptList'); // Добавить ошибку
@@ -602,7 +603,7 @@ procedure TddProperty.pm_SetPropertyType(const Value: TddPropertyType);
 begin
   f_PropertyType := Value;
   if Value = ptList then
-   f_SubItems:= TObjectList.Create(True);
+   f_ListItems:= TObjectList.Create(True);
 end;
 
 procedure TddProperty.SetItem(aItem: TddPropertyLink);
@@ -610,12 +611,12 @@ var
  l_Item: TddPropertyLink;
  l_Next: TddPropertyLink;
 begin
- FreeAndNil(f_Item);
- f_Item:= TProperties.Create;
+ FreeAndNil(f_ListItem);
+ f_ListItem:= TProperties.Create;
  l_Next:= aItem;
  while l_Next <> nil do
  begin
-   f_Item.Add(l_Next.Item);
+   f_ListItem.Add(l_Next.Item);
    l_Item:= l_Next;
    l_Next:= l_Item.Next;
    FreeAndNil(l_Item);
@@ -664,12 +665,12 @@ end;
 
 procedure TComboBoxProperty.CheckList;
 begin
- if f_SubItems = nil then
+ if f_ListItems = nil then
  begin
-   f_SubItems.Create;
-   f_Item:= TProperties.Create;
-   f_Item.Define('Caption', 'Название', ptString);
- end; // f_SubItems
+   f_ListItems.Create;
+   f_ListItem:= TProperties.Create;
+   f_ListItem.Define('Caption', 'Название', ptString);
+ end; // f_ListItems
 end;
 
 end.
