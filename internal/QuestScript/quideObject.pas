@@ -9,7 +9,7 @@ uses
 
 type
   //1 Базовый объект
-  TquideObject = class(TPersistent, IquideStore)
+  TquideObject = class(TProperties)
   private
     f_Changed: Boolean;
     f_Properties: TProperties;
@@ -18,13 +18,10 @@ type
     procedure pm_SetCaption(const Value: string);
     procedure pm_SetHint(const Value: string);
   protected
-    procedure AddProperty(const aAlias, aCaption: String; aType: TPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
   public
     constructor Create; virtual;
     constructor Make(const aCaption, aHint: string);
     destructor Destroy; override;
-    procedure Assign(aSource: TPersistent);
     //1 Сбрасывает в начальное состояние
     procedure Clear; virtual;
     //1 Проверяет соответствует ли переданное название собственному
@@ -47,8 +44,8 @@ implementation
 constructor TquideObject.Create;
 begin
   f_Properties := TProperties.Create();
-  AddProperty('Caption', 'Название', ptString, nil);
-  AddProperty('Hint', 'Описание', ptString, nil);
+  Add('Caption', 'Название', ptString);
+  Add('Hint', 'Описание', ptString);
 end;
 
 constructor TquideObject.Make(const aCaption, aHint: string);
@@ -63,32 +60,13 @@ begin
  FreeAndNil(f_Properties);
 end;
 
-procedure TquideObject.AddProperty(const aAlias, aCaption: String; aType:
-    TPropertyType; aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
-var
- l_P: TProperty;
-begin
- l_P:= Add;
- l_P.Alias:= aAlias;
- l_P.Caption:= aCaption;
- l_P.PropertyType:= aType;
- l_P.Visible:= aVisible;
- l_P.Event:= aEvent;
-end;
 
-procedure TquideObject.Assign(aSource: TPersistent);
-begin
- if aSource is TquideObject then
- begin
-  f_Properties.Assign(aSource.f_Properies);
- end;
-end;
 
 procedure TquideObject.Clear;
 begin
  Caption:= '';
  Hint:= '';
- Cahnged:= False;
+ Changed:= False;
 end;
 
 function TquideObject.ItsMe(const aCaption: String): Boolean;
@@ -99,7 +77,8 @@ end;
 procedure TquideObject.Load(aStream: TStream);
 begin
  Clear;
- f_Properties.Load(aStream);
+ { TODO -oДимка : Чтение-запись не работает }
+ //Properties.Load(aStream);
  Changed:= False;
 end;
 
@@ -125,7 +104,8 @@ end;
 
 procedure TquideObject.Save(aStream: TStream);
 begin
- f_Properties.Save(aStream);
+ { TODO -oДимка : Чтение-запись не работает }
+ //f_Properties.Save(aStream);
  Changed:= False;
 end;
 

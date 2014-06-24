@@ -4,7 +4,7 @@ interface
 Uses
  quideObject;
 
-Types
+Type
  TquideGUILink = class(TquideObject)
 
  end;
