@@ -3,16 +3,17 @@ unit quideScenarios;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+  SysUtils, Windows, Generics.Collections,
+  quideObject, quideVariables, quideSteps;
 
 type
   TquideScenario = class(TquideObject)
   private
     //1 Список глав сценария
-    f_Chapters: TObjectList;
-    f_Inventory: TObjectList;
+    f_Chapters: TObjectList<TquideChapter>;
+    f_Inventory: TObjectList<TquideInventoryItem>;
     f_LocationsNames: TStrings;
-    f_Variables: TObjectList;
+    f_Variables: TObjectList<TquideVariable>;
     f_VariablesNames: TStrings;
     function pm_GetChapters(Index: Integer): TquideChapter;
     function pm_GetChaptersCount: Integer;
@@ -60,9 +61,9 @@ begin
   inherited Create;
   f_VariablesNames := TStringList.Create;
   f_LocationsNames := TStringList.Create;
-  f_Chapters := TObjectList.Create();
-  f_Variables := TObjectList.Create();
-  f_Inventory := TObjectList.Create();
+  f_Chapters := TObjectList<TquideChapter>.Create();
+  f_Variables := TObjectList<TquideVariable>.Create();
+  f_Inventory := TObjectList<TquideInventory>.Create();
   Changed:= False;
 end;
 

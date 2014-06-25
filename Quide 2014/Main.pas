@@ -18,7 +18,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   SimpleGraph {$IFDEF COMPILER7_UP}, XPMan {$ENDIF}, Dialogs, ExtDlgs,
   Menus, ActnList, ImgList, StdCtrls, ComCtrls, ToolWin, JPEG, Buttons,
-  System.Actions;
+  System.Actions, quideScenarios;
 
 type
   TMainForm = class(TForm)
@@ -118,43 +118,25 @@ type
     Help1: TMenuItem;
     About2: TMenuItem;
     FormatToolBar: TToolBar;
-    cbxFontName: TComboBox;
-    cbxFontSize: TComboBox;
-    btnBoldface: TToolButton;
-    btnItalic: TToolButton;
-    btnUnderline: TToolButton;
     FormatBold: TAction;
     FormatItalic: TAction;
     FormatUnderline: TAction;
     FormatAlignLeft: TAction;
     FormatCenter: TAction;
     FormatAlignRight: TAction;
-    ToolButton27: TToolButton;
-    ToolButton28: TToolButton;
-    ToolButton29: TToolButton;
     ExportMetafile: TAction;
     SavePictureDialog: TSavePictureDialog;
     ToolButton30: TToolButton;
-    ToolButton17: TToolButton;
-    ToolButton25: TToolButton;
     ViewZoomIn: TAction;
     ViewZoomOut: TAction;
     ToolButton32: TToolButton;
     FormatAlignTop: TAction;
     FormatVCenter: TAction;
     FormatAlignBottom: TAction;
-    ToolButton36: TToolButton;
-    ToolButton37: TToolButton;
-    ToolButton38: TToolButton;
-    ToolButton39: TToolButton;
     ToolButton40: TToolButton;
     ViewGrid: TAction;
     ToolButton42: TToolButton;
-    ToolButton44: TToolButton;
-    ToolButton45: TToolButton;
-    ToolButton46: TToolButton;
     ToolButton47: TToolButton;
-    ToolButton48: TToolButton;
     EditLockLinks: TAction;
     EditLockLinks1: TMenuItem;
     InsertTriangle2: TMenuItem;
@@ -228,11 +210,9 @@ type
     BackgroundLabel: TLabel;
     ViewTransparent: TAction;
     ransparent1: TMenuItem;
-    ToolButton26: TToolButton;
     EditSize: TAction;
     Size1: TMenuItem;
     Size2: TMenuItem;
-    ToolButton31: TToolButton;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -245,16 +225,8 @@ type
     procedure EditPasteExecute(Sender: TObject);
     procedure EditDeleteExecute(Sender: TObject);
     procedure EditSelectAllExecute(Sender: TObject);
-    procedure EditSendToBackExecute(Sender: TObject);
-    procedure EditBringToFrontExecute(Sender: TObject);
     procedure EditLockNodesExecute(Sender: TObject);
     procedure EditPropertiesExecute(Sender: TObject);
-    procedure FormatBoldExecute(Sender: TObject);
-    procedure FormatItalicExecute(Sender: TObject);
-    procedure FormatUnderlineExecute(Sender: TObject);
-    procedure FormatAlignLeftExecute(Sender: TObject);
-    procedure FormatCenterExecute(Sender: TObject);
-    procedure FormatAlignRightExecute(Sender: TObject);
     procedure HelpAboutExecute(Sender: TObject);
     procedure ObjectsNoneExecute(Sender: TObject);
     procedure ObjectsRoundRectExecute(Sender: TObject);
@@ -262,8 +234,6 @@ type
     procedure ViewZoomInExecute(Sender: TObject);
     procedure ViewZoomOutExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject;var CanClose: Boolean);
-    procedure cbxFontSizeChange(Sender: TObject);
-    procedure cbxFontNameChange(Sender: TObject);
     procedure SimpleGraphDblClick(Sender: TObject);
     procedure SimpleGraphNodeDblClick(Graph: TSimpleGraph;
       Node: TGraphNode);
@@ -275,9 +245,6 @@ type
       GraphObject: TGraphObject);
     procedure SimpleGraphObjectDblClick(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
-    procedure FormatAlignTopExecute(Sender: TObject);
-    procedure FormatVCenterExecute(Sender: TObject);
-    procedure FormatAlignBottomExecute(Sender: TObject);
     procedure ViewGridExecute(Sender: TObject);
     procedure SimpleGraphInfoTip(Graph: TSimpleGraph;
       GraphObject: TGraphObject; var InfoTip: String);
@@ -326,7 +293,6 @@ type
     procedure ClipboardBitmapExecute(Sender: TObject);
     procedure ClipboardMetafileExecute(Sender: TObject);
     procedure ViewFixScrollsExecute(Sender: TObject);
-    procedure EditAlignExecute(Sender: TObject);
     procedure ClipboardBitmapUpdate(Sender: TObject);
     procedure ClipboardMetafileUpdate(Sender: TObject);
     procedure ClipboardNativeUpdate(Sender: TObject);
@@ -362,13 +328,16 @@ type
     procedure ViewTransparentUpdate(Sender: TObject);
     procedure ViewTransparentExecute(Sender: TObject);
     procedure EditSizeUpdate(Sender: TObject);
-    procedure EditSizeExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
     function IsGraphSaved: Boolean;
     procedure ShowHint(Sender: TObject);
     function ForEachCallback(GraphObject: TGraphObject; Action: Integer): Boolean;
+    // Quide
+    procedure MakeScript;
+    procedure DestroyScript;
+    // Quide
   end;
 
 var
@@ -455,10 +424,6 @@ begin
       GraphObject.BringToFront;
     FEO_MAKESELECTABLE:
       GraphObject.Options := GraphObject.Options + [goSelectable];
-    FEO_SETFONTFACE:
-      GraphObject.Font.Name := cbxFontName.Text;
-    FEO_SETFONTSIZE:
-      GraphObject.Font.Size := cbxFontSize.Tag;
     FEO_SETFONTBOLD:
       GraphObject.Font.Style := GraphObject.Font.Style + [fsBold];
     FEO_SETFONTITALIC:
@@ -543,7 +508,6 @@ begin
   Application.OnHint := ShowHint;
   SimpleGraphCommandModeChange(nil);
   SimpleGraphZoomChange(nil);
-  cbxFontName.Items := Screen.Fonts;
   if ParamCount > 0 then
   begin
     SimpleGraph.LoadFromFile(ParamStr(1));
@@ -766,19 +730,9 @@ begin
   EditSendToBack.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
 end;
 
-procedure TMainForm.EditSendToBackExecute(Sender: TObject);
-begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SENDTOBACK, True);
-end;
-
 procedure TMainForm.EditBringToFrontUpdate(Sender: TObject);
 begin
   EditBringToFront.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
-end;
-
-procedure TMainForm.EditBringToFrontExecute(Sender: TObject);
-begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_BRINGTOFRONT, True);
 end;
 
 procedure TMainForm.EditAlignUpdate(Sender: TObject);
@@ -786,26 +740,9 @@ begin
   EditAlign.Enabled := (SimpleGraph.SelectedObjects.Count > 1);
 end;
 
-procedure TMainForm.EditAlignExecute(Sender: TObject);
-var
-  H: THAlignOption;
-  V: TVAlignOption;
-begin
-  if TAlignDialog.Execute(H, V) then
-    SimpleGraph.AlignSelection(H, V);
-end;
-
 procedure TMainForm.EditSizeUpdate(Sender: TObject);
 begin
   EditSize.Enabled := (SimpleGraph.SelectedObjects.Count > 1);
-end;
-
-procedure TMainForm.EditSizeExecute(Sender: TObject);
-var
-  Horz, Vert: TResizeOption;
-begin
-  if TSizeDialog.Execute(Horz, Vert) then
-    SimpleGraph.ResizeSelection(Horz, Vert);
 end;
 
 procedure TMainForm.EditLockNodesUpdate(Sender: TObject);
@@ -853,6 +790,11 @@ begin
   ClipboardNative.Checked := cfNative in SimpleGraph.ClipboardFormats;
 end;
 
+procedure TMainForm.DestroyScript;
+begin
+
+end;
+
 procedure TMainForm.ClipboardNativeExecute(Sender: TObject);
 begin
   if cfNative in SimpleGraph.ClipboardFormats then
@@ -887,69 +829,6 @@ begin
     SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats + [cfMetafile];
 end;
 
-procedure TMainForm.FormatBoldExecute(Sender: TObject);
-begin
-  FormatBold.Checked := not FormatBold.Checked;
-  if FormatBold.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTBOLD, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTBOLD, True);
-end;
-
-procedure TMainForm.FormatItalicExecute(Sender: TObject);
-begin
-  FormatItalic.Checked := not FormatItalic.Checked;
-  if FormatItalic.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTITALIC, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTITALIC, True);
-end;
-
-procedure TMainForm.FormatUnderlineExecute(Sender: TObject);
-begin
-  FormatUnderline.Checked := not FormatUnderline.Checked;
-  if FormatUnderline.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTUNDERLINE, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTUNDERLINE, True);
-end;
-
-procedure TMainForm.FormatAlignLeftExecute(Sender: TObject);
-begin
-  FormatAlignLeft.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTLEFT, True);
-end;
-
-procedure TMainForm.FormatCenterExecute(Sender: TObject);
-begin
-  FormatCenter.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTCENTER, True);
-end;
-
-procedure TMainForm.FormatAlignRightExecute(Sender: TObject);
-begin
-  FormatAlignRight.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTRIGHT, True);
-end;
-
-procedure TMainForm.FormatAlignTopExecute(Sender: TObject);
-begin
-  FormatAlignTop.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTTOP, True);
-end;
-
-procedure TMainForm.FormatVCenterExecute(Sender: TObject);
-begin
-  FormatVCenter.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTCENTER, True);
-end;
-
-procedure TMainForm.FormatAlignBottomExecute(Sender: TObject);
-begin
-  FormatAlignBottom.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTBOTTOM, True);
-end;
-
 procedure TMainForm.ObjectsNoneUpdate(Sender: TObject);
 begin
   ObjectsNone.Checked :=(SimpleGraph.CommandMode in [cmEdit, cmViewOnly]);
@@ -982,9 +861,10 @@ begin
  *)
  b.Create(10, 10, 110, 60);
  N1:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
- b.Create(10, 100, 110, 150);
- N2:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
- SimpleGraph.InsertLink(N1, N2);
+ // Линковка чуть позже
+ //b.Create(10, 100, 110, 150);
+ //N2:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
+ //SimpleGraph.InsertLink(N1, N2);
 end;
 
 procedure TMainForm.ObjectsLinkExecute(Sender: TObject);
@@ -1110,18 +990,6 @@ begin
     CanClose := False;
 end;
 
-procedure TMainForm.cbxFontSizeChange(Sender: TObject);
-begin
-  cbxFontSize.Tag := StrToIntDef(cbxFontSize.Text, cbxFontSize.Tag);
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTSIZE, True);
-end;
-
-procedure TMainForm.cbxFontNameChange(Sender: TObject);
-begin
-  cbxFontName.Text := cbxFontName.Items[cbxFontName.ItemIndex];
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTFACE, True);
-end;
-
 procedure TMainForm.LinkRemovePointExecute(Sender: TObject);
 begin
   with TGraphLink(SimpleGraph.SelectedObjects[0]) do
@@ -1142,6 +1010,11 @@ end;
 procedure TMainForm.LinkShrinkExecute(Sender: TObject);
 begin
   SimpleGraph.ForEachObject(ForEachCallback, FEO_SHRINK25, True);
+end;
+
+procedure TMainForm.MakeScript;
+begin
+
 end;
 
 procedure TMainForm.LinkRotateCWExecute(Sender: TObject);
@@ -1361,8 +1234,6 @@ var
 begin
   if (SimpleGraph.SelectedObjects.Count = 1) and (SimpleGraph.SelectedObjects[0] = GraphObject) then
   begin
-    cbxFontName.Text := GraphObject.Font.Name;
-    cbxFontSize.Text := IntToStr(GraphObject.Font.Size);
     FormatBold.Checked := (fsBold in GraphObject.Font.Style);
     FormatItalic.Checked := (fsItalic in GraphObject.Font.Style);
     FormatUnderline.Checked := (fsUnderline in GraphObject.Font.Style);
@@ -1407,9 +1278,6 @@ begin
     Include(FontStyle, fsUnderline);
   with GraphObject.Font do
   begin
-    if cbxFontName.Text <> '' then
-      Name := cbxFontName.Text;
-    Size := cbxFontSize.Tag;
     Style := FontStyle;
   end;
   if GraphObject is TGraphNode then
