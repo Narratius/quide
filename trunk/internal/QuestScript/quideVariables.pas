@@ -3,7 +3,7 @@ unit quideVariables;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+  quide;
 
 type
  TdcVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
