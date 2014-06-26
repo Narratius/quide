@@ -15,7 +15,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    function Add: TquideLocation;
+    function AddLocation: TquideLocation;
     procedure Delete(Index: Integer);
     //1 ¬озвращает локацию с указанным именем или nil  
     function IsValidLocation(const aCaption: String): TquideLocation;
@@ -46,7 +46,7 @@ begin
   inherited Destroy;
 end;
 
-function TquideChapter.Add: TquideLocation;
+function TquideChapter.AddLocation: TquideLocation;
 begin
  Result:= f_Locations.Add;
 end;

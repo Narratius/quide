@@ -28,7 +28,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     //1 Создает Главу и добавляет в список
-    function Add: TquideChapter;
+    function AddChapter: TquideChapter;
     function AddVariable(const aAlias, aHint: String; aVarType:
         TquideVariableType; aValue: string): TquideVariable;
     //1 Удаление указанной главы
@@ -78,12 +78,13 @@ begin
   inherited Destroy;
 end;
 
-function TquideScenario.Add: TquideChapter;
+function TquideScenario.AddChapter: TquideChapter;
 begin
   Result := TquideChapter.Create();
   f_Chapters.Add(Result);
   UpdateChapters;
   Changed:= False;
+
 end;
 
 function TquideScenario.AddVariable(const aAlias, aHint: String; aVarType:

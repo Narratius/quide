@@ -12,7 +12,6 @@ type
   TquideObject = class(TProperties)
   private
     f_Changed: Boolean;
-    f_Properties: TProperties;
     f_GraphID: DWord;
     function pm_GetCaption: string;
     function pm_GetHint: string;
@@ -45,7 +44,7 @@ implementation
 }
 constructor TquideObject.Create;
 begin
-  f_Properties := TProperties.Create();
+ inherited Create;
   Add('Caption', 'Название', ptString);
   Add('Hint', 'Описание', ptString);
 end;
@@ -59,7 +58,6 @@ end;
 
 destructor TquideObject.Destroy;
 begin
- FreeAndNil(f_Properties);
 end;
 
 
@@ -86,22 +84,22 @@ end;
 
 function TquideObject.pm_GetCaption: string;
 begin
- Result:= f_Properties.Values['Caption'];
+ Result:= Values['Caption'];
 end;
 
 function TquideObject.pm_GetHint: string;
 begin
- Result:= f_Properties.Values['Hint'];
+ Result:= Values['Hint'];
 end;
 
 procedure TquideObject.pm_SetCaption(const Value: string);
 begin
- f_Properties.Values['Caption']:= Value;
+ Values['Caption']:= Value;
 end;
 
 procedure TquideObject.pm_SetHint(const Value: string);
 begin
- f_Properties.Values['Hint']:= Value;
+ Values['Hint']:= Value;
 end;
 
 procedure TquideObject.Save(aStream: TStream);
