@@ -3,19 +3,10 @@ unit quideLocations;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+ Contnrs,
+ quideObject, quideActions;
 
 type
-  TquideLocations = class(TObjectList)
-  private
-    function pm_GetItems(Index: Integer): TquideLocation;
-    procedure pm_SetItems(Index: Integer; Value: TquideLocation);
-  public
-    function Add: TquideLocation;
-    property Items[Index: Integer]: TquideLocation read pm_GetItems write
-        pm_SetItems; default;
-  end;
-
   TquideLocation = class(TquideObject)
   private
     f_Actions: TObjectList;
@@ -29,6 +20,27 @@ type
     property ActionsCount: Integer read pm_GetActionsCount;
   end;
 
+  TquideLocations = class(TObjectList)
+  private
+    function pm_GetItems(Index: Integer): TquideLocation;
+    procedure pm_SetItems(Index: Integer; Value: TquideLocation);
+  public
+    function Add: TquideLocation;
+    property Items[Index: Integer]: TquideLocation read pm_GetItems write
+        pm_SetItems; default;
+  end;
+
+    //1 ѕереход в другую локацию пр€мо из текста
+  TquideJump = class(TquideAction)
+  private
+    f_Target: TquideLocation;
+  public
+    property Target: TquideLocation read f_Target write f_Target;
+  end;
+
+  //1  нопка дл€ перехода в другую локацию
+  TquideButton = class(TquideJump)
+  end;
 
 implementation
 

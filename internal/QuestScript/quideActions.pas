@@ -3,7 +3,8 @@ unit quideActions;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+  XMLIntf, Contnrs,
+  quideObject, quideVariables, quideLinks, quideConditions;
 
 type
  TquideActionType = (atNone, atGoto, atInventory, atLogic, atText, atVariable, atButton);
@@ -57,20 +58,13 @@ type
     property Condition: TquideCondition read f_Condition write f_Condition;
   end;
 
-  //1 Переход в другую локацию прямо из текста
-  TquideJump = class(TquideAction)
-  private
-    f_Target: TquideLocation;
-  public
-    property Target: TquideLocation read f_Target write f_Target;
-  end;
 
-  //1 Кнопка для перехода в другую локацию
-  TquideButton = class(TquideJump)
-  end;
 
 
 implementation
+
+Uses
+ Propertys;
 
 {
 ********************************* TquideAction *********************************
@@ -78,7 +72,7 @@ implementation
 constructor TquideAction.Create;
 begin
   inherited Create;
-  AddProperty('ActionType', 'Тип действия', ptInteger, 0);
+  Add('ActionType', 'Тип действия', ptInteger);
 end;
 
 destructor TquideAction.Destroy;
