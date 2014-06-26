@@ -3,10 +3,11 @@ unit quideLinks;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+ quideObject;
 
 type
-  //1 —сылка из текста
+  TquideLinkType = (linkText);
+  //1 —сылка из текста на другую локацию
   TquideLink = class(TquideObject)
   private
     f_LinkType: TquideLinkType;

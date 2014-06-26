@@ -3,7 +3,7 @@ unit quideSteps;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+ quideObject, quideLocations;
 
 type
   //1 Глава сценария

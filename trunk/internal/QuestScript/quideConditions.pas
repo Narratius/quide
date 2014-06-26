@@ -3,7 +3,7 @@ unit quideConditions;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+ quideObject;
 
 type
   TquideCondition = class(TquideObject)
