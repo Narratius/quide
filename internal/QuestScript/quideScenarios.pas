@@ -3,8 +3,8 @@ unit quideScenarios;
 interface
 
 uses
-  SysUtils, Windows, Generics.Collections,
-  quideObject, quideVariables, quideSteps;
+  SysUtils, Windows, Generics.Collections, Classes,
+  quideObject, quideVariables, quideSteps, quideInventory, quideLocations;
 
 type
   TquideScenario = class(TquideObject)
@@ -63,7 +63,7 @@ begin
   f_LocationsNames := TStringList.Create;
   f_Chapters := TObjectList<TquideChapter>.Create();
   f_Variables := TObjectList<TquideVariable>.Create();
-  f_Inventory := TObjectList<TquideInventory>.Create();
+  f_Inventory := TObjectList<TquideInventoryItem>.Create();
   Changed:= False;
 end;
 
@@ -93,7 +93,7 @@ begin
  Result.Caption:= aAlias;
  Result.Hint:= aHint;
  Result.VarType:= aVarType;
- Result.Value:= aValue;
+ //Result.Value:= aValue; пока нет класса со значением
  f_Variables.Add(Result);
 end;
 
@@ -111,6 +111,7 @@ var
   l_Loc: TquideLocation;
 begin
   Result:= nil;
+  (*
   for i:= 0 to Pred(StepsCount) do
   begin
    l_Loc:= Chapters[i].IsValidLocation(aCaption);
@@ -119,6 +120,7 @@ begin
     Result:= l_Loc;
     break;
    end;
+   *)
 end;
 
 function TquideScenario.IsValidVariable(const aCaption: String): TquideVariable;
@@ -161,7 +163,7 @@ end;
 
 function TquideScenario.pm_GetVariables(Index: Integer): TquideVariable;
 begin
- Result:= TquideVariable(f_Variables[i]);
+ Result:= TquideVariable(f_Variables[index]);
 end;
 
 function TquideScenario.pm_GetVariablesCount: Integer;
@@ -177,13 +179,13 @@ end;
 procedure TquideScenario.UpdateChapters;
 var
   l_Chapter: TquideChapter;
-  j: Integer;
+  i, j: Integer;
 begin
  f_LocationsNames.Clear;
  for i:= 0 to Pred(ChaptersCount) do
  begin
   l_Chapter:= Chapters[i];
-  for j:= 0 Pred(l_Chapter.LocationsCount) do
+  for j:= 0 to Pred(l_Chapter.LocationsCount) do
    f_LocationsNames.Add(l_Chapter[j].Caption);
  end;
 end;

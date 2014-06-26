@@ -129,6 +129,7 @@
             <Form>SizeDialog</Form>
         </DCCReference>
         <DCCReference Include="quideGUILink.pas"/>
+        <DCCReference Include="..\internal\QuestScript\quideInventory.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -188,7 +189,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
-                <Platform value="Android" ActiveMobileDevice="rsxe5_android">True</Platform>
+                <Platform value="Android">True</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

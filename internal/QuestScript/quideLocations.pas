@@ -44,6 +44,9 @@ type
 
 implementation
 
+Uses
+ SysUtils;
+
 {
 ******************************* TquideLocations ********************************
 }
@@ -76,7 +79,7 @@ end;
 
 function TquideLocation.pm_GetActions(Index: Integer): TquideAction;
 begin
- Result:= TquideAction(f_Actions[i])
+ Result:= TquideAction(f_Actions[index])
 end;
 
 function TquideLocation.pm_GetActionsCount: Integer;
