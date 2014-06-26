@@ -2,7 +2,9 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899.12.30 00:00:00.000.090,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.646,C:\quide_svn\Quide 2014\SGDemo.dproj=C:\quide_svn\Quide 2014\Quide2014.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.849,C:\svn\Quide\Quide 2014\quideGUILink.pas=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.849,C:\svn\Quide\Quide 2014\Unit1.pas=C:\svn\Quide\Quide 2014\quideGUILink.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.646,C:\quide_svn\Quide 2014\Quide2014.dproj=C:\quide_svn\Quide 2014\SGDemo.dproj</Transaction>
+    <Transaction>2014.06.26 13:52:36.755,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
+    <Transaction>2014.06.26 13:55:43.323,C:\svn\Quide\internal\QuestScript\quideInventory.pas=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>

@@ -17,7 +17,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure Clear; override;
-    class function Make(aElement: IXMLNode): TquideActionType;
+    class function Make(aElement: IXMLNode): TquideAction;
     //1 Тип действия - текст, кнопка, переход...
     property ActionType: TquideActionType read pm_GetActionType write
         pm_SetActionType;
@@ -64,6 +64,7 @@ type
 implementation
 
 Uses
+ SysUtils,
  Propertys;
 
 {
@@ -86,9 +87,10 @@ begin
   ActionType:= atNone;
 end;
 
-class function TquideAction.Make(aElement: IXMLNode): TquideActionType;
+class function TquideAction.Make(aElement: IXMLNode): TquideAction;
 begin
  Result:= nil;
+ (*
   case StringToActionType(aElement.Attributes['Type']) of
     atGoto: Result:= TquideJump.Create;
     atInventory: Result:= TdcInventoryAction.Create;
@@ -99,16 +101,17 @@ begin
   end;
   if Result <> nil then
    Result.Load(aElement);
+ *)
 end;
 
 function TquideAction.pm_GetActionType: TquideActionType;
 begin
- Result:= TquideActionType(f_Properties.Values['ActionType'])
+ Result:= TquideActionType(Values['ActionType'])
 end;
 
 procedure TquideAction.pm_SetActionType(Value: TquideActionType);
 begin
- f_Properties.Values['ActionType']:= IntToStr(Ord(Value));
+ Values['ActionType']:= IntToStr(Ord(Value));
 end;
 
 {
@@ -133,7 +136,7 @@ constructor TquideTextAction.Create;
 begin
   inherited Create;
   f_Links := TObjectList.Create();
-  AddProperty('Text', 'Текстовое поле', ptString, '');
+  Add('Text', 'Текстовое поле', ptString);
 end;
 
 destructor TquideTextAction.Destroy;
@@ -164,12 +167,12 @@ end;
 
 function TquideTextAction.pm_GetText: string;
 begin
- Result:= f_Properties.Values['Text'];
+ Result:= Values['Text'];
 end;
 
 procedure TquideTextAction.pm_SetText(const Value: string);
 begin
- f_Properties.Values['Text']:= Value;
+ Values['Text']:= Value;
 end;
 
 

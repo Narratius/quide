@@ -28,6 +28,9 @@ type
 
 implementation
 
+Uses
+  SysUtils;
+
 {
 ******************************** TquideChapter *********************************
 }
@@ -45,8 +48,7 @@ end;
 
 function TquideChapter.Add: TquideLocation;
 begin
- Result:= TquideLocation.Create;
- f_Locations.Add(Result);
+ Result:= f_Locations.Add;
 end;
 
 procedure TquideChapter.Delete(Index: Integer);
@@ -69,7 +71,7 @@ end;
 
 function TquideChapter.pm_GetLocations(Index: Integer): TquideLocation;
 begin
- Result:= TquideLocation(f_Locations[i]);
+ Result:= TquideLocation(f_Locations[index]);
 end;
 
 function TquideChapter.pm_GetLocationsCount: Integer;
