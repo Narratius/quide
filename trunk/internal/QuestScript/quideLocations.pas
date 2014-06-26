@@ -3,31 +3,22 @@ unit quideLocations;
 interface
 
 uses
- Contnrs,
+ Generics.Collections,
  quideObject, quideActions;
 
 type
   TquideLocation = class(TquideObject)
   private
-    f_Actions: TObjectList;
+    f_Actions: TObjectList<TquideAction>;
     function pm_GetActions(Index: Integer): TquideAction;
     function pm_GetActionsCount: Integer;
   public
     constructor Create; override;
     destructor Destroy; override;
+    function AddAction(aActType: TquideActionType): TquideAction;
     property Actions[Index: Integer]: TquideAction read pm_GetActions; default;
     //1 Количество действий на локации
     property ActionsCount: Integer read pm_GetActionsCount;
-  end;
-
-  TquideLocations = class(TObjectList)
-  private
-    function pm_GetItems(Index: Integer): TquideLocation;
-    procedure pm_SetItems(Index: Integer; Value: TquideLocation);
-  public
-    function Add: TquideLocation;
-    property Items[Index: Integer]: TquideLocation read pm_GetItems write
-        pm_SetItems; default;
   end;
 
     //1 Переход в другую локацию прямо из текста
@@ -47,28 +38,29 @@ implementation
 Uses
  SysUtils;
 
-{
-******************************* TquideLocations ********************************
-}
-function TquideLocations.Add: TquideLocation;
-begin
-end;
-
-function TquideLocations.pm_GetItems(Index: Integer): TquideLocation;
-begin
-end;
-
-procedure TquideLocations.pm_SetItems(Index: Integer; Value: TquideLocation);
-begin
-end;
 
 {
 ******************************** TquideLocation ********************************
 }
+function TquideLocation.AddAction(aActType: TquideActionType): TquideAction;
+begin
+ case aActType of
+   atNone: Result:= nil;
+   atGoto: Result:= TquideJump.Create;
+   atInventory: ;
+   atLogic: ;
+   atText: Result:= TquideTextAction.Create;
+   atVariable: ;
+   atButton: Result:= TquideButton.Create;
+ end;
+ if Result <> nil then
+   f_Actions.Add(Result);
+end;
+
 constructor TquideLocation.Create;
 begin
   inherited Create;
-  f_Actions := TObjectList.Create();
+  f_Actions := TObjectList<TquideAction>.Create();
 end;
 
 destructor TquideLocation.Destroy;

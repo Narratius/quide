@@ -328,9 +328,12 @@ type
     procedure ViewTransparentUpdate(Sender: TObject);
     procedure ViewTransparentExecute(Sender: TObject);
     procedure EditSizeUpdate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
+
+    f_Scenario: TquideScenario;
     function IsGraphSaved: Boolean;
     procedure ShowHint(Sender: TObject);
     function ForEachCallback(GraphObject: TGraphObject; Action: Integer): Boolean;
@@ -349,7 +352,8 @@ implementation
 
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
-  AboutDelphiArea, AlignDlg, SizeDlg;
+  AboutDelphiArea, AlignDlg, SizeDlg,
+  quideLocations;
 
 resourcestring
   SAppTitle      = 'Quest IDE 2014';
@@ -516,6 +520,13 @@ begin
   end
   else
    Caption:= Application.Title;
+
+ MakeScript;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+ DestroyScript;
 end;
 
 procedure TMainForm.FileNewExecute(Sender: TObject);
@@ -792,7 +803,7 @@ end;
 
 procedure TMainForm.DestroyScript;
 begin
-
+ FreeAndNil(f_Scenario);
 end;
 
 procedure TMainForm.ClipboardNativeExecute(Sender: TObject);
@@ -853,6 +864,7 @@ procedure TMainForm.ObjectsRoundRectExecute(Sender: TObject);
 var
  B: TRect;
  N1, N2: TGraphNode;
+ l_Loc: TquideLocation;
 begin
  // сначала вызываем окно редактирования локации, потом добавляем визуалку
  (*  Original
@@ -861,6 +873,10 @@ begin
  *)
  b.Create(10, 10, 110, 60);
  N1:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
+
+ l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
+ l_Loc.GraphID:= n1.ID;
+
  // Линковка чуть позже
  //b.Create(10, 100, 110, 150);
  //N2:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
@@ -1014,7 +1030,8 @@ end;
 
 procedure TMainForm.MakeScript;
 begin
-
+ f_Scenario:= TquideScenario.Create;
+ f_Scenario.AddChapter;
 end;
 
 procedure TMainForm.LinkRotateCWExecute(Sender: TObject);
