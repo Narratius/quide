@@ -90,6 +90,8 @@ type
     procedure LoadValues(Element: IXMLNode);
     procedure SaveHeader(Element: IXMLNode);
     procedure LoadHeader(Element: IXMLNode);
+    function pm_GetVisible(Alias: String): Boolean;
+    procedure pm_SetVisible(Alias: String; const Value: Boolean);
   public
     constructor Create;
     function Add(const aAlias, aCaption: String; aType: TddPropertyType;
@@ -109,6 +111,7 @@ type
     property Count: Integer read pm_GetCount;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
+    property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;
   end;
 
 type
@@ -446,6 +449,11 @@ begin
  Result := AliasItems[Alias].Value;
 end;
 
+function TProperties.pm_GetVisible(Alias: String): Boolean;
+begin
+ Result:= AliasItems[Alias].Visible;
+end;
+
 procedure TProperties.pm_SetAliasItems(Alias: String; aValue: TddProperty);
 var
   l_Prop: TddProperty;
@@ -464,6 +472,12 @@ end;
 procedure TProperties.pm_SetValues(Alias: String; const Value: Variant);
 begin
  AliasItems[Alias].Value:= Value;
+ Changed:= True;
+end;
+
+procedure TProperties.pm_SetVisible(Alias: String; const Value: Boolean);
+begin
+ AliasItems[Alias].Visible:= Value;
  Changed:= True;
 end;
 

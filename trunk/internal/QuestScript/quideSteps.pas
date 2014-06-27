@@ -3,13 +3,14 @@ unit quideSteps;
 interface
 
 uses
+ Generics.Collections,
  quideObject, quideLocations;
 
 type
   //1 Глава сценария
   TquideChapter = class(TquideObject)
   private
-    f_Locations: TquideLocations;
+    f_Locations: TObjectList<TquideLocation>;
     function pm_GetLocations(Index: Integer): TquideLocation;
     function pm_GetLocationsCount: Integer;
   public
@@ -17,7 +18,7 @@ type
     destructor Destroy; override;
     function AddLocation: TquideLocation;
     procedure Delete(Index: Integer);
-    //1 Возвращает локацию с указанным именем или nil  
+    //1 Возвращает локацию с указанным именем или nil
     function IsValidLocation(const aCaption: String): TquideLocation;
     //1 Список локаций шага сценария
     property Locations[Index: Integer]: TquideLocation read pm_GetLocations;
@@ -37,7 +38,7 @@ Uses
 constructor TquideChapter.Create;
 begin
   inherited Create;
-  f_Locations := TquideLocations.Create();
+  f_Locations := TObjectList<TquideLocation>.Create();
 end;
 
 destructor TquideChapter.Destroy;
@@ -48,7 +49,8 @@ end;
 
 function TquideChapter.AddLocation: TquideLocation;
 begin
- Result:= f_Locations.Add;
+ Result:= TquideLocation.Create;
+ f_Locations.Add(Result);
 end;
 
 procedure TquideChapter.Delete(Index: Integer);
