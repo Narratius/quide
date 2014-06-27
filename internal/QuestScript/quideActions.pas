@@ -73,7 +73,9 @@ Uses
 constructor TquideAction.Create;
 begin
   inherited Create;
-  Add('ActionType', 'Тип действия', ptInteger);
+  Visible['Caption']:= False;
+  Visible['Hint']:= False;
+  Add('ActionType', 'Тип действия', ptInteger, False);
 end;
 
 destructor TquideAction.Destroy;

@@ -353,7 +353,7 @@ implementation
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
   AboutDelphiArea, AlignDlg, SizeDlg,
-  quideLocations;
+  quideLocations, quideLocationDlg;
 
 resourcestring
   SAppTitle      = 'Quest IDE 2014';
@@ -875,7 +875,16 @@ begin
  N1:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
 
  l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
+ l_Loc.Caption:= Format('Новая локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
  l_Loc.GraphID:= n1.ID;
+
+ with TquideLocationDialog.Create(Self) do
+ try
+   if Execute(l_Loc) then
+    N1.Text:= l_Loc.Caption;
+ finally
+   Free;
+ end;
 
  // Линковка чуть позже
  //b.Create(10, 100, 110, 150);
