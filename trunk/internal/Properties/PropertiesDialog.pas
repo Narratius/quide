@@ -53,6 +53,7 @@ begin
   f_WorkPanel.Left:= 0;
   f_WorkPanel.Top:= 0;
   f_WorkPanel.Height:= ClientHeight;
+  f_WorkPanel.Width:= Button1.Left - 10;
 end;
 
 function TPropDialog.GetProperties: TProperties;
