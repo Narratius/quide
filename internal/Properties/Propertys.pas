@@ -93,7 +93,7 @@ type
     function pm_GetVisible(Alias: String): Boolean;
     procedure pm_SetVisible(Alias: String; const Value: Boolean);
   public
-    constructor Create;
+    constructor Create; virtual;
     function Add(const aAlias, aCaption: String; aType: TddPropertyType;
         aVisible: Boolean = True; aEvent: TNotifyEvent = nil): TddProperty; overload;
     function Add(aProp: TddProperty): TddProperty; overload;
@@ -252,7 +252,8 @@ end;
 
 function TProperties.Add(aProp: TddProperty): TddProperty;
 begin
- Result:= TddProperty(f_Items.Add(aProp));
+ Result:= aProp;
+ Result.ID:= f_Items.Add(aProp) + propBase;
 end;
 
 procedure TProperties.Assign(Source: TProperties);
