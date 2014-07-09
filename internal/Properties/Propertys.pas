@@ -3,20 +3,21 @@ unit Propertys;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Xml.XMLIntf, Contnrs,
+  SysUtils, Windows, Messages, Classes, Xml.XMLIntf, Generics.Collections,
   PropertyIntf;
 
 type
  TddPropertyType = (ptString,    // TEdit
-                  ptInteger,   // TEdit
-                  ptText,      // TMemo
-                  ptBoolean,   // TRadioGroup (TCombobox)
-                  ptChoice,    // TComboBox
-                  ptAction,    // TButton
-                  ptList,      // TListBox
-                  ptProperties // TScrollBox (Вложенные свойства)
-                  );
+                    ptInteger,   // TEdit
+                    ptText,      // TMemo
+                    ptBoolean,   // TRadioGroup (TCombobox)
+                    ptChoice,    // TComboBox
+                    ptAction,    // TButton
+                    ptList,      // TListBox
+                    ptProperties // TScrollBox (Вложенные свойства)
+                    );
 
+  TddChoiceLink = class;
   TddPropertyLink = class;
   TProperties = class;
   TddProperty = class(TPersistent)
@@ -29,7 +30,7 @@ type
     f_Visible: Boolean;
     f_ID: Integer;
     f_ListItem: TProperties;      // Эталонный элемент списка
-    f_ListItems: TObjectList;  // Элементы списка
+    f_ListItems: TObjectList<TProperties>;  // Элементы списка
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
@@ -37,14 +38,21 @@ type
     procedure pm_SetItem(const Value: TProperties);
   public
     constructor Create(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil); reintroduce;
+        aVisible: Boolean = True); reintroduce;
     constructor MakeClone(aSource: TddProperty);
+    constructor MakeList(const aAlias, aCaption: String; aListDef: TddPropertyLink;
+        aVisible: Boolean = True);
+    constructor MakeButton(const aAlias, aCaption: String; aEvent: TNotifyEvent;
+        aVisible: Boolean = True);
+    constructor MakeChoice(const aAlias, aCaption: String; aChoiceDef: TddChoiceLink;
+        aVisible: Boolean = True);
     destructor Destroy; override;
     function AddItem: Integer; overload;
     function AddItem(aItem: TProperties): Integer; overload;
     procedure DeleteItem(Index: Integer);
     procedure Assign(Source: TPersistent); override;
     procedure SetItem(aItem: TddPropertyLink);
+    procedure SetChoice(aChoiceDef: TddChoiceLink);
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
     property ID: Integer read f_ID write f_ID;
@@ -73,11 +81,26 @@ type
    property Next: TddPropertyLink read FNext write SetNext;
   end;
 
+  TddChoiceLink = class
+  private
+    FID: Integer;
+    FText: String;
+    FNext: TddChoiceLink;
+    procedure SetID(const Value: Integer);
+    procedure SetNext(const Value: TddChoiceLink);
+    procedure SetText(const Value: String);
+  public
+   constructor Create(aID: Integer; aText: String; aNext: TddChoiceLink = nil);
+   property ID: Integer read FID write SetID;
+   property Text: String read FText write SetText;
+   property Next: TddChoiceLink read FNext write SetNext;
+  end;
+
   TddPropertyFunc = function (aItem: TddProperty): Boolean of object;
   TProperties = class(TInterfacedObject, IpropertyStore)
   private
     f_Changed: Boolean;
-    f_Items: TObjectList;
+    f_Items: TObjectList<TddProperty>;
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
@@ -94,13 +117,13 @@ type
     procedure pm_SetVisible(Alias: String; const Value: Boolean);
   public
     constructor Create; virtual;
-    function Add(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil): TddProperty; overload;
-    function Add(aProp: TddProperty): TddProperty; overload;
+    function Add(aProp: TddProperty): TddProperty;
     procedure Assign(Source: TProperties);
     function Clone: Pointer;
     procedure Define(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
+        aVisible: Boolean = True);
+    procedure DefineButton(const aAlias, aCaption: String; aEvent: TNotifyEvent);
+    procedure DefineChoice(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddChoiceLink = nil);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure IterateAll(aFunc: TddPropertyFunc);
     procedure LoadFromXML(Element: IXMLNode);
@@ -180,7 +203,7 @@ var
  l_ListItem: TProperties;
 begin
  Result:= -1;
- if PropertyType = ptList then
+ if PropertyType in [ptList, ptChoice] then
  begin
    l_ListItem:= f_ListItem.Clone;
    Result:= f_ListItems.Add(l_ListItem);
@@ -198,6 +221,8 @@ begin
 end;
 
 procedure TddProperty.Assign(Source: TPersistent);
+var
+ i: Integer;
 begin
   if Source is TddProperty then
   begin
@@ -207,10 +232,12 @@ begin
    f_Value:= TddProperty(Source).Value;
    f_Visible:= TddProperty(Source).Visible;
    f_ID:= TddProperty(Source).ID; // ?
-   if PropertyType = ptList then
+   if PropertyType in [ptList, ptChoice] then
    begin
     ListItem:= TddProperty(Source).ListItem;
     // SubItems
+    for i := 0 to TddProperty(Source).f_ListItems.Count-1 do
+     f_ListItems.Add(TddProperty(Source).f_ListItems[i]);
    end;
   end
   else
@@ -220,34 +247,50 @@ end;
 constructor TddProperty.Create;
 begin
   inherited Create;
+  if (aAlias = '') or (aAlias[1] in ['0'..'9']) then
+   raise Exception.Create('Alias не должен быть пустым или начинаться с цифры');
   Alias:= aAlias;
   Caption:= aCaption;
   PropertyType:= aType;
   Visible:= aVisible;
-  Event:= aEvent;
+  f_ListItems:= TObjectList<TProperties>.Create;
 end;
 
+
+constructor TddProperty.MakeButton(const aAlias, aCaption: String;
+  aEvent: TNotifyEvent; aVisible: Boolean);
+begin
+ Create(aAlias, aCaption, ptAction, aVisible);
+ Event:= aEvent;
+end;
+
+constructor TddProperty.MakeChoice(const aAlias, aCaption: String;
+  aChoiceDef: TddChoiceLink; aVisible: Boolean);
+begin
+ Create(aAlias, aCaption, ptChoice, aVisible);
+ SetChoice(aChoiceDef);
+end;
 
 constructor TddProperty.MakeClone(aSource: TddProperty);
 begin
- Create(aSource.Alias, aSource.Caption, aSource.PropertyType, aSource.Visible, aSource.Event);
+ Create(aSource.Alias, aSource.Caption, aSource.PropertyType, aSource.Visible);
  Assign(aSource);
 end;
 
+
+constructor TddProperty.MakeList(const aAlias, aCaption: String;
+  aListDef: TddPropertyLink; aVisible: Boolean);
+begin
+ Create(aAlias, aCaption, ptList, aVisible);
+ SetItem(aListDef);
+end;
 
 {
 ********************************* TProperties **********************************
 }
 constructor TProperties.Create;
 begin
- F_Items := TObjectList.Create(True);
-end;
-
-function TProperties.Add(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil): TddProperty;
-begin
- Result := TddProperty.Create(aAlias, aCaption, aType, aVisible, aEvent);
- Result.ID:= f_Items.Add(Result) + propBase;
+ F_Items := TObjectList<TddProperty>.Create(True);
 end;
 
 function TProperties.Add(aProp: TddProperty): TddProperty;
@@ -277,12 +320,26 @@ begin
 end;
 
 procedure TProperties.Define(const aAlias, aCaption: String; aType:
-    TddPropertyType; aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
+    TddPropertyType; aVisible: Boolean = True);
+begin
+ // Проверить валидность Alias - не должна начинаться с цифры
+ Add(TddProperty.Create(aAlias, aCaption, aType, aVisible));
+end;
+
+procedure TProperties.DefineButton(const aAlias, aCaption: String;
+  aEvent: TNotifyEvent);
+begin
+
+end;
+
+procedure TProperties.DefineChoice(const aAlias, aCaption: String;
+  aVisible: Boolean; aItem: TddChoiceLink);
 var
  l_P: TddProperty;
 begin
- // Проверить валидность Alias - не должна начинаться с цифры
- l_P:= Add(aAlias, aCaption, aType, aVisible, aEvent);
+ Define(aAlias, aCaption, ptChoice, aVisible);
+ l_P:= AliasItems[aAlias];
+ l_P.SetChoice(aItem);
 end;
 
 procedure TProperties.DefineList(const aAlias, aCaption: String; aVisible: Boolean;
@@ -391,9 +448,12 @@ begin
         end;
       end
       else
-      if l_Type = ptList then
+      if l_Type in [ptList, ptChoice] then
       begin
-       DefineList(l_Alias, l_Caption, l_Visible);
+       if l_Type = ptList then
+        DefineList(l_Alias, l_Caption, l_Visible)
+       else
+        DefineChoice(l_Alias, l_Caption, l_Visible);
        // Прочитать описание элемента списка
        l_E:= l_Item.ChildNodes.FindNode('Properties');
        l_SubItem:= TProperties.Create;
@@ -420,12 +480,11 @@ begin
           end;
          end; // Item
        end; // for j
-      end // ptList
-      else
-      if l_Type = ptChoice then
-      begin
-       Define(l_Alias, l_Caption, l_Type, l_Visible);
-      end;
+       if l_Type = ptChoice then
+       begin
+         // прочитать значение ItemIndex
+       end;
+      end; // ptList
     end; // Property
   end; // for i
 end;
@@ -534,18 +593,17 @@ begin
         end;
        end;
       ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
-      ptChoice: // TComboBox
-       begin
 
-       end;
       ptAction:;    // TButton
-      ptList:
+      ptList, // TListBox
+      ptChoice: // TComboBox
        begin
         // Записываем описание эталонного элемента
         ListItem.SaveToXML(l_Item.AddChild('Properties'));
         // Теперь скидываем все элементы списка
         for j := 0 to ListItemsCount-1 do
          ListItems[j].SaveToXML(l_Value.AddChild('Item'));
+        // Для комбобокса нужно добавить сохранение ItemIndex
        end; // ptList
       ptProperties: ; // TScrollBox (Вложенные свойства)
      end; // case
@@ -581,17 +639,13 @@ end;
 function TddProperty.pm_GetItems(Index: Integer): TProperties;
 begin
  Result:= nil;
- if PropertyType = ptList then
- try
+ if PropertyType in [ptList, ptChoice] then
   Result:= TProperties(f_ListItems[index])
- except
-  Result:= TProperties(f_ListItems[index])
- end;
 end;
 
 function TddProperty.pm_GetItemsCount: Integer;
 begin
- if PropertyType = ptList then
+ if PropertyType in [ptList, ptChoice] then
   Result:= f_ListItems.Count
  else
   Result:= -1;
@@ -604,7 +658,7 @@ end;
 
 procedure TddProperty.pm_SetItem(const Value: TProperties);
 begin
- if (PropertyType = ptList) then
+ if (PropertyType in [ptList, ptChoice]) then
  begin
   if f_ListItem = nil then
    f_ListItem:= TProperties.Create;
@@ -617,8 +671,29 @@ end;
 procedure TddProperty.pm_SetPropertyType(const Value: TddPropertyType);
 begin
   f_PropertyType := Value;
-  if Value = ptList then
-   f_ListItems:= TObjectList.Create(True);
+end;
+
+procedure TddProperty.SetChoice(aChoiceDef: TddChoiceLink);
+var
+ l_Cur, l_Next: TddChoiceLink;
+ l_Index: Integer;
+begin
+ // Раскручиваем цепочку и формируем список. Можно использовать внутренний список
+ FreeAndNil(f_ListItem);
+ f_ListItem:= TProperties.Create;
+ f_ListItem.Define('id', 'id', ptInteger, False);
+ f_ListItem.Define('caption', 'caption', ptString, False);
+ f_ListItems.Clear;
+ l_Next:= aChoiceDef;
+ while l_Next <> nil do
+ begin
+  l_Index:= AddItem;
+  ListItems[l_Index].Values['id']:= l_Next.ID;
+  ListItems[l_Index].Values['caption']:= l_Next.Text;
+  l_Cur:= l_Next;
+  l_Next:= l_Cur.Next;
+  FreeAndNil(l_Cur);
+ end;
 end;
 
 procedure TddProperty.SetItem(aItem: TddPropertyLink);
@@ -686,6 +761,32 @@ begin
    f_ListItem:= TProperties.Create;
    f_ListItem.Define('Caption', 'Название', ptString);
  end; // f_ListItems
+end;
+
+{ TddChoiceLink }
+
+constructor TddChoiceLink.Create(aID: Integer; aText: String;
+  aNext: TddChoiceLink);
+begin
+ inherited Create;
+ fID:= aID;
+ fText:= aText;
+ fNext:= aNext;
+end;
+
+procedure TddChoiceLink.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TddChoiceLink.SetNext(const Value: TddChoiceLink);
+begin
+  FNext := Value;
+end;
+
+procedure TddChoiceLink.SetText(const Value: String);
+begin
+  FText := Value;
 end;
 
 end.
