@@ -324,6 +324,10 @@ begin
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  MakeCustomControl(TSizeableMemo);
+// !!!
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   Position:= cpInline;
 end;
 
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
@@ -346,10 +350,19 @@ begin
 end;
 
 procedure TPropertiesPanel.SetChoiceValue(aProperty: TddProperty; aControl: TControl);
+var
+  I: Integer;
 begin
  // Комбобокс
  if aControl is TComboBox then
+ begin
+  TComboBox(aControl).Items.Clear;
+  for I := 0 to aProperty.ListItemsCount-1 do
+  begin
+   TComboBox(aControl).Items.add(aProperty.ListItems[i].Values['caption']);
+  end;
   TComboBox(aControl).ItemIndex:= aProperty.Value;
+ end;
 end;
 
 procedure TPropertiesPanel.SetIntegerValue(aProperty: TddProperty; aControl: TControl);
