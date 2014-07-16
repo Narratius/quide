@@ -30,7 +30,9 @@ type
     f_Visible: Boolean;
     f_ID: Integer;
     f_ListItem: TProperties;      // Ёталонный элемент списка
-    f_ListItems: TObjectList<TProperties>;  // Ёлементы списка
+    f_ListItems: TObjectList<TProperties>;
+    f_Hint: String;
+    f_OnChange: TNotifyEvent;  // Ёлементы списка
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
@@ -56,6 +58,7 @@ type
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
     property ID: Integer read f_ID write f_ID;
+    property Hint: String read f_Hint write f_Hint;
     property OrdinalType: Boolean read pm_GetOrdinalType;
     property PropertyType: TddPropertyType read f_PropertyType write
         pm_SetPropertyType;
@@ -65,6 +68,7 @@ type
     property ListItem: TProperties read f_ListItem write pm_SetItem;
     property ListItems[Index: Integer]: TProperties read pm_GetItems;
     property ListItemsCount: Integer read pm_GetItemsCount;
+    property OnChange: TNotifyEvent read f_OnChange write f_OnChange;
   end;
 
 
@@ -101,6 +105,7 @@ type
   private
     f_Changed: Boolean;
     f_Items: TObjectList<TddProperty>;
+    FOnChange: TNotifyEvent;
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
@@ -115,6 +120,10 @@ type
     procedure LoadHeader(Element: IXMLNode);
     function pm_GetVisible(Alias: String): Boolean;
     procedure pm_SetVisible(Alias: String; const Value: Boolean);
+    function GetHints(Alias: String): String;
+    procedure SetHints(Alias: String; const Value: String);
+    procedure SetOnChange(const Value: TNotifyEvent);
+    procedure InnerOnChange(Sender: TObject);
   public
     constructor Create; virtual;
     function Add(aProp: TddProperty): TddProperty;
@@ -133,8 +142,10 @@ type
     property Changed: Boolean read f_Changed write pm_SetChanged;
     property Count: Integer read pm_GetCount;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
+    property Hints[Alias: String]: String read GetHints write SetHints;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
     property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;
+    property OnChange: TNotifyEvent read FOnChange write SetOnChange;
   end;
 
 type
@@ -297,6 +308,7 @@ function TProperties.Add(aProp: TddProperty): TddProperty;
 begin
  Result:= aProp;
  Result.ID:= f_Items.Add(aProp) + propBase;
+ Result.OnChange:= InnerOnChange;
 end;
 
 procedure TProperties.Assign(Source: TProperties);
@@ -363,6 +375,18 @@ begin
      Result:= Items[i];
      break
     end;
+end;
+
+function TProperties.GetHints(Alias: String): String;
+begin
+ Result:= AliasItems[Alias].Hint;
+end;
+
+procedure TProperties.InnerOnChange(Sender: TObject);
+begin
+ f_Changed:= True;
+ if Assigned(fOnChange) then
+  fOnChange(Self);
 end;
 
 procedure TProperties.IterateAll(aFunc: TddPropertyFunc);
@@ -609,6 +633,16 @@ begin
      end; // case
    end; // with Items[i]
   end; // for i
+end;
+
+procedure TProperties.SetHints(Alias: String; const Value: String);
+begin
+ AliasItems[Alias].Hint:= Value;
+end;
+
+procedure TProperties.SetOnChange(const Value: TNotifyEvent);
+begin
+  FOnChange := Value;
 end;
 
 { TddPropertyLink }

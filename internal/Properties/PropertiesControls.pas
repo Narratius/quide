@@ -116,6 +116,7 @@ constructor TPropertiesPanel.Create(aOwner: TComponent);
 begin
   inherited;
   fLabelTop:= False;
+  ShowHint:= True;
 end;
 
 function TPropertiesPanel.FillControls: TControlsArray;
@@ -303,6 +304,8 @@ begin
   begin
    f_Controls[i].Tag:= aProperty.ID;
    f_Controls[i].Event:= aProperty.Event;
+   f_Controls[i].Hint:= aProperty.Hint;
+   f_Controls[i].OnChange:= aProperty.OnChange;
   end;
  end; // aProperty.Visible
 end;
