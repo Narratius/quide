@@ -110,7 +110,8 @@ begin
      { TODO -oДД -cУлучшение на будущее : Тут может быть больше одного элемента }
      aControl.Top:= TControl(aControls[aControls.Count-1]).Top;
      aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
-     aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
+     if aSize = csAutoSize then
+      aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
      l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
      if l_Delta > 0 then
      begin
