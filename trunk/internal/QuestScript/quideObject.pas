@@ -45,8 +45,8 @@ implementation
 constructor TquideObject.Create;
 begin
  inherited Create;
-  Add('Caption', 'Название', ptString);
-  Add('Hint', 'Описание', ptString);
+  Define('Caption', 'Название', ptString);
+  Define('Hint', 'Описание', ptString);
 end;
 
 constructor TquideObject.Make(const aCaption, aHint: string);

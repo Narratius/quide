@@ -36,6 +36,8 @@ type
     function IsValidLocation(const aCaption: String): TquideLocation;
     //1 Проверяет список переменных на наличие в нем нужной и возвращает ее
     function IsValidVariable(const aCaption: String): TquideVariable;
+    procedure SaveToFile(const aFileName: String);
+    procedure LoadFromFile(const aFileName: String);
     property Chapters[Index: Integer]: TquideChapter read pm_GetChapters;
         default;
     property ChaptersCount: Integer read pm_GetChaptersCount;
@@ -52,6 +54,9 @@ type
 
 
 implementation
+
+Uses
+ XMLDoc, XMLIntf;
 
 {
 ******************************** TquideScenario ********************************
@@ -137,6 +142,19 @@ begin
    end;
 end;
 
+procedure TquideScenario.LoadFromFile(const aFileName: String);
+var
+ l_Node: IXMLNode;
+ l_Doc: IXMLDocument;
+begin
+ l_Doc:= TXMLDocument.Create(nil);
+ l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
+ l_Doc.Active:= True;
+ l_Doc.LoadFromFile(aFileName);
+ l_Node:= l_Doc.ChildNodes.FindNode('Scenario');
+ LoadFromXML(l_Node);
+end;
+
 function TquideScenario.pm_GetChapters(Index: Integer): TquideChapter;
 begin
  Result:= TquideChapter(f_Chapters[Index])
@@ -175,6 +193,19 @@ end;
 function TquideScenario.pm_GetVariablesNames: TStrings;
 begin
   Result := f_VariablesNames;
+end;
+
+procedure TquideScenario.SaveToFile(const aFileName: String);
+var
+ l_Node: IXMLNode;
+ l_Doc: IXMLDocument;
+begin
+ l_Doc:= TXMLDocument.Create(nil);
+ l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
+ l_Doc.Active:= True;
+ l_Node:= l_Doc.AddChild('Scenario');
+ SaveToXML(l_Node);
+ l_Doc.SaveToFile(aFileName);
 end;
 
 procedure TquideScenario.UpdateChapters;

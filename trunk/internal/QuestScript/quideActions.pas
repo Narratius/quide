@@ -75,7 +75,7 @@ begin
   inherited Create;
   Visible['Caption']:= False;
   Visible['Hint']:= False;
-  Add('ActionType', 'Тип действия', ptInteger, False);
+  Define('ActionType', 'Тип действия', ptInteger, False);
 end;
 
 destructor TquideAction.Destroy;
@@ -138,7 +138,7 @@ constructor TquideTextAction.Create;
 begin
   inherited Create;
   f_Links := TObjectList.Create();
-  Add('Text', 'Текстовое поле', ptString);
+  Define('Text', '', ptText);
 end;
 
 destructor TquideTextAction.Destroy;

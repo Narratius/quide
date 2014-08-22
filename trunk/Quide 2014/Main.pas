@@ -556,6 +556,7 @@ begin
       SimpleGraph.CommandMode := cmEdit;
     SaveDialog.FileName := OpenDialog.FileName;
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
+    f_Scenario.LoadFromFile(ChangeFileExt(OpenDialog.FileName, '.xml'));
   end;
 end;
 
@@ -582,12 +583,16 @@ begin
   if SaveDialog.FileName <> SUntitled then
   begin
     SimpleGraph.SaveToFile(SaveDialog.FileName);
+    f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end
   else
   begin
     if SaveDialog.Execute then
+    begin
       SimpleGraph.SaveToFile(SaveDialog.FileName);
+      f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
+    end;
   end;
   Caption := SaveDialog.FileName + ' - ' + Application.Title;
 end;
@@ -604,6 +609,7 @@ begin
     SimpleGraph.SaveToFile(SaveDialog.FileName);
     SimpleGraph.CommandMode := cmEdit;
     IsReadonly := False;
+    f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end;
 end;

@@ -7,7 +7,9 @@ uses
   PropertyIntf;
 
 type
- TddPropertyType = (ptString,    // TEdit
+ TddPropertyType = (
+                    ptChar,      // TEdit
+                    ptString,    // TEdit
                     ptInteger,   // TEdit
                     ptText,      // TMemo
                     ptBoolean,   // TRadioGroup (TCombobox)
@@ -186,7 +188,7 @@ Uses
 
 const
  PropertyTypeNames: Array[TddPropertyType] of String = (
-  'String', 'Integer', 'Text', 'Boolean', 'Choice', 'Action', 'List', 'Properties');
+  'Char', 'String', 'Integer', 'Text', 'Boolean', 'Choice', 'Action', 'List', 'Properties');
 
 function PropertyType2String(aType: TddPropertyType): String;
 begin

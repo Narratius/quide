@@ -22,6 +22,7 @@ type
     // Создание контролов
     procedure MakeActionControl(aProperty: TddProperty); virtual;
     procedure MakeBooleanControl(aProperty: TddProperty); virtual;
+    procedure MakeCharControl(aProperty: TddProperty); virtual;
     procedure MakeChoiceControl(aProperty: TddProperty); virtual;
     procedure MakeCustomControl(aControlClass: TControlClass);
     procedure MakeIntegerControl(aProperty: TddProperty); virtual;
@@ -172,6 +173,7 @@ begin
  l_C:= ControlByTag(aProperty.ID);
  if l_C <> nil then
     case aProperty.PropertyType of
+      ptChar,
       ptString: GetStringValue(aProperty, l_C);
       ptInteger: GetIntegerValue(aProperty, l_C);
       ptText: GetTextValue(aProperty, l_C);
@@ -291,6 +293,7 @@ begin
  begin
   l_Count:= Length(f_Controls);
   case aProperty.PropertyType of
+    ptChar: MakeCharControl(aProperty);
     ptString: MakeStringControl(aProperty);
     ptInteger: MakeIntegerControl(aProperty);
     ptText: MakeTextControl(aProperty);
@@ -309,6 +312,23 @@ begin
   end;
  end; // aProperty.Visible
 end;
+
+procedure TPropertiesPanel.MakeCharControl(aProperty: TddProperty);
+begin
+ MakeCustomControl(TLabel);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TEdit);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   Position:= cpInline;
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  Size:= csFixed;
+  Width:= 16;
+ end;
+end;
+
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TddProperty);
 begin
@@ -394,6 +414,7 @@ begin
  l_C:= ControlByTag(aProperty.ID);
  if l_C <> nil then
     case aProperty.PropertyType of
+      ptChar,
       ptString: SetStringValue(aProperty, l_C);
       ptInteger: SetIntegerValue(aProperty, l_C);
       ptText: SetTextValue(aProperty, l_C);

@@ -12,6 +12,7 @@ type
     Position: TControlPosition;
     Size: TControlSize;
     Height: Integer;
+    Width: Integer;
     Hint: String;
     Tag: Integer;
     Event: TNotifyEvent;
@@ -37,6 +38,7 @@ const
                                  Position: cpNewLine;
                                  Size: csAutoSize;
                                  Height: 0;
+                                 Width: 0;
                                  Hint: '';
                                  Tag: 0;
                                  Event: nil;
@@ -72,6 +74,9 @@ begin
 
    if (aControls[i].Size = csFixed) and (aControls[i].Height > 0) then
     l_C.Height:= aControls[i].Height;
+   if (aControls[i].Size = csFixed) and (aControls[i].Width > 0) then
+    l_C.Width:= aControls[i].Width;
+
    //AddControl(l_C, aControls[i].Size, aControls[i].Position);
    if l_C is TLabel then
     TLabel(l_C).Caption:= aControls[i].Caption
@@ -89,6 +94,7 @@ begin
     if l_C is TEdit then
     begin
      TEdit(l_C).Text:= '';
+     // Задать максимальное число символов
      TEdit(l_C).OnChange:= aControls[i].OnChange;
     end
     else
@@ -101,6 +107,7 @@ begin
     if l_C is TMemo then
     begin
      TMemo(l_C).Text:= '';
+     TMemo(l_C).ScrollBars:= ssVertical;
      TMemo(l_C).OnChange:= aControls[i].OnChange;
     end
     else
