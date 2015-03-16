@@ -1,0 +1,124 @@
+# Вступление #
+
+Файл в формате XML, сответствующий данному описанию подается на вход генератору игры
+
+
+# Подробности #
+
+Файл описания состоит из нескольких разделов - Meta, Variables, Locations, Inventory.
+
+## Meta ##
+
+Содержит общую информацию о сценарии, разделенную на несколько узлов.
+```
+  <Meta>
+    <Title>Проверка Квиды</Title>
+    <Author>Дудко Д.</Author>
+    <Description>Тестовый сценарий для проверки работы Квиды</Description>
+  </Meta>
+```
+**Title** - название игры
+
+**Autor** - автор
+
+**Description** - описание сценария
+
+## Variables ##
+```
+<Variables>
+    <Numeric Caption="Life" Value="100"/>
+    <String Caption="Name" Value="Вася"/>
+    <Boolean Caption="Alive" Value="Истина"/>
+    <Enum Caption="Время суток" Value="Вечер">
+      <Item>Утро</Item>
+      <Item>День</Item>
+      <Item>Вечер</Item>
+      <Item>Ночь</Item>
+    </Enum>
+  </Variables>
+```
+## Locations ##
+Раздел Locations содержит список локаций игры.
+```
+<Locations Start="Начало">
+    <Location Caption="Начало" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Здесь все и началось. А может быть закончилось.
+Все зависит от выбора.</Text>
+      </Actions>
+      <Buttons>
+        <Button Caption="Узнать, что случилось" Target="Знание"/>
+        <Button Caption="Ну, на фиг!" Target="Конец"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Знание" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Собственно, ничего-то &lt;и&gt; не произошло...
+A &gt; B &lt;tag&gt;
+B &lt; A</Text>
+      </Actions>
+      <Buttons>
+        <Button Caption="Вот и все, ребята!" Target="Конец"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Конец" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Вот так и закончилась эта история.</Text>
+      </Actions>
+      <Buttons/>
+    </Location>
+  </Locations>
+```
+## Inventory ##
+
+## Пример сценария ##
+```
+<?xml version="1.0" encoding="Windows-1251"?>
+<Quide Version="1.0" Date="03.03.2010">
+  <Meta>
+    <Title>Проверка Квиды</Title>
+    <Author>Дудко Д.</Author>
+    <Description>Тестовый сценарий для проверки работы Квиды</Description>
+  </Meta>
+  <Variables>
+    <Numeric Caption="Life" Value="100"/>
+    <String Caption="Name" Value="Вася"/>
+    <Boolean Caption="Alive" Value="Истина"/>
+    <Enum Caption="Время суток" Value="Вечер">
+      <Item>Утро</Item>
+      <Item>День</Item>
+      <Item>Вечер</Item>
+      <Item>Ночь</Item>
+    </Enum>
+  </Variables>
+  <Locations Start="Начало">
+    <Location Caption="Начало" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Здесь все и началось. А может быть закончилось.
+Все зависит от выбора.</Text>
+      </Actions>
+      <Buttons>
+        <Button Caption="Узнать, что случилось" Target="Знание"/>
+        <Button Caption="Ну, на фиг!" Target="Конец"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Знание" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Собственно, ничего-то &lt;и&gt; не произошло...
+A &gt; B &lt;tag&gt;
+B &lt; A</Text>
+      </Actions>
+      <Buttons>
+        <Button Caption="Вот и все, ребята!" Target="Конец"/>
+      </Buttons>
+    </Location>
+    <Location Caption="Конец" Hint="">
+      <Actions>
+        <Text Caption="Текст1">Вот так и закончилась эта история.</Text>
+      </Actions>
+      <Buttons/>
+    </Location>
+  </Locations>
+  <Inventory/>
+</Quide>
+```
