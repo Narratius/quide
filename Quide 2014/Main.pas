@@ -519,8 +519,10 @@ begin
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end
   else
+  begin
    Caption:= Application.Title;
-
+   SaveDialog.FileName:= SUntitled;
+  end;
  MakeScript;
 end;
 

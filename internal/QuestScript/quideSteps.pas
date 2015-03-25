@@ -3,7 +3,7 @@ unit quideSteps;
 interface
 
 uses
- Generics.Collections,
+ Generics.Collections, XML.XMLIntf,
  quideObject, quideLocations;
 
 type
@@ -18,6 +18,8 @@ type
     destructor Destroy; override;
     function AddLocation: TquideLocation;
     procedure Delete(Index: Integer);
+    procedure LoadFromXML(Element: IXMLNode);
+    procedure SaveToXML(Element: IXMLNode);
     //1 Возвращает локацию с указанным именем или nil
     function IsValidLocation(const aCaption: String): TquideLocation;
     //1 Список локаций шага сценария
@@ -71,6 +73,11 @@ begin
   end;
 end;
 
+procedure TquideChapter.LoadFromXML(Element: IXMLNode);
+begin
+
+end;
+
 function TquideChapter.pm_GetLocations(Index: Integer): TquideLocation;
 begin
  Result:= TquideLocation(f_Locations[index]);
@@ -82,5 +89,16 @@ begin
 end;
 
 
+
+procedure TquideChapter.SaveToXML(Element: IXMLNode);
+var
+ l_Node: IXMLNode;
+ i: Integer;
+begin
+ inherited;
+ l_Node:= Element.AddChild('Locations');
+ for i:= 0 to LocationsCount-1 do
+  Locations[i].SaveToXML(l_Node.AddChild('Location'));
+end;
 
 end.

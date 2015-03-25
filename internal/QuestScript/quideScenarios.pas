@@ -197,14 +197,21 @@ end;
 
 procedure TquideScenario.SaveToFile(const aFileName: String);
 var
+ l_Scenario,
  l_Node: IXMLNode;
  l_Doc: IXMLDocument;
+ i: Integer;
 begin
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
  l_Doc.Active:= True;
- l_Node:= l_Doc.AddChild('Scenario');
- SaveToXML(l_Node);
+ l_Scenario:= l_Doc.AddChild('Scenario');
+ // Собственные атрибуты
+ SaveToXML(l_Scenario);
+ // Главы
+ l_Node:= l_Scenario.AddChild('Chapters');
+ for I := 0 to ChaptersCount-1 do
+  Chapters[i].SaveToXML(l_Node.AddChild('Chapter'));
  l_Doc.SaveToFile(aFileName);
 end;
 

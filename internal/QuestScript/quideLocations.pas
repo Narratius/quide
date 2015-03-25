@@ -3,7 +3,7 @@ unit quideLocations;
 interface
 
 uses
- Generics.Collections,
+ Generics.Collections, Xml.XMLIntf,
  quideObject, quideActions;
 
 type

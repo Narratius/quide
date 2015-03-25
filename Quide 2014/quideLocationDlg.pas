@@ -102,12 +102,14 @@ end;
 
 function TquideLocationDialog.Execute(aLocation: TquideLocation): Boolean;
 begin
+ Result:= False;
  Location:= aLocation;
  if IsPositiveResult(ShowModal) then
  begin
    // Считать значения из окошка
    f_Header.GetValues;
    GetActionsValues;
+   Result:= True;
  end;
 end;
 
@@ -116,7 +118,7 @@ var
  i: Integer;
 begin
  //  Прочитать знаечения действий
- fLocation.Clear;
+ //fLocation.Clear; - нельзя
  { TODO : Нужно реализовать }
  (*
  for i := 0 to f_Actions.ControlCount-1 do
