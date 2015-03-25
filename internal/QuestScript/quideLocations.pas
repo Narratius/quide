@@ -15,7 +15,8 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    function AddAction(aActType: TquideActionType): TquideAction;
+    function AddAction(aActType: TquideActionType): TquideAction; overload;
+    procedure AddAction(aAction: TquideAction); overload;
     property Actions[Index: Integer]: TquideAction read pm_GetActions; default;
     //1 Количество действий на локации
     property ActionsCount: Integer read pm_GetActionsCount;
@@ -42,8 +43,14 @@ Uses
 {
 ******************************** TquideLocation ********************************
 }
+procedure TquideLocation.AddAction(aAction: TquideAction);
+begin
+ f_Actions.Add(aAction);
+end;
+
 function TquideLocation.AddAction(aActType: TquideActionType): TquideAction;
 begin
+ Result:= nil;
  case aActType of
    atNone: Result:= nil;
    atGoto: Result:= TquideJump.Create;
@@ -54,7 +61,7 @@ begin
    atButton: Result:= TquideButton.Create;
  end;
  if Result <> nil then
-   f_Actions.Add(Result);
+  AddAction(Result);
 end;
 
 constructor TquideLocation.Create;

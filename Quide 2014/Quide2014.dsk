@@ -17,20 +17,21 @@ File_14=TSourceModule,'C:\Users\AACE~1\AppData\Local\Temp\mainForm.pas-revHEAD.s
 
 [Modules]
 Module0=C:\svn\Quide\Quide 2014\quideLocationDlg.pas
-Module1=C:\svn\Quide\Quide 2014\Main.pas
-Module2=C:\svn\Quide\internal\QuestScript\quideObject.pas
-Module3=C:\svn\Quide\internal\Properties\PropertiesControls.pas
-Module4=C:\svn\Quide\internal\QuestScript\quideScenarios.pas
-Module5=C:\svn\Quide\internal\Properties\Propertys.pas
-Module6=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\XML\Xml.XMLIntf.pas
-Module7=C:\svn\Quide\internal\Properties\SizeableControls.pas
-Module8=C:\svn\Quide\internal\Properties\ParamControls.pas
-Module9=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\VCL\Vcl.StdCtrls.pas
-Module10=C:\svn\Quide\internal\QuestScript\quideActions.pas
-Module11=C:\svn\Quide\internal\QuestScript\quideLocations.pas
-Module12=default.htm
-Module13=C:\svn\Quide\internal\QuestScript\quideSteps.pas
-Count=14
+Module1=C:\svn\Quide\internal\QuestScript\quideActions.pas
+Module2=C:\svn\Quide\Quide 2014\quideActionControls.pas
+Module3=C:\svn\Quide\internal\Properties\Propertys.pas
+Module4=C:\svn\Quide\internal\Properties\PropertiesControls.pas
+Module5=C:\svn\Quide\internal\Properties\ParamControls.pas
+Module6=C:\svn\Quide\Quide 2014\Main.pas
+Module7=C:\svn\Quide\internal\QuestScript\quideLocations.pas
+Module8=C:\svn\Quide\internal\QuestScript\quideSteps.pas
+Module9=C:\svn\Quide\internal\QuestScript\quideObject.pas
+Module10=C:\svn\Quide\internal\QuestScript\quideScenarios.pas
+Module11=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\XML\Xml.XMLIntf.pas
+Module12=C:\svn\Quide\internal\Properties\SizeableControls.pas
+Module13=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\VCL\Vcl.StdCtrls.pas
+Module14=default.htm
+Count=15
 EditWindowCount=1
 
 [C:\svn\Quide\Quide 2014\quideLocationDlg.pas]
@@ -38,12 +39,17 @@ ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
-[C:\svn\Quide\Quide 2014\Main.pas]
+[C:\svn\Quide\internal\QuestScript\quideActions.pas]
 ModuleType=TSourceModule
-FormState=1
+FormState=0
 FormOnTop=0
 
-[C:\svn\Quide\internal\QuestScript\quideObject.pas]
+[C:\svn\Quide\Quide 2014\quideActionControls.pas]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[C:\svn\Quide\internal\Properties\Propertys.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
@@ -53,12 +59,32 @@ ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
 
-[C:\svn\Quide\internal\QuestScript\quideScenarios.pas]
+[C:\svn\Quide\internal\Properties\ParamControls.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
 
-[C:\svn\Quide\internal\Properties\Propertys.pas]
+[C:\svn\Quide\Quide 2014\Main.pas]
+ModuleType=TSourceModule
+FormState=1
+FormOnTop=0
+
+[C:\svn\Quide\internal\QuestScript\quideLocations.pas]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[C:\svn\Quide\internal\QuestScript\quideSteps.pas]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[C:\svn\Quide\internal\QuestScript\quideObject.pas]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[C:\svn\Quide\internal\QuestScript\quideScenarios.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
@@ -73,22 +99,7 @@ ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
 
-[C:\svn\Quide\internal\Properties\ParamControls.pas]
-ModuleType=TSourceModule
-FormState=0
-FormOnTop=0
-
 [c:\program files (x86)\embarcadero\studio\14.0\SOURCE\VCL\Vcl.StdCtrls.pas]
-ModuleType=TSourceModule
-FormState=0
-FormOnTop=0
-
-[C:\svn\Quide\internal\QuestScript\quideActions.pas]
-ModuleType=TSourceModule
-FormState=0
-FormOnTop=0
-
-[C:\svn\Quide\internal\QuestScript\quideLocations.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
@@ -96,13 +107,8 @@ FormOnTop=0
 [default.htm]
 ModuleType=TURLModule
 
-[C:\svn\Quide\internal\QuestScript\quideSteps.pas]
-ModuleType=TSourceModule
-FormState=0
-FormOnTop=0
-
 [EditWindow0]
-ViewCount=14
+ViewCount=15
 CurrentEditView=C:\svn\Quide\Quide 2014\quideLocationDlg.pas
 View0=0
 View1=1
@@ -118,6 +124,7 @@ View10=10
 View11=11
 View12=12
 View13=13
+View14=14
 PercentageSizes=1
 Create=1
 Visible=1
@@ -154,9 +161,9 @@ WelcomePageURL=bds:/default.htm
 [View1]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\Quide 2014\Main.pas
-CursorX=11
-CursorY=889
-TopLine=872
+CursorX=18
+CursorY=605
+TopLine=586
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -165,9 +172,9 @@ EditViewName=C:\svn\Quide\Quide 2014\Main.pas
 [View2]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\QuestScript\quideScenarios.pas
-CursorX=1
-CursorY=156
-TopLine=122
+CursorX=57
+CursorY=12
+TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -187,9 +194,9 @@ EditViewName=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\XML\Xml.XMLIn
 [View4]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\Quide 2014\quideLocationDlg.pas
-CursorX=12
-CursorY=70
-TopLine=67
+CursorX=46
+CursorY=120
+TopLine=103
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -198,9 +205,9 @@ EditViewName=C:\svn\Quide\Quide 2014\quideLocationDlg.pas
 [View5]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\QuestScript\quideActions.pas
-CursorX=19
-CursorY=141
-TopLine=121
+CursorX=80
+CursorY=23
+TopLine=31
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -208,38 +215,49 @@ EditViewName=C:\svn\Quide\internal\QuestScript\quideActions.pas
 
 [View6]
 CustomEditViewType=TEditView
+Module=C:\svn\Quide\Quide 2014\quideActionControls.pas
+CursorX=33
+CursorY=14
+TopLine=1
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\svn\Quide\Quide 2014\quideActionControls.pas
+
+[View7]
+CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\QuestScript\quideObject.pas
-CursorX=17
-CursorY=22
-TopLine=22
+CursorX=3
+CursorY=12
+TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\QuestScript\quideObject.pas
 
-[View7]
+[View8]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\Properties\Propertys.pas
-CursorX=3
-CursorY=106
-TopLine=124
+CursorX=83
+CursorY=821
+TopLine=791
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\Properties\Propertys.pas
 
-[View8]
+[View9]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\Properties\PropertiesControls.pas
-CursorX=17
-CursorY=57
-TopLine=57
+CursorX=1
+CursorY=9
+TopLine=37
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\Properties\PropertiesControls.pas
 
-[View9]
+[View10]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\Properties\SizeableControls.pas
 CursorX=62
@@ -250,7 +268,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\Properties\SizeableControls.pas
 
-[View10]
+[View11]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\Properties\ParamControls.pas
 CursorX=1
@@ -261,7 +279,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\Properties\ParamControls.pas
 
-[View11]
+[View12]
 CustomEditViewType=TEditView
 Module=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\VCL\Vcl.StdCtrls.pas
 CursorX=14
@@ -272,7 +290,7 @@ Elisions={{1650,4},{1668,15},{'TScrollWindow'}}
 Bookmarks=
 EditViewName=c:\program files (x86)\embarcadero\studio\14.0\SOURCE\VCL\Vcl.StdCtrls.pas
 
-[View12]
+[View13]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\QuestScript\quideSteps.pas
 CursorX=105
@@ -283,12 +301,12 @@ Elisions=
 Bookmarks=
 EditViewName=C:\svn\Quide\internal\QuestScript\quideSteps.pas
 
-[View13]
+[View14]
 CustomEditViewType=TEditView
 Module=C:\svn\Quide\internal\QuestScript\quideLocations.pas
-CursorX=27
-CursorY=52
-TopLine=28
+CursorX=48
+CursorY=20
+TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -308,20 +326,19 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=209
 LRDockWidth=13600
 Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=2
+Count=1
 Breakpoint0='C:\svn\Quide\Quide 2014\Main.pas',7,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint1='C:\svn\Quide\Quide 2014\quideLocationDlg.pas',109,'',0,1,'',1,0,0,'',1,'','','',0,''
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -424,11 +441,11 @@ State=0
 Left=0
 Top=0
 Width=2000
-Height=6465
+Height=8523
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=6465
+ClientHeight=8523
 TBDockHeight=4884
 LRDockWidth=5306
 Dockable=1
@@ -440,8 +457,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=-302
-Top=-100
+Left=-151
+Top=-102
 Width=1844
 Height=3140
 MaxLeft=-1
@@ -505,16 +522,11 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1894
 ClientHeight=3326
-TBDockHeight=6756
+TBDockHeight=8814
 LRDockWidth=1894
 Dockable=1
 StayOnTop=0
 SplitPos=111
-
-[PropInspDesignerSelection]
-ArrangeBy=Name
-SelectedItem=Caption,
-ExpandedItems=LiveBindings=0,Margins=0,StyleElements=0,Touch=0,BevelEdges=0,Constraints=0,Anchors=0,Font=0,Options=0,Action=0
 
 [TFileExplorerForm]
 PercentageSizes=1
@@ -522,8 +534,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=-1182
-Top=-27
+Left=-1280
+Top=-102
 Width=2844
 Height=6209
 MaxLeft=-1
@@ -542,7 +554,7 @@ Visible=0
 Docked=1
 State=0
 Left=-1440
-Top=205
+Top=-102
 Width=275
 Height=360
 MaxLeft=-1
@@ -566,11 +578,11 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=407
 LRDockWidth=4950
 Dockable=1
@@ -585,11 +597,11 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=209
 LRDockWidth=7406
 Dockable=1
@@ -608,11 +620,11 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=1535
 LRDockWidth=3481
 Dockable=1
@@ -627,11 +639,11 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=2058
 LRDockWidth=3481
 Dockable=1
@@ -646,11 +658,11 @@ State=0
 Left=0
 Top=0
 Width=2338
-Height=953
+Height=1186
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2338
-ClientHeight=953
+ClientHeight=1186
 TBDockHeight=2314
 LRDockWidth=2825
 Dockable=1
@@ -711,11 +723,11 @@ State=0
 Left=0
 Top=0
 Width=2000
-Height=6465
+Height=8523
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=6465
+ClientHeight=8523
 TBDockHeight=4884
 LRDockWidth=7150
 Dockable=1
@@ -730,11 +742,11 @@ State=0
 Left=0
 Top=0
 Width=3825
-Height=1047
+Height=1128
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1047
+ClientHeight=1128
 TBDockHeight=1547
 LRDockWidth=8744
 Dockable=1
@@ -821,14 +833,14 @@ Visible=0
 Docked=1
 State=0
 Left=0
-Top=23
+Top=0
 Width=3825
-Height=1337
+Height=1419
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3825
-ClientHeight=1337
-TBDockHeight=1337
+ClientHeight=1419
+TBDockHeight=1419
 LRDockWidth=3825
 Dockable=1
 StayOnTop=0
@@ -852,7 +864,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
 ClientHeight=4581
-TBDockHeight=6756
+TBDockHeight=8814
 LRDockWidth=2000
 Dockable=1
 StayOnTop=0
@@ -876,7 +888,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1894
 ClientHeight=3523
-TBDockHeight=6756
+TBDockHeight=8814
 LRDockWidth=1894
 Dockable=1
 StayOnTop=0
@@ -900,7 +912,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
 ClientHeight=2267
-TBDockHeight=6756
+TBDockHeight=8814
 LRDockWidth=2000
 Dockable=1
 StayOnTop=0
