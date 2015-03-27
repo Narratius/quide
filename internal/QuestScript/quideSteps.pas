@@ -74,8 +74,21 @@ begin
 end;
 
 procedure TquideChapter.LoadFromXML(Element: IXMLNode);
+var
+ l_Node,
+ l_XMLLoc: IXMLNode;
+ i: Integer;
+ l_Location: TquideLocation;
 begin
-
+ inherited;
+ l_Node:= Element.ChildNodes.FindNode('Locations');
+ if l_Node <> nil then
+  for I := 0 to l_Node.ChildNodes.Count-1 do
+  begin
+    l_XMLLoc:= l_Node.ChildNodes.Get(i);
+    l_Location:= TquideLocation.Create;
+    l_Location.LoadFromXML(l_XMLLoc);
+  end;
 end;
 
 function TquideChapter.pm_GetLocations(Index: Integer): TquideLocation;

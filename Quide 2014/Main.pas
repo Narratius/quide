@@ -559,6 +559,7 @@ begin
     SaveDialog.FileName := OpenDialog.FileName;
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
     f_Scenario.LoadFromFile(ChangeFileExt(OpenDialog.FileName, '.xml'));
+    // Нужно слинковать с визуалкой...
   end;
 end;
 
@@ -711,6 +712,7 @@ end;
 procedure TMainForm.EditDeleteExecute(Sender: TObject);
 begin
   SimpleGraph.ForEachObject(ForEachCallback, FEO_DELETE, True);
+  { TODO : Нужно удалить связанные объекты }
 end;
 
 procedure TMainForm.EditSelectAllUpdate(Sender: TObject);
@@ -889,7 +891,10 @@ begin
  with TquideLocationDialog.Create(Self) do
  try
    if Execute(l_Loc) then
+   begin
     N1.Text:= l_Loc.Caption;
+    l_Loc.Values['GraphObject']:= N1.ID;
+   end;
  finally
    Free;
  end;

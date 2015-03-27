@@ -16,6 +16,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function AddAction(aActType: TquideActionType): TquideAction; overload;
+    procedure LoadFromXML(Element: IXMLNode);
+    procedure SaveToXML(Element: IXMLNode);
     procedure AddAction(aAction: TquideAction); overload;
     property Actions[Index: Integer]: TquideAction read pm_GetActions; default;
     //1 Количество действий на локации
@@ -37,7 +39,8 @@ type
 implementation
 
 Uses
- SysUtils;
+ SysUtils,
+ Propertys;
 
 
 {
@@ -67,6 +70,7 @@ end;
 constructor TquideLocation.Create;
 begin
   inherited Create;
+  Define('GraphObject', 'Визуальный элемент', ptInteger, False);
   f_Actions := TObjectList<TquideAction>.Create();
 end;
 
@@ -74,6 +78,19 @@ destructor TquideLocation.Destroy;
 begin
   FreeAndNil(f_Actions);
   inherited Destroy;
+end;
+
+procedure TquideLocation.LoadFromXML(Element: IXMLNode);
+var
+ l_Node: IXMLNode;
+ i: Integer;
+ l_Action: TquideAction;
+begin
+ inherited;
+ l_Node:= Element.ChildNodes.FindNode('Actions');
+ if l_Node <> nil then
+  for I := 0 to l_Node.ChildNodes.Count-1 do
+   l_Action:= TquideAction.Make(l_Node.ChildNodes.Get(i));
 end;
 
 function TquideLocation.pm_GetActions(Index: Integer): TquideAction;
@@ -87,5 +104,16 @@ begin
 end;
 
 
+
+procedure TquideLocation.SaveToXML(Element: IXMLNode);
+var
+ l_Node: IXMLNode;
+ i: Integer;
+begin
+ inherited;
+ l_Node:= Element.AddChild('Actions');
+ for I := 0 to ActionsCount-1 do
+  Actions[i].SaveToXML(l_Node.AddChild('Action'));
+end;
 
 end.
