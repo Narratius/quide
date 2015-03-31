@@ -58,10 +58,13 @@ type
   private
     f_Condition: TquideCondition;
   public
+    constructor Create; override;
     property Condition: TquideCondition read f_Condition write f_Condition;
   end;
 
-
+  TquideButtonAction = class(TquideAction)
+    constructor Create; override;
+  end;
 
 
 implementation
@@ -106,7 +109,7 @@ begin
   end;
   if Result <> nil then
    Result.Load(aElement);
- *)
+  *)
 end;
 
 function TquideAction.pm_GetActionType: TquideActionType;
@@ -126,6 +129,7 @@ constructor TquideVariableAction.Create;
 begin
   inherited Create;
   f_Variable := TquideVariable.Create();
+  ActionType:= atVariable;
 end;
 
 destructor TquideVariableAction.Destroy;
@@ -142,6 +146,7 @@ begin
   inherited Create;
   f_Links := TObjectList.Create();
   Define('Text', '', ptText);
+  ActionType:= atText;
 end;
 
 destructor TquideTextAction.Destroy;
@@ -178,6 +183,22 @@ end;
 procedure TquideTextAction.pm_SetText(const Value: string);
 begin
  Values['Text']:= Value;
+end;
+
+{ TquideButtonAction }
+
+constructor TquideButtonAction.Create;
+begin
+  inherited;
+  ActionType:= atButton;
+end;
+
+{ TquideLogicalAction }
+
+constructor TquideLogicalAction.Create;
+begin
+  inherited;
+  ActionType:= atLogic;
 end;
 
 end.
