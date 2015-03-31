@@ -48,6 +48,7 @@ implementation
 procedure TquideLocationDialog.actButtonExecute(Sender: TObject);
 begin
  // Добавляем кнопку
+ AddAction(fLocation.AddAction(atButton));
 end;
 
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);
@@ -72,6 +73,7 @@ begin
  l_Actions.Width:= f_Actions.ClientWidth;
  l_Actions.Properties:= aAction;
  l_Actions.Top:= l_Top;
+ l_Actions.Tag:= aAction.Index;
 end;
 
 procedure TquideLocationDialog.ClearControls;
@@ -120,13 +122,13 @@ begin
  //  Прочитать знаечения действий
  //fLocation.Clear; - нельзя
  { TODO : Нужно реализовать }
- (*
+ (* *)
  for i := 0 to f_Actions.ControlCount-1 do
  begin
    if f_Actions.Controls[i] is TPropertiesPanel then
-    fLocation.AddAction(TPropertiesPanel(f_Actions.Controls[i]).Properties.);
+    TPropertiesPanel(f_Actions.Controls[i]).GetValues;
  end;
- *)
+ (* *)
 end;
 
 procedure TquideLocationDialog.SetLocation(const Value: TquideLocation);

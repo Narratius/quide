@@ -11,6 +11,7 @@ type
   //1 Базовый объект для действия в локации
   TquideAction = class(TquideObject)
   private
+    f_Index: Integer;
     function pm_GetActionType: TquideActionType;
     procedure pm_SetActionType(Value: TquideActionType);
   public
@@ -21,6 +22,8 @@ type
     //1 Тип действия - текст, кнопка, переход...
     property ActionType: TquideActionType read pm_GetActionType write
         pm_SetActionType;
+    property Index: Integer
+     read f_Index write f_Index;
   end;
 
   TquideVariableAction = class(TquideAction)
@@ -176,7 +179,5 @@ procedure TquideTextAction.pm_SetText(const Value: string);
 begin
  Values['Text']:= Value;
 end;
-
-
 
 end.

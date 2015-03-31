@@ -66,7 +66,7 @@ type
 implementation
 
 uses
- Variants,
+ Variants, Vcl.ComCtrls,
  SizeableTypes, PropertiesListControl;
 
 {
@@ -202,8 +202,8 @@ end;
 procedure TPropertiesPanel.GetTextValue(aProperty: TddProperty;
   aControl: TControl);
 begin
- if aControl is TMemo then
-  aProperty.Value:= TMemo(aControl).Text;
+ if aControl is TRichEdit then
+  aProperty.Value:= TRichEdit(aControl).Text;
 end;
 
 procedure TPropertiesPanel.GetValues;
@@ -346,7 +346,8 @@ begin
  MakeCustomControl(TLabel);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TSizeableMemo);
+ //MakeCustomControl(TSizeableMemo);
+ MakeCustomControl(TRichEdit);
 // !!!
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
@@ -442,8 +443,8 @@ end;
 procedure TPropertiesPanel.SetTextValue(aProperty: TddProperty; aControl: TControl);
 begin
  // Мемо
- if aControl is TMemo then
-  TMemo(aControl).Text:= VarToStr(aProperty.Value);
+ if aControl is TRichEdit then
+  TRichEdit(aControl).Text:= VarToStr(aProperty.Value);
 end;
 
 procedure TPropertiesPanel.SetValues;

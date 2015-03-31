@@ -48,7 +48,7 @@ Uses
 }
 procedure TquideLocation.AddAction(aAction: TquideAction);
 begin
- f_Actions.Add(aAction);
+ aAction.Index:= f_Actions.Add(aAction);
 end;
 
 function TquideLocation.AddAction(aActType: TquideActionType): TquideAction;
@@ -95,7 +95,7 @@ end;
 
 function TquideLocation.pm_GetActions(Index: Integer): TquideAction;
 begin
- Result:= TquideAction(f_Actions[index])
+ Result:= f_Actions[index]
 end;
 
 function TquideLocation.pm_GetActionsCount: Integer;
