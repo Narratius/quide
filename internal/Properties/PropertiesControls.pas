@@ -83,6 +83,7 @@ var
  i: Integer;
  l_Ctrl: TControl;
 begin
+ // Выравнивание контролов относительно меток
  for I := 0 to Pred(ControlCount) do
   if (f_Controls[i].Position = cpInline) then
   begin
@@ -90,7 +91,8 @@ begin
    //Сдвигать только тех, у кого Inline
    if (l_Ctrl.Left <> LeftIndent) then
    begin
-    l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
+    if f_Controls[i].Size = csAutoSize then
+     l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
     l_Ctrl.Left:= LeftIndent;
    end;
   end;
