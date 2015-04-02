@@ -144,8 +144,9 @@ end;
 
 procedure TquideScenario.LoadFromFile(const aFileName: String);
 var
- l_Node: IXMLNode;
+ l_Node, l_Chaps: IXMLNode;
  l_Doc: IXMLDocument;
+ i: Integer;
 begin
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
@@ -153,6 +154,10 @@ begin
  l_Doc.LoadFromFile(aFileName);
  l_Node:= l_Doc.ChildNodes.FindNode('Scenario');
  LoadFromXML(l_Node);
+ l_Chaps:= l_Node.ChildNodes.FindNode('Chapters');
+ if l_Chaps <> nil then
+  for I := 0 to l_Chaps.ChildNodes.Count-1 do
+   AddChapter.LoadFromXML(l_Chaps.ChildNodes.Get(i));
 end;
 
 function TquideScenario.pm_GetChapters(Index: Integer): TquideChapter;

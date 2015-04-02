@@ -19,6 +19,8 @@ type
     destructor Destroy; override;
     procedure Clear; override;
     class function Make(aElement: IXMLNode): TquideAction;
+    procedure LoadFromXML(Element: IXMLNode);
+    procedure SaveToXML(Element: IXMLNode);
     //1 Тип действия - текст, кнопка, переход...
     property ActionType: TquideActionType read pm_GetActionType write
         pm_SetActionType;
@@ -73,6 +75,31 @@ Uses
  SysUtils,
  Propertys;
 
+
+
+const
+ ActionTypeNames: Array[TquideActionType] of String = (
+  'None', 'Goto', 'Inventory', 'Logic', 'Text', 'Variable', 'Button');
+
+function ActionType2String(aType: TquideActionType): String;
+begin
+ Result:= ActionTypeNames[aType];
+end;
+
+function String2ActionType(const aText: String): TquideActionType;
+var
+ i: TquideActionType;
+begin
+ Result:= atNone;
+ for I := Low(i) to High(i) do
+  if AnsiSameText(aText, ActionTypeNames[i]) then
+  begin
+    Result:= i;
+    break;
+  end;
+end;
+
+
 {
 ********************************* TquideAction *********************************
 }
@@ -89,6 +116,11 @@ begin
   inherited Destroy;
 end;
 
+procedure TquideAction.LoadFromXML(Element: IXMLNode);
+begin
+ inherited;
+end;
+
 procedure TquideAction.Clear;
 begin
   inherited Clear;
@@ -98,18 +130,20 @@ end;
 class function TquideAction.Make(aElement: IXMLNode): TquideAction;
 begin
  Result:= nil;
- (*
-  case StringToActionType(aElement.Attributes['Type']) of
-    atGoto: Result:= TquideJump.Create;
-    atInventory: Result:= TdcInventoryAction.Create;
-    atLogic: Result:= TdcLogicAction.Create;
-    atText: Result:= TdcTextAction.Create;
-    atVariable: Result:= TdcVariableAction.Create;
-    atButton: Result:= TdcButtonAction.Create;
+ // Все не так :(
+ (* *)
+  case String2ActionType(aElement.Attributes['Type']) of
+  //case TquideActionType(StrToIntDef(aElement.Attributes['Type'], 0)) of
+    //atGoto: Result:= TquideJump.Create;
+    //atInventory: Result:= TquideInventoryAction.Create;
+    atLogic: Result:= TquideLogicalAction.Create;
+    atText: Result:= TquideTextAction.Create;
+    atVariable: Result:= TquideVariableAction.Create;
+    atButton: Result:= TquideButtonAction.Create;
   end;
   if Result <> nil then
-   Result.Load(aElement);
-  *)
+   Result.LoadFromXML(aElement);
+  (* *)
 end;
 
 function TquideAction.pm_GetActionType: TquideActionType;
@@ -120,6 +154,12 @@ end;
 procedure TquideAction.pm_SetActionType(Value: TquideActionType);
 begin
  Values['ActionType']:= IntToStr(Ord(Value));
+end;
+
+procedure TquideAction.SaveToXML(Element: IXMLNode);
+begin
+ inherited;
+ Element.SetAttribute('Type', ActionType2String(ActionType));
 end;
 
 {

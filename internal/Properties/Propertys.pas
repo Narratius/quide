@@ -433,6 +433,7 @@ var
   l_Type: TddPropertyType;
   l_Alias, l_Caption: String;
   l_Visible: Boolean;
+  l_Val: Variant;
 begin
  // Загрузка значений элементов
   for i:= 0 to Pred(Element.ChildNodes.Count) do
@@ -441,8 +442,15 @@ begin
     l_Item:= Element.ChildNodes.Nodes[i];
     if AnsiSameText(l_Item.NodeName, 'Property') then
     begin
-      l_Alias:= l_Item.ChildValues['Alias'];
-      l_Caption:= l_Item.ChildValues['Caption'];
+      { TODO : Потом унифицировать }
+      l_Val:= l_Item['Alias'];
+      if not VarIsNull(l_Val) then
+       l_Alias:= l_Val;
+
+      l_Val:= l_Item['Caption'];
+      if not VarIsNull(l_Val) then
+       l_Caption:= l_Val;
+
       if not TryStrToBool(l_Item.ChildValues['Visible'], l_Visible) then
        l_Visible:= True; // Или False
       l_Type:= String2PropertyType(l_Item.ChildValues['Type']);
@@ -458,7 +466,7 @@ begin
       else
       if l_Type = ptText then
       begin
-       { TODO : Не работает }
+
         Define(l_Alias, l_Caption, l_Type, l_Visible);
         l_E:= l_Item.ChildNodes.FindNode('Value').ChildNodes.FindNode('Texts');
         if l_E <> nil then
