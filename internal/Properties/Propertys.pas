@@ -171,7 +171,9 @@ type
 
 const
  propBase = 100;
- propOrdinals : Set of TddPropertyType = [ptString,    // TEdit
+ propOrdinals : Set of TddPropertyType = [
+                  ptChar, // TEdit
+                  ptString,    // TEdit
                   ptInteger,   // TEdit
                   //ptText,      // TMemo
                   ptAction, // Tbutton
@@ -456,8 +458,9 @@ begin
       else
       if l_Type = ptText then
       begin
+       { TODO : Не работает }
         Define(l_Alias, l_Caption, l_Type, l_Visible);
-        l_E:= l_Item.ChildNodes.FindNode('Texts');
+        l_E:= l_Item.ChildNodes.FindNode('Value').ChildNodes.FindNode('Texts');
         if l_E <> nil then
         try
           l_Strings:= TStringList.Create;
@@ -599,6 +602,7 @@ begin
     l_Item.AddChild('Type').Text:= PropertyType2String(PropertyType);
     l_Value:= l_Item.AddChild('Value');
      case PropertyType of
+      ptChar,
       ptString: l_Value.Text:= VarToStr(Value);    // TEdit
       ptInteger: l_Value.Text:= VarToStr(Value);   // TEdit
       ptText :  // TMemo
