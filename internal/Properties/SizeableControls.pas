@@ -122,7 +122,7 @@ begin
  end
  else
  begin
-  aControl.Top:= cIndent;
+  aControl.Top:= 8;//cIndent;
   aControl.Left:= cIndent;
   aParent.Height:= aControl.Height + 2*cIndent;
  end;

@@ -64,7 +64,18 @@ type
     property Condition: TquideCondition read f_Condition write f_Condition;
   end;
 
-  TquideButtonAction = class(TquideAction)
+    //1 ѕереход в другую локацию пр€мо из текста
+  TquideJumpAction = class(TquideAction)
+  private
+
+    //Target: TquideLocation;
+  public
+    constructor Create; override;
+    //property Target: TquideLocation read f_Target write f_Target;
+  end;
+
+  //1  нопка дл€ перехода в другую локацию
+  TquideButtonAction = class(TquideJumpAction)
     constructor Create; override;
   end;
 
@@ -225,6 +236,14 @@ begin
  Values['Text']:= Value;
 end;
 
+{ TquideLogicalAction }
+
+constructor TquideLogicalAction.Create;
+begin
+  inherited;
+  ActionType:= atLogic;
+end;
+
 { TquideButtonAction }
 
 constructor TquideButtonAction.Create;
@@ -233,12 +252,13 @@ begin
   ActionType:= atButton;
 end;
 
-{ TquideLogicalAction }
+{ TquideJumpAction }
 
-constructor TquideLogicalAction.Create;
+constructor TquideJumpAction.Create;
 begin
   inherited;
-  ActionType:= atLogic;
+  ActionType:= atGoto;
 end;
+
 
 end.

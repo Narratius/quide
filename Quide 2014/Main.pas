@@ -213,6 +213,9 @@ type
     EditSize: TAction;
     Size1: TMenuItem;
     Size2: TMenuItem;
+    N5: TMenuItem;
+    N21: TMenuItem;
+    actScenarioProperties: TAction;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -329,6 +332,7 @@ type
     procedure ViewTransparentExecute(Sender: TObject);
     procedure EditSizeUpdate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure actScenarioPropertiesExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
@@ -353,6 +357,7 @@ implementation
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
   AboutDelphiArea, AlignDlg, SizeDlg,
+  PropertyUtils,
   quideLocations, quideLocationDlg;
 
 resourcestring
@@ -827,6 +832,12 @@ end;
 procedure TMainForm.ClipboardBitmapUpdate(Sender: TObject);
 begin
   ClipboardBitmap.Checked := cfBitmap in SimpleGraph.ClipboardFormats;
+end;
+
+procedure TMainForm.actScenarioPropertiesExecute(Sender: TObject);
+begin
+ // Редактирование свойств сценария
+  ShowPropDialog('Свойства сценария', f_Scenario);
 end;
 
 procedure TMainForm.ClipboardBitmapExecute(Sender: TObject);
