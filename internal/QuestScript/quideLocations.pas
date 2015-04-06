@@ -90,7 +90,7 @@ begin
  l_Node:= Element.ChildNodes.FindNode('Actions');
  if l_Node <> nil then
   for I := 0 to l_Node.ChildNodes.Count-1 do
-   l_Action:= TquideAction.Make(l_Node.ChildNodes.Get(i));
+   AddAction(TquideAction.Make(l_Node.ChildNodes.Get(i)));
 end;
 
 function TquideLocation.pm_GetActions(Index: Integer): TquideAction;

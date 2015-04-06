@@ -411,6 +411,7 @@ procedure TProperties.LoadFromXML(Element: IXMLNode);
 begin
  if Element <> nil then
  begin
+   f_Items.Clear;
    LoadHeader(Element);
    LoadValues(Element);
  end;
@@ -445,11 +446,15 @@ begin
       { TODO : Потом унифицировать }
       l_Val:= l_Item['Alias'];
       if not VarIsNull(l_Val) then
-       l_Alias:= l_Val;
+       l_Alias:= l_Val
+      else
+       l_Alias:= '';
 
       l_Val:= l_Item['Caption'];
       if not VarIsNull(l_Val) then
-       l_Caption:= l_Val;
+       l_Caption:= l_Val
+      else
+       l_Caption:= '';
 
       if not TryStrToBool(l_Item.ChildValues['Visible'], l_Visible) then
        l_Visible:= True; // Или False

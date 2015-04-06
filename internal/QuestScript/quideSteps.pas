@@ -86,8 +86,9 @@ begin
   for I := 0 to l_Node.ChildNodes.Count-1 do
   begin
     l_XMLLoc:= l_Node.ChildNodes.Get(i);
-    l_Location:= TquideLocation.Create;
+    l_Location:= AddLocation;
     l_Location.LoadFromXML(l_XMLLoc);
+
   end;
 end;
 

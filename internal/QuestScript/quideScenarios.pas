@@ -148,6 +148,11 @@ var
  l_Doc: IXMLDocument;
  i: Integer;
 begin
+ // Очистка текущего состояния
+ f_Chapters.Clear;
+ f_Inventory.Clear;
+ f_Variables.Clear;
+ // Загрузка из файла
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
  l_Doc.Active:= True;
