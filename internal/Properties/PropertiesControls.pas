@@ -291,6 +291,7 @@ var
  i, l_Count: Integer;
 begin
  Result:= True;
+ { Debug }
  if aProperty.Visible then
  begin
   l_Count:= Length(f_Controls);

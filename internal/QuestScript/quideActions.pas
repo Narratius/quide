@@ -250,6 +250,7 @@ constructor TquideButtonAction.Create;
 begin
   inherited;
   ActionType:= atButton;
+  DefineButton('Button', '', nil);
 end;
 
 { TquideJumpAction }
@@ -257,6 +258,7 @@ end;
 constructor TquideJumpAction.Create;
 begin
   inherited;
+  Define('Target', '', ptString, False);
   ActionType:= atGoto;
 end;
 

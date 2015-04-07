@@ -108,5 +108,10 @@ object quideLocationDialog: TquideLocationDialog
       Hint = #1044#1086#1073#1072#1074#1083#1103#1077#1090' '#1082#1085#1086#1087#1082#1091' '#1087#1077#1088#1077#1093#1086#1076#1072
       OnExecute = actButtonExecute
     end
+    object actEditButton: TAction
+      Category = #1044#1077#1081#1089#1090#1074#1080#1103
+      Caption = #1048#1079#1084#1077#1085#1080#1090#1100' '#1082#1085#1086#1087#1082#1091
+      OnExecute = actEditButtonExecute
+    end
   end
 end

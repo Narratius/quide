@@ -19,8 +19,10 @@ type
     Panel1: TPanel;
     Button1: TButton;
     Button2: TButton;
+    actEditButton: TAction;
     procedure actNewTextExecute(Sender: TObject);
     procedure actButtonExecute(Sender: TObject);
+    procedure actEditButtonExecute(Sender: TObject);
   private
     FLocation: TquideLocation;
     f_Header : TPropertiesPanel;
@@ -46,9 +48,24 @@ implementation
 { TForm1 }
 
 procedure TquideLocationDialog.actButtonExecute(Sender: TObject);
+var
+ l_Loc: String;
+ l_Act: TquideAction;
 begin
  // Добавляем кнопку
- AddAction(fLocation.AddAction(atButton));
+ l_Loc:= '';
+ if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
+ begin
+  l_Act:= fLocation.AddAction(atButton);
+  l_Act.AliasItems['Button'].Caption:= l_Loc;
+  TquideButtonAction(l_Act).Values['Target']:= l_Loc;
+  AddAction(l_Act);
+ end;
+end;
+
+procedure TquideLocationDialog.actEditButtonExecute(Sender: TObject);
+begin
+ // Изменяем свойства кнопки
 end;
 
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);

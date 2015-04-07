@@ -15,10 +15,10 @@ File_12=TSourceModule,'C:\svn\Quide\internal\QuestScript\quideObject.pas',0,1,1,
 File_13=TSourceModule,'C:\svn\Quide\internal\QuestScript\quideSteps.pas',0,1,1,3,11,0,0,,
 
 [Modules]
-Module0=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas
-Module1=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLocations.pas
-Module2=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\quideLocationDlg.pas
-Module3=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas
+Module0=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas
+Module1=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\quideLocationDlg.pas
+Module2=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas
+Module3=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLocations.pas
 Module4=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\Propertys.pas
 Module5=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideSteps.pas
 Module6=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertyIntf.pas
@@ -27,12 +27,7 @@ Module8=default.htm
 Count=9
 EditWindowCount=1
 
-[C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas]
-ModuleType=TSourceModule
-FormState=0
-FormOnTop=0
-
-[C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLocations.pas]
+[C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
@@ -42,7 +37,12 @@ ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
-[C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas]
+[C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLocations.pas]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
@@ -72,7 +72,7 @@ ModuleType=TURLModule
 
 [EditWindow0]
 ViewCount=9
-CurrentEditView=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas
+CurrentEditView=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas
 View0=0
 View1=1
 View2=2
@@ -140,9 +140,9 @@ EditViewName=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\Property
 [View3]
 CustomEditViewType=TEditView
 Module=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLocations.pas
-CursorX=23
-CursorY=134
-TopLine=131
+CursorX=1
+CursorY=57
+TopLine=29
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -151,9 +151,9 @@ EditViewName=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideLo
 [View4]
 CustomEditViewType=TEditView
 Module=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas
-CursorX=24
-CursorY=138
-TopLine=119
+CursorX=1
+CursorY=252
+TopLine=234
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -163,8 +163,8 @@ EditViewName=C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideAc
 CustomEditViewType=TEditView
 Module=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas
 CursorX=1
-CursorY=297
-TopLine=282
+CursorY=294
+TopLine=279
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -185,7 +185,7 @@ EditViewName=C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\Property
 CustomEditViewType=TEditView
 Module=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\quideLocationDlg.pas
 CursorX=1
-CursorY=51
+CursorY=74
 TopLine=49
 LeftCol=1
 Elisions=
@@ -237,7 +237,7 @@ Breakpoint3='C:\svn\Quide\internal\QuestScript\quideScenarios.pas',209,'',0,1,''
 Breakpoint4='C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\Propertys.pas',321,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint5='C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\PropertiesControls.pas',218,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint6='C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\quideLocationDlg.pas',74,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint7='C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\quideLocationDlg.pas',51,'',0,1,'',1,0,0,'',1,'','','',0,''
+Breakpoint7='C:\Users\ddudko\Documents\GitHub\quide\internal\QuestScript\quideActions.pas',252,'',0,1,'',1,0,0,'',1,'','','',0,''
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -426,11 +426,6 @@ LRDockWidth=1894
 Dockable=1
 StayOnTop=0
 SplitPos=111
-
-[PropInspDesignerSelection]
-ArrangeBy=Name
-SelectedItem=,Action
-ExpandedItems=Images=0,Anchors=0,Constraints=0,Font=0,ImageMargins=0,LiveBindings=0,Margins=0,StyleElements=0
 
 [TFileExplorerForm]
 PercentageSizes=1

@@ -345,7 +345,8 @@ end;
 procedure TProperties.DefineButton(const aAlias, aCaption: String;
   aEvent: TNotifyEvent);
 begin
-
+ Define(aAlias, aCaption, ptAction, True);
+ // Event?
 end;
 
 procedure TProperties.DefineChoice(const aAlias, aCaption: String;
