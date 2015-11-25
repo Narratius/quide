@@ -59,6 +59,7 @@ begin
   l_Act:= fLocation.AddAction(atButton);
   l_Act.AliasItems['Button'].Caption:= l_Loc;
   TquideButtonAction(l_Act).Values['Target']:= l_Loc;
+  TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
   AddAction(l_Act);
  end;
 end;
@@ -66,6 +67,7 @@ end;
 procedure TquideLocationDialog.actEditButtonExecute(Sender: TObject);
 begin
  // Изменяем свойства кнопки
+ ShowMessage('Click!');
 end;
 
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);

@@ -216,6 +216,8 @@ type
     N5: TMenuItem;
     N21: TMenuItem;
     actScenarioProperties: TAction;
+    actFileGenerate: TAction;
+    N22: TMenuItem;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -333,6 +335,7 @@ type
     procedure EditSizeUpdate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure actScenarioPropertiesExecute(Sender: TObject);
+    procedure actFileGenerateExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
@@ -834,6 +837,11 @@ begin
   ClipboardBitmap.Checked := cfBitmap in SimpleGraph.ClipboardFormats;
 end;
 
+procedure TMainForm.actFileGenerateExecute(Sender: TObject);
+begin
+ // Генерация игры
+end;
+
 procedure TMainForm.actScenarioPropertiesExecute(Sender: TObject);
 begin
  // Редактирование свойств сценария
@@ -897,7 +905,6 @@ begin
 
  l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
  l_Loc.Caption:= Format('Новая локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
- l_Loc.GraphID:= n1.ID;
 
  with TquideLocationDialog.Create(Self) do
  try
@@ -1141,8 +1148,41 @@ end;
 
 procedure TMainForm.SimpleGraphObjectDblClick(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
+var
+ N1: TGraphNode;
+ LinkCount: Integer;
+ l_Loc: TquideLocation;
 begin
-  EditProperties.Execute;
+ // Редактирование локации
+
+  if SimpleGraph.SelectedObjects.Count = 0 then
+    TDesignerProperties.Execute(SimpleGraph)
+  else
+  begin
+    LinkCount := SimpleGraph.SelectedObjectsCount(TGraphLink);
+    if LinkCount = 0 then
+    begin
+      N1:= TGraphNode(SimpleGraph.SelectedObjects[0]);
+      l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(N1.ID);
+      if L_loc <> nil then
+       with TquideLocationDialog.Create(Self) do
+       try
+         if Execute(l_Loc) then
+         begin
+          N1.Text:= l_Loc.Caption;
+          l_Loc.Values['GraphObject']:= N1.ID;
+         end;
+       finally
+         Free;
+       end;
+
+    end
+    else if LinkCount = SimpleGraph.SelectedObjects.Count then
+      TLinkProperties.Execute(SimpleGraph.SelectedObjects)
+    else
+      TObjectProperties.Execute(SimpleGraph.SelectedObjects);
+  end;
+  //EditProperties.Execute;
 end;
 
 procedure TMainForm.SimpleGraphGraphChange(Sender: TObject);
