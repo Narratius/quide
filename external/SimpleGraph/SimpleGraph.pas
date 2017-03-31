@@ -1,6 +1,6 @@
 {------------------------------------------------------------------------------}
 {                                                                              }
-{  TSimpleGraph v2.90                                                        }
+{  TSimpleGraph v2.91                                                        }
 {  by Kambiz R. Khojasteh                                                      }
 {                                                                              }
 {  kambiz@delphiarea.com                                                       }
@@ -1436,7 +1436,7 @@ begin
     end;
     if E <> nil then
     begin
-      while (E >= S) and (P^ = ' ') do
+      while (E >= S) and (E^ = ' ') do
         Dec(E);
     end;
     if E <> nil then
