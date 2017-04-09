@@ -34,6 +34,8 @@ type
 
   //1  нопка дл€ перехода в другую локацию
   TquideButton = class(TquideJump)
+  public
+    constructor Create; override;
   end;
 
 implementation
@@ -86,7 +88,7 @@ var
  i: Integer;
  l_Action: TquideAction;
 begin
- inherited;
+ inherited LoadFromXML(Element, False);
  l_Node:= Element.ChildNodes.FindNode('Actions');
  if l_Node <> nil then
   for I := 0 to l_Node.ChildNodes.Count-1 do
@@ -110,10 +112,19 @@ var
  l_Node: IXMLNode;
  i: Integer;
 begin
- inherited;
+ inherited SaveToXML(Element, False);
  l_Node:= Element.AddChild('Actions');
  for I := 0 to ActionsCount-1 do
   Actions[i].SaveToXML(l_Node.AddChild('Action'));
+end;
+
+{ TquideButton }
+
+constructor TquideButton.Create;
+begin
+  inherited;
+  ActionType:= atButton;
+  Visible['Caption']:= False;
 end;
 
 end.

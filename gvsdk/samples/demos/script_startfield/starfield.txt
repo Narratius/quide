@@ -1,0 +1,162 @@
+--[[-----------------------------------------------------------------------
+  GVScript Starfield Simulation
+  Copyright (c) 2003 Jarrod Davis Software
+  All Rights Reserved.
+-------------------------------------------------------------------------]]
+
+GV_KEY_ESCAPE     = 1
+GV_KEY_M          = 50
+
+SCREEN_WIDTH      = 640
+SCREEN_HEIGHT     = 480
+SCREEN_BPP        = 32
+SCREEN_WINDOWED   = false
+SCREEN_CAPTION    = "GVScript StarField"
+
+VIEW_SCALE_RATIO  = 640 / 480
+VIEW_SCALE        = 80
+
+MIN_X             = -1000;
+MIN_Y             = -1000;
+MIN_Z             =    10;
+MAX_X             =  1000;
+MAX_Y             =  1000;
+MAX_Z             =  1000;
+
+MAX_STARS         = 250
+
+star_t = {x,y,z}
+star   = {}
+
+function TransformDrawPoint(aX, aY, aZ)
+  local x,y, sw,sh, ooz, cv, color
+
+  ooz = ((1.0 / aZ) * VIEW_SCALE)
+  x = 320 - (aX * ooz)*VIEW_SCALE_RATIO
+  y = 240 + (aY * ooz)*VIEW_SCALE_RATIO
+  sw = (1 * ooz);
+  if sw < 1 then sw = 1 end
+  sh = (1 * ooz)
+  if sh < 1 then sh = 1 end
+
+  cv = 255.0-(((1.0 / MAX_Z) / (1.0 / aZ)) * 255.0)
+
+  color = GV_Color_Make(cv, cv, cv, cv)
+  GV_RenderDevice_DrawRect(x, y, sw, sh, color, 5)
+end
+
+
+function stars_init()
+  local i
+  for i=1,MAX_STARS do
+    star[i]   = {star_t,}
+    star[i].x = GV_RandomNum_RangeInteger(MIN_X, MAX_X)
+    star[i].y = GV_RandomNum_RangeInteger(MIN_Y, MAX_Y)
+    star[i].z = GV_RandomNum_RangeInteger(MIN_Z, MAX_Z)
+  end
+end
+
+function stars_update(Speed, ElapsedTime)
+  local i
+  for i=1,MAX_STARS do
+    star[i].z = star[i].z - (Speed * ElapsedTime)
+    if star[i].z < MIN_Z then
+      star[i].x = GV_RandomNum_RangeInteger(MIN_X, MAX_X)
+      star[i].y = GV_RandomNum_RangeInteger(MIN_Y, MAX_Y);
+      star[i].z = MAX_Z - star[i].z;
+    end
+  end
+end
+
+function stars_render()
+  local i
+  for i=1,MAX_STARS do
+    TransformDrawPoint(star[i].x, star[i].y, star[i].z)
+  end
+end
+
+function main()
+  MusicPath = ""
+  MusicPath = GV_Dialog_PickDir('Pick Music Path')
+  if MusicPath == "" then MusicPath = "C:/My Music" end
+
+  GV_Timer_Init(35, 3)
+
+  GV_RezFile_Init(1)
+  GV_Font_Init(1)
+  GV_Texture_Init(256)
+
+  RezFile = GV_RezFile_OpenArchive("../../samples.rez")
+
+  GV_AppWindow_Open(SCREEN_CAPTION, SCREEN_WIDTH, SCREEN_HEIGHT)
+  GV_AppWindow_Show()
+
+  GV_RenderDevice_SetMode(GV_AppWindow_GetHandle(), SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SCREEN_WINDOWED, 1)
+
+  Font = GV_Font_Load(RezFile, "media/fonts/font0")
+
+  GV_Audio_Open(GV_AppWindow_GetHandle())
+  GV_MusicPlayer_InitSongList();
+  GV_MusicPlayer_AddSongs(MusicPath);
+
+  GV_Input_Open(GV_AppWindow_GetHandle(), SCREEN_WINDOWED)
+
+  stars_init()
+
+  repeat
+    GV_App_ProcessMessages()
+    if GV_RenderDevice_IsReady() == true then
+
+      GV_RenderDevice_ClearFrame(3, 0)
+      if GV_RenderDevice_StartFrame() == true then
+        stars_render()
+        GV_Font_Print(Font, 0, 0, GV_White, "%d fps", GV_Timer_FrameRate())
+        GV_Font_Print(Font, 0,24, GV_Green, "M   - Random Song");
+        GV_Font_Print(Font, 0,36, GV_Green, "ESC - Quit");
+
+        GV_Font_Center(Font, 0, GV_White, "3D Star Field Simulation")
+        GV_Font_Center(Font, 12, GV_White, "using GVScript")
+
+        GV_Font_Center(Font, 456, GV_Yellow, 'GameVision (tm) SDK Copyright (c) 1994-2003 Jarrod Davis Software');
+        GV_Font_Center(Font, 468, GV_Yellow, 'Visit the GameVision SDK site at: www.gamevisionsdk.com');
+
+        GV_RenderDevice_EndFrame()
+      end
+      GV_RenderDevice_ShowFrame()
+
+      GV_Input_Update()
+      GV_Timer_Update()
+      ElapsedTime = GV_Timer_ElapsedTime()
+      stars_update(5, ElapsedTime)
+
+      if GV_MusicPlayer_SongPlaying() == false then
+        GV_MusicPlayer_PlayRandomSong(false)
+      end
+
+      if GV_Input_KeyHit(GV_KEY_M) then
+        GV_MusicPlayer_PlayRandomSong(false)
+      end
+
+      if GV_Input_KeyHit(GV_KEY_ESCAPE) then
+        GV_App_Terminate()
+      end
+    end
+
+  until GV_App_IsTerminated() == true
+
+  GV_Input_Close()
+  GV_Audio_StopMusic()
+  GV_Audio_Close()
+
+  GV_Font_Dispose(Font)
+
+  GV_RenderDevice_RestoreMode()
+
+  GV_AppWindow_Close()
+
+  GV_RezFile_CloseArchive(RezFile)
+
+  GV_Font_Done()
+  GV_Texture_Done()
+  GV_RezFile_Done()
+end

@@ -7,16 +7,17 @@ uses
   PropertyIntf;
 
 type
- TddPropertyType = (
-                    ptChar,      // TEdit
-                    ptString,    // TEdit
-                    ptInteger,   // TEdit
-                    ptText,      // TMemo
-                    ptBoolean,   // TRadioGroup (TCombobox)
-                    ptChoice,    // TComboBox
-                    ptAction,    // TButton
-                    ptList,      // TListBox
-                    ptProperties // TScrollBox (Вложенные свойства)
+ TddPropertyType = (ptNothing,    // Нет визуального элемента ввода
+                    ptChar,       // TEdit
+                    ptString,     // TEdit
+                    ptInteger,    // TEdit
+                    ptText,       // TMemo
+                    ptBoolean,    // TRadioGroup (TCombobox)
+                    ptChoice,     // TComboBox
+                    ptAction,     // TButton
+                    ptList,       // TListBox
+                    ptProperties, // TScrollBox (Вложенные свойства)
+                    ptPassword    // TEdit с PasswordChar
                     );
 
   TddChoiceLink = class;
@@ -34,7 +35,8 @@ type
     f_ListItem: TProperties;      // Эталонный элемент списка
     f_ListItems: TObjectList<TProperties>;
     f_Hint: String;
-    f_OnChange: TNotifyEvent;  // Элементы списка
+    f_OnChange: TNotifyEvent;
+    f_ReadOnly: Boolean;  // Элементы списка
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
@@ -64,6 +66,7 @@ type
     property OrdinalType: Boolean read pm_GetOrdinalType;
     property PropertyType: TddPropertyType read f_PropertyType write
         pm_SetPropertyType;
+    property ReadOnly: Boolean read f_ReadOnly write f_ReadOnly;
     property Value: Variant read f_Value write f_Value;
     property Visible: Boolean read f_Visible write f_Visible;
     property Event: TNotifyEvent read f_Event write f_Event;
@@ -117,7 +120,7 @@ type
     procedure pm_SetValues(Alias: String; const Value: Variant);
     function pm_GetCount: Integer;
     procedure SaveValues(Element: IXMLNode);
-    procedure LoadValues(Element: IXMLNode);
+    procedure LoadValues(Element: IXMLNode; LoadStruct: Boolean);
     procedure SaveHeader(Element: IXMLNode);
     procedure LoadHeader(Element: IXMLNode);
     function pm_GetVisible(Alias: String): Boolean;
@@ -126,6 +129,8 @@ type
     procedure SetHints(Alias: String; const Value: String);
     procedure SetOnChange(const Value: TNotifyEvent);
     procedure InnerOnChange(Sender: TObject);
+    function Encrypt(const aText: String): String;
+    function Decrypt(const aText: String): String;
   public
     constructor Create; virtual;
     function Add(aProp: TddProperty): TddProperty;
@@ -137,8 +142,8 @@ type
     procedure DefineChoice(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddChoiceLink = nil);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure IterateAll(aFunc: TddPropertyFunc);
-    procedure LoadFromXML(Element: IXMLNode);
-    procedure SaveToXML(Element: IXMLNode);
+    procedure LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
+    procedure SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
     property AliasItems[Alias: String]: TddProperty read pm_GetAliasItems write
         pm_SetAliasItems; default;
     property Changed: Boolean read f_Changed write pm_SetChanged;
@@ -177,7 +182,8 @@ const
                   ptInteger,   // TEdit
                   //ptText,      // TMemo
                   ptAction, // Tbutton
-                  ptBoolean];   // TRadioGroup (TCombobox)
+                  ptBoolean,
+                  ptPassword];   // TRadioGroup (TCombobox)
 
 function PropertyType2String(aType: TddPropertyType): String;
 
@@ -186,11 +192,13 @@ function String2PropertyType(const aText: String): TddPropertyType;
 implementation
 
 Uses
- Variants;
+ Variants,
+ PropertyUtils;
 
 const
  PropertyTypeNames: Array[TddPropertyType] of String = (
-  'Char', 'String', 'Integer', 'Text', 'Boolean', 'Choice', 'Action', 'List', 'Properties');
+  'Nothing', 'Char', 'String', 'Integer', 'Text',
+  'Boolean', 'Choice', 'Action', 'List', 'Properties', 'Password');
 
 function PropertyType2String(aType: TddPropertyType): String;
 begin
@@ -209,6 +217,56 @@ begin
     break;
   end;
 end;
+
+const
+  C1 = 439;
+  C2 = 163;
+
+{$R-}
+function BorlandEncrypt(const S: AnsiString; Key: Word): AnsiString;
+var
+  I: byte;
+  l_C: Integer;
+begin
+  //SetLength(Result,Length(S));
+  Result:= '';
+  for I := 1 to Length(S) do
+  begin
+    l_C:= byte(S[I]) xor (Key shr 8);
+    Result := Result + IntToHex(l_C, 2);
+    Key := (byte(l_C) + Key) * C1 + C2;
+  end;
+end;
+
+function BorlandDecrypt(const S: AnsiString; Key: Word): AnsiString;
+var
+  I: byte;
+  l_C: Integer;
+begin
+  //SetLength(Result,Length(S));
+  Result:= '';
+  for I := 0 to Length(S) div 2  - 1 do
+  begin
+    l_C:= StrToInt('$'+S[i*2+1]+S[i*2+2]);
+    Result := Result + ansichar(l_C xor (Key shr 8));
+    Key := (l_C + Key) * C1 + C2;
+  end;
+end;
+{$R+}
+
+function EncryptText(Text : AnsiString): AnsiString;
+begin
+ Result := BorlandEncrypt(Text,17732);
+end;
+
+function DecryptText(Text : AnsiString): AnsiString;
+begin
+ if Text = '' then
+  result := ''
+ else
+  result := BorlandDecrypt(Text,17732);
+end;
+
 
 {
 ********************************** TddProperty ***********************************
@@ -247,6 +305,7 @@ begin
    f_Value:= TddProperty(Source).Value;
    f_Visible:= TddProperty(Source).Visible;
    f_ID:= TddProperty(Source).ID; // ?
+   f_ReadOnly:= TddProperty(Source).ReadOnly;
    if PropertyType in [ptList, ptChoice] then
    begin
     ListItem:= TddProperty(Source).ListItem;
@@ -268,6 +327,7 @@ begin
   Caption:= aCaption;
   PropertyType:= aType;
   Visible:= aVisible;
+  Value:= Unassigned;
   f_ListItems:= TObjectList<TProperties>.Create;
 end;
 
@@ -335,6 +395,11 @@ begin
  TProperties(Result).Assign(Self);
 end;
 
+function TProperties.Decrypt(const aText: String): String;
+begin
+  Result:= DecryptText(aText);
+end;
+
 procedure TProperties.Define(const aAlias, aCaption: String; aType:
     TddPropertyType; aVisible: Boolean = True);
 begin
@@ -366,6 +431,19 @@ begin
  Define(aAlias, aCaption, ptList, aVisible);
  l_P:= AliasItems[aAlias];
  l_P.SetItem(aItem);
+end;
+
+function TProperties.Encrypt(const aText: String): String;
+begin
+  Result:= EncryptText(aText);
+  (*
+  with TIdHashMessageDigest5.Create do
+  try
+    Result:= HashStringAsHex(aText);
+  finally
+    Free;
+  end;
+  *)
 end;
 
 function TProperties.FindProperty(aAlias: String): TddProperty;
@@ -407,13 +485,16 @@ begin
   end;
 end;
 
-procedure TProperties.LoadFromXML(Element: IXMLNode);
+procedure TProperties.LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
 begin
  if Element <> nil then
  begin
-   f_Items.Clear;
-   LoadHeader(Element);
-   LoadValues(Element);
+   if LoadStruct then
+   begin
+    f_Items.Clear;
+    LoadHeader(Element);
+   end;
+   LoadValues(Element, LoadStruct);
  end;
 end;
 
@@ -423,7 +504,7 @@ begin
   // Загрузка структуры элемента и создание элементов
 end;
 
-procedure TProperties.LoadValues(Element: IXMLNode);
+procedure TProperties.LoadValues(Element: IXMLNode; LoadStruct: Boolean);
 var
   i, j, k: Integer;
   l_E: IXMLNode;
@@ -461,18 +542,19 @@ begin
       l_Type:= String2PropertyType(l_Item.ChildValues['Type']);
       if l_Type in propOrdinals then
       begin
-       Define(l_Alias, l_Caption, l_Type, l_Visible);
-       try
-       Values[l_Alias]:= l_Item.ChildValues['Value'];
-       except
-       Values[l_Alias]:= l_Item.ChildValues['Value'];
-       end;
+       if LoadStruct then
+        Define(l_Alias, l_Caption, l_Type, l_Visible);
+       //Values[l_Alias]:= {l_Item['Value']//}l_Item.ChildValues['Value'];
+       Values[l_Alias]:= l_Item.ChildNodes.FindNode('Value').Text;
+       { TODO : Нужно расшифровать строку }
+       if l_Type = ptPassword then
+        Values[l_Alias]:= Decrypt(Values[l_Alias]);
       end
       else
       if l_Type = ptText then
       begin
-
-        Define(l_Alias, l_Caption, l_Type, l_Visible);
+        if LoadStruct then
+         Define(l_Alias, l_Caption, l_Type, l_Visible);
         l_E:= l_Item.ChildNodes.FindNode('Value').ChildNodes.FindNode('Texts');
         if l_E <> nil then
         try
@@ -492,15 +574,18 @@ begin
       else
       if l_Type in [ptList, ptChoice] then
       begin
-       if l_Type = ptList then
-        DefineList(l_Alias, l_Caption, l_Visible)
-       else
-        DefineChoice(l_Alias, l_Caption, l_Visible);
+       if LoadStruct then
+       begin
+        if l_Type = ptList then
+         DefineList(l_Alias, l_Caption, l_Visible)
+        else
+         DefineChoice(l_Alias, l_Caption, l_Visible);
+       end;
        // Прочитать описание элемента списка
        l_E:= l_Item.ChildNodes.FindNode('Properties');
        l_SubItem:= TProperties.Create;
        try
-        l_SubItem.LoadFromXML(l_E);
+        l_SubItem.LoadFromXML(l_E, LoadStruct);
         AliasItems[l_Alias].ListItem:= l_SubItem;
        finally
         FreeAndNil(l_SubItem);
@@ -515,7 +600,7 @@ begin
           k:= AliasItems[l_Alias].AddItem;
           l_SubItem:= TProperties.Create; // потом вынести за скобки
           try
-           l_SubItem.LoadFromXML(l_E.ChildNodes.Get(j));
+           l_SubItem.LoadFromXML(l_E.ChildNodes.Get(j), LoadStruct);
            AliasItems[l_Alias].ListItems[k].Assign(l_SubItem);
           finally
            FreeAndNil(l_SubItem);
@@ -588,9 +673,10 @@ begin
  // Сохраение структуры элемента
 end;
 
-procedure TProperties.SaveToXML(Element: IXMLNode);
+procedure TProperties.SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
 begin
- SaveHeader(Element);
+ if SaveStruct then
+  SaveHeader(Element);
  SaveValues(Element);
 end;
 
@@ -635,20 +721,21 @@ begin
          l_E:= nil;
         end;
        end;
-      ptBoolean: l_Value.Text:= Value;   // TRadioGroup (TCombobox)
+      ptBoolean: l_Value.Text:= VarToStr(Value);   // TRadioGroup (TCombobox)
 
       ptAction:;    // TButton
       ptList, // TListBox
       ptChoice: // TComboBox
        begin
         // Записываем описание эталонного элемента
-        ListItem.SaveToXML(l_Item.AddChild('Properties'));
+        ListItem.SaveToXML(l_Item.AddChild('Properties'), True);
         // Теперь скидываем все элементы списка
         for j := 0 to ListItemsCount-1 do
-         ListItems[j].SaveToXML(l_Value.AddChild('Item'));
+         ListItems[j].SaveToXML(l_Value.AddChild('Item'), True);
         // Для комбобокса нужно добавить сохранение ItemIndex
        end; // ptList
       ptProperties: ; // TScrollBox (Вложенные свойства)
+      ptPassword: l_Value.Text:= Encrypt(VarToStrDef(Value, ''));
      end; // case
    end; // with Items[i]
   end; // for i
@@ -750,11 +837,13 @@ begin
 end;
 
 procedure TddProperty.SetItem(aItem: TddPropertyLink);
-var
- l_Item: TddPropertyLink;
- l_Next: TddPropertyLink;
+//var
+// l_Item: TddPropertyLink;
+// l_Next: TddPropertyLink;
 begin
  FreeAndNil(f_ListItem);
+ f_ListItem:= LinkToProperties(aItem);
+(*
  f_ListItem:= TProperties.Create;
  l_Next:= aItem;
  while l_Next <> nil do
@@ -764,6 +853,7 @@ begin
    l_Next:= l_Item.Next;
    FreeAndNil(l_Item);
  end;
+*)
 end;
 
 

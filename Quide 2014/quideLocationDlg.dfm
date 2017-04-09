@@ -2,7 +2,7 @@ object quideLocationDialog: TquideLocationDialog
   Left = 0
   Top = 0
   Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1077' '#1083#1086#1082#1072#1094#1080#1080
-  ClientHeight = 242
+  ClientHeight = 249
   ClientWidth = 527
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -37,17 +37,20 @@ object quideLocationDialog: TquideLocationDialog
     Left = 0
     Top = 25
     Width = 440
-    Height = 217
+    Height = 224
     Align = alClient
+    PopupMenu = PopupMenu1
     TabOrder = 1
+    ExplicitHeight = 217
   end
   object Panel1: TPanel
     Left = 440
     Top = 25
     Width = 87
-    Height = 217
+    Height = 224
     Align = alRight
     TabOrder = 2
+    ExplicitHeight = 217
     object Button1: TButton
       Left = 8
       Top = 0
@@ -107,6 +110,16 @@ object quideLocationDialog: TquideLocationDialog
       Caption = #1050#1085#1086#1087#1082#1072
       Hint = #1044#1086#1073#1072#1074#1083#1103#1077#1090' '#1082#1085#1086#1087#1082#1091' '#1087#1077#1088#1077#1093#1086#1076#1072
       OnExecute = actButtonExecute
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 328
+    Top = 161
+    object MenuText: TMenuItem
+      Action = actNewText
+    end
+    object MenuButton: TMenuItem
+      Action = actButton
     end
   end
 end

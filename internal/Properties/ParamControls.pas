@@ -15,6 +15,7 @@ type
     Width: Integer;
     Hint: String;
     Tag: Integer;
+    ReadOnly: Boolean;
     Event: TNotifyEvent;
     OnChange: TNotifyEvent;
   end;
@@ -41,6 +42,7 @@ const
                                  Width: 0;
                                  Hint: '';
                                  Tag: 0;
+                                 ReadOnly: False;
                                  Event: nil;
                                  OnChange: nil);
 
@@ -76,6 +78,7 @@ begin
     l_C.Height:= aControls[i].Height;
    if (aControls[i].Size = csFixed) and (aControls[i].Width > 0) then
     l_C.Width:= aControls[i].Width;
+   l_C.Enabled:= not aControls[i].ReadOnly;
 
    //AddControl(l_C, aControls[i].Size, aControls[i].Position);
    if l_C is TLabel then

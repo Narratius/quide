@@ -9,8 +9,8 @@ type
   //1 Обеспечивает сохранение-загрузку
   IPropertyStore = interface
     ['{1604F322-5F86-4359-A44A-33EE3CB1F6C7}']
-    procedure LoadFromXML(Element: IXMLNode);
-    procedure SaveToXML(Element: IXMLNode);
+    procedure LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
+    procedure SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
   end;
 
   IPropertyControlValue = interface

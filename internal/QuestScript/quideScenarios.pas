@@ -158,7 +158,7 @@ begin
  l_Doc.Active:= True;
  l_Doc.LoadFromFile(aFileName);
  l_Node:= l_Doc.ChildNodes.FindNode('Scenario');
- LoadFromXML(l_Node);
+ LoadFromXML(l_Node, False);
  l_Chaps:= l_Node.ChildNodes.FindNode('Chapters');
  if l_Chaps <> nil then
   for I := 0 to l_Chaps.ChildNodes.Count-1 do
@@ -217,7 +217,7 @@ begin
  l_Doc.Active:= True;
  l_Scenario:= l_Doc.AddChild('Scenario');
  // Собственные атрибуты
- SaveToXML(l_Scenario);
+ SaveToXML(l_Scenario, False);
  // Главы
  l_Node:= l_Scenario.AddChild('Chapters');
  for I := 0 to ChaptersCount-1 do

@@ -118,7 +118,7 @@ end;
 
 procedure TquideAction.LoadFromXML(Element: IXMLNode);
 begin
- inherited;
+ inherited LoadFromXML(Element, False);
 end;
 
 procedure TquideAction.Clear;
@@ -158,7 +158,7 @@ end;
 
 procedure TquideAction.SaveToXML(Element: IXMLNode);
 begin
- inherited;
+ inherited SaveToXML(Element, False);
  Element.SetAttribute('Type', ActionType2String(ActionType));
 end;
 

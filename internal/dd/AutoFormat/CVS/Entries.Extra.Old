@@ -1,0 +1,10 @@
+/afAppendixFormatter.pas////*////
+/afDocumentCleaner.pas////*////
+/afDoubleSpaceFilter.pas////*////
+/afEmptyParaEliminator.pas////*////
+/afSignFormatter.pas////*////
+/afSourceDetector.pas////*////
+/afStyleReplacer.pas////*////
+/afTextNormalizer.pas////*////
+/afTextReplacer.pas////*////
+/afTitleCollector.pas////*////

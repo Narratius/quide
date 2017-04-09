@@ -7,7 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   quideLocations, System.Actions, Vcl.ActnList,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ToolWin, Vcl.ActnCtrls,
-  Vcl.ActnMenus, Vcl.ExtCtrls, PropertiesControls, Vcl.StdCtrls, quideActions;
+  Vcl.ActnMenus, Vcl.ExtCtrls, PropertiesControls, Vcl.StdCtrls, quideActions,
+  Vcl.Menus;
 
 type
   TquideLocationDialog = class(TForm)
@@ -19,6 +20,9 @@ type
     Panel1: TPanel;
     Button1: TButton;
     Button2: TButton;
+    PopupMenu1: TPopupMenu;
+    MenuText: TMenuItem;
+    MenuButton: TMenuItem;
     procedure actNewTextExecute(Sender: TObject);
     procedure actButtonExecute(Sender: TObject);
   private

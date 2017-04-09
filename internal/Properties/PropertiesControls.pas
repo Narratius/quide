@@ -29,6 +29,7 @@ type
     procedure MakeListControl(aProperty: TddProperty); virtual;
     procedure MakePropertiesControl(aProperty: TddProperty); virtual;
     procedure MakeStringControl(aProperty: TddProperty); virtual;
+    procedure MakePasswordControl(aProperty: TddProperty); virtual;
     procedure MakeTextControl(aProperty: TddProperty); virtual;
     // Установка значений в контролы
     procedure SetActionValue(aProperty: TddProperty; aControl: TControl); virtual;
@@ -39,6 +40,7 @@ type
     procedure SetPropertiesValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetStringValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetTextValue(aProperty: TddProperty; aControl: TControl); virtual;
+    procedure SetPasswordValue(aProperty: TddProperty; aControl: TControl); virtual;
     // Чтение значений из контролов
     procedure GetActionValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure GetBooleanValue(aProperty: TddProperty; aControl: TControl); virtual;
@@ -66,7 +68,7 @@ type
 implementation
 
 uses
- Variants, Vcl.ComCtrls,
+ Variants, Vcl.ComCtrls, SySutils,
  SizeableTypes, PropertiesListControl;
 
 {
@@ -176,7 +178,8 @@ begin
  if l_C <> nil then
     case aProperty.PropertyType of
       ptChar,
-      ptString: GetStringValue(aProperty, l_C);
+      ptString,
+      ptPassword: GetStringValue(aProperty, l_C);
       ptInteger: GetIntegerValue(aProperty, l_C);
       ptText: GetTextValue(aProperty, l_C);
       ptBoolean: GetBooleanValue(aProperty, l_C);
@@ -278,6 +281,12 @@ begin
     Caption:= aProperty.Caption;
 end;
 
+procedure TPropertiesPanel.MakePasswordControl(aProperty: TddProperty);
+begin
+  MakeStringControl(aProperty);
+  //TEdit(f_Controls[Length(f_Controls)-1]).PasswordChar:= '*';
+end;
+
 procedure TPropertiesPanel.MakePropertiesControl(aProperty: TddProperty);
 begin
  MakeCustomControl(TLabel);
@@ -304,9 +313,11 @@ begin
     ptAction: MakeActionControl(aProperty);
     ptList: MakeListControl(aProperty);
     ptProperties: MakePropertiesControl(aProperty);
+    ptPassword: MakePAsswordControl(aProperty);
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
+   f_Controls[i].ReadOnly:= aProperty.ReadOnly;
    f_Controls[i].Tag:= aProperty.ID;
    f_Controls[i].Event:= aProperty.Event;
    f_Controls[i].Hint:= aProperty.Hint;
@@ -369,10 +380,22 @@ begin
 end;
 
 procedure TPropertiesPanel.SetBooleanValue(aProperty: TddProperty; aControl: TControl);
+var
+ l_IsChecked: Boolean;
 begin
  // Чекбокс
- if (aControl is TCheckbox) and (aProperty.Value <> Null) then
-  TCheckBox(aControl).Checked:= aProperty.Value;
+ if (aControl is TCheckbox) then
+ begin
+  l_IsChecked:= False;
+  if not (VarIsClear(aProperty.Value) or VarIsEmpty(aProperty.Value)) then
+  begin
+   if VarType(aProperty.Value) = vtBoolean then
+    l_IsChecked:= aProperty.Value
+   else
+    l_IsChecked:= StrToBoolDef(VarToStrDef(aProperty.Value, 'False'), False);
+  TCheckBox(aControl).Checked:= l_IsChecked;
+  end;
+ end;
 end;
 
 procedure TPropertiesPanel.SetChoiceValue(aProperty: TddProperty; aControl: TControl);
@@ -426,8 +449,18 @@ begin
       ptAction: SetActionValue(aProperty, l_C);
       ptList: SetListValue(aProperty, l_C);
       ptProperties: SetPropertiesValue(aProperty, l_C);
+      ptPassword: SetPasswordValue(aProperty, l_C);
     end;
  Result:= True;
+end;
+
+procedure TPropertiesPanel.SetPasswordValue(aProperty: TddProperty; aControl: TControl);
+begin
+  if aControl is TEdit then
+  begin
+    TEdit(aControl).PasswordChar:= '*';
+    TEdit(aControl).Text:= VarToStr(aProperty.Value);
+  end;
 end;
 
 procedure TPropertiesPanel.SetPropertiesValue(aProperty: TddProperty; aControl: TControl);

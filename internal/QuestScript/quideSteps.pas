@@ -80,7 +80,7 @@ var
  i: Integer;
  l_Location: TquideLocation;
 begin
- inherited;
+ inherited LoadFromXML(Element, False);
  l_Node:= Element.ChildNodes.FindNode('Locations');
  if l_Node <> nil then
   for I := 0 to l_Node.ChildNodes.Count-1 do
@@ -109,7 +109,7 @@ var
  l_Node: IXMLNode;
  i: Integer;
 begin
- inherited;
+ inherited SaveToXML(Element, False);
  l_Node:= Element.AddChild('Locations');
  for i:= 0 to LocationsCount-1 do
   Locations[i].SaveToXML(l_Node.AddChild('Location'));
