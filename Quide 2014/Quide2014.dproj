@@ -78,8 +78,9 @@
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
         <DCC_Optimize>false</DCC_Optimize>
-        <Icon_MainIcon>Quide2014_Icon1.ico</Icon_MainIcon>
+        <Icon_MainIcon>Quide2014_Icon3.ico</Icon_MainIcon>
         <DCC_UnitSearchPath>$(libi)\Properties;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Build>1</VerInfo_Build>
         <VerInfo_MajorVer>2014</VerInfo_MajorVer>
@@ -125,7 +126,6 @@
             <Form>SizeDialog</Form>
         </DCCReference>
         <DCCReference Include="quideGUILink.pas"/>
-        <DCCReference Include="..\internal\QuestScript\quideInventory.pas"/>
         <DCCReference Include="quideLocationDlg.pas">
             <Form>quideLocationDialog</Form>
             <FormType>dfm</FormType>

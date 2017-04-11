@@ -212,7 +212,7 @@ type
     EditSize: TAction;
     Size1: TMenuItem;
     Size2: TMenuItem;
-    SimpleGraph1: TSimpleGraph;
+    Simplegraph1: Tsimplegraph;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -329,6 +329,8 @@ type
     procedure ViewTransparentExecute(Sender: TObject);
     procedure EditSizeUpdate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure actScenarioPropertiesExecute(Sender: TObject);
+    procedure actFileGenerateExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
@@ -353,6 +355,7 @@ implementation
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
   AboutDelphiArea, AlignDlg, SizeDlg,
+  PropertyUtils,
   quideLocations, quideLocationDlg;
 
 resourcestring
@@ -829,6 +832,17 @@ begin
   ClipboardBitmap.Checked := cfBitmap in SimpleGraph1.ClipboardFormats;
 end;
 
+procedure TMainForm.actFileGenerateExecute(Sender: TObject);
+begin
+ // Генерация игры
+end;
+
+procedure TMainForm.actScenarioPropertiesExecute(Sender: TObject);
+begin
+ // Редактирование свойств сценария
+  ShowPropDialog('Свойства сценария', f_Scenario);
+end;
+
 procedure TMainForm.ClipboardBitmapExecute(Sender: TObject);
 begin
   if cfBitmap in SimpleGraph1.ClipboardFormats then
@@ -886,7 +900,6 @@ begin
 
  l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
  l_Loc.Caption:= Format('Новая локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
- l_Loc.GraphID:= n1.ID;
 
  with TquideLocationDialog.Create(Self) do
  try
@@ -1130,8 +1143,41 @@ end;
 
 procedure TMainForm.SimpleGraphObjectDblClick(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
+var
+ N1: TGraphNode;
+ LinkCount: Integer;
+ l_Loc: TquideLocation;
 begin
-  EditProperties.Execute;
+ // Редактирование локации
+
+  if SimpleGraph1.SelectedObjects.Count = 0 then
+    TDesignerProperties.Execute(SimpleGraph1)
+  else
+  begin
+    LinkCount := SimpleGraph1.SelectedObjectsCount(TGraphLink);
+    if LinkCount = 0 then
+    begin
+      N1:= TGraphNode(SimpleGraph1.SelectedObjects[0]);
+      l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(N1.ID);
+      if L_loc <> nil then
+       with TquideLocationDialog.Create(Self) do
+       try
+         if Execute(l_Loc) then
+         begin
+          N1.Text:= l_Loc.Caption;
+          l_Loc.Values['GraphObject']:= N1.ID;
+         end;
+       finally
+         Free;
+       end;
+
+    end
+    else if LinkCount = SimpleGraph1.SelectedObjects.Count then
+      TLinkProperties.Execute(SimpleGraph1.SelectedObjects)
+    else
+      TObjectProperties.Execute(SimpleGraph1.SelectedObjects);
+  end;
+  //EditProperties.Execute;
 end;
 
 procedure TMainForm.SimpleGraphGraphChange(Sender: TObject);

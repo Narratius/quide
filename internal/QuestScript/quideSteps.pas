@@ -22,6 +22,7 @@ type
     procedure SaveToXML(Element: IXMLNode);
     //1 Возвращает локацию с указанным именем или nil
     function IsValidLocation(const aCaption: String): TquideLocation;
+    function FindLocationByGraph(aGraphID: Cardinal): TquideLocation;
     //1 Список локаций шага сценария
     property Locations[Index: Integer]: TquideLocation read pm_GetLocations;
         default;
@@ -47,6 +48,19 @@ destructor TquideChapter.Destroy;
 begin
   FreeAndNil(f_Locations);
   inherited Destroy;
+end;
+
+function TquideChapter.FindLocationByGraph(aGraphID: Cardinal): TquideLocation;
+var
+  i: Integer;
+begin
+ Result:= nil;
+ for i:= 0 to Pred(LocationsCount) do
+  if Locations[i].Values['GraphObject'] = aGraphID then
+  begin
+   Result:= Locations[i];
+   break;
+  end;
 end;
 
 function TquideChapter.AddLocation: TquideLocation;

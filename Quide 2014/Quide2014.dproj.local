@@ -1,21 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.056,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\quideActionControls\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.925,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\default.txaPackage</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.756,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.090,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.683,C:\svn\Quide\Quide 2014\quideActionControls.pas=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.358,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\NodeProp\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.434,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\Quide2014\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.646,C:\quide_svn\Quide 2014\Quide2014.dproj=C:\quide_svn\Quide 2014\SGDemo.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.074,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.707,C:\svn\Quide\Quide 2014\Unit1.dfm=C:\svn\Quide\Quide 2014\quideLocationDlg.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.361,=C:\Users\ddudko\Documents\GitHub\quide\Quide 2014\ModelSupport_Quide2014\quideGUILink\default.txvpck</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.323,C:\svn\Quide\internal\QuestScript\quideInventory.pas=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.707,C:\svn\Quide\Quide 2014\Unit1.pas=C:\svn\Quide\Quide 2014\quideLocationDlg.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.849,C:\svn\Quide\Quide 2014\Unit1.pas=C:\svn\Quide\Quide 2014\quideGUILink.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.755,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.243,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>

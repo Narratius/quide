@@ -3,7 +3,7 @@ unit quideActions;
 interface
 
 uses
-  XMLIntf, Contnrs,
+  XMLIntf, Contnrs, Classes,
   quideObject, quideVariables, quideLinks, quideConditions;
 
 type
@@ -64,8 +64,24 @@ type
     property Condition: TquideCondition read f_Condition write f_Condition;
   end;
 
-  TquideButtonAction = class(TquideAction)
+    //1 ѕереход в другую локацию пр€мо из текста
+  TquideJumpAction = class(TquideAction)
+  private
+
+    //Target: TquideLocation;
+  public
     constructor Create; override;
+    //property Target: TquideLocation read f_Target write f_Target;
+  end;
+
+  //1  нопка дл€ перехода в другую локацию
+  TquideButtonAction = class(TquideJumpAction)
+    constructor Create; override;
+  private
+    FOnClick: TNotifyEvent;
+    procedure SetOnClick(const Value: TNotifyEvent);
+  public
+    property OnClick: TNotifyEvent read FOnClick write SetOnClick;
   end;
 
 
@@ -225,14 +241,6 @@ begin
  Values['Text']:= Value;
 end;
 
-{ TquideButtonAction }
-
-constructor TquideButtonAction.Create;
-begin
-  inherited;
-  ActionType:= atButton;
-end;
-
 { TquideLogicalAction }
 
 constructor TquideLogicalAction.Create;
@@ -240,5 +248,29 @@ begin
   inherited;
   ActionType:= atLogic;
 end;
+
+{ TquideButtonAction }
+
+constructor TquideButtonAction.Create;
+begin
+  inherited;
+  ActionType:= atButton;
+  DefineButton('Button', '', FOnClick);
+end;
+
+procedure TquideButtonAction.SetOnClick(const Value: TNotifyEvent);
+begin
+  FOnClick := Value;
+end;
+
+{ TquideJumpAction }
+
+constructor TquideJumpAction.Create;
+begin
+  inherited;
+  Define('Target', '', ptString, False);
+  ActionType:= atGoto;
+end;
+
 
 end.

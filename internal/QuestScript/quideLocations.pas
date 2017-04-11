@@ -24,19 +24,6 @@ type
     property ActionsCount: Integer read pm_GetActionsCount;
   end;
 
-    //1 ѕереход в другую локацию пр€мо из текста
-  TquideJump = class(TquideAction)
-  private
-    f_Target: TquideLocation;
-  public
-    property Target: TquideLocation read f_Target write f_Target;
-  end;
-
-  //1  нопка дл€ перехода в другую локацию
-  TquideButton = class(TquideJump)
-  public
-    constructor Create; override;
-  end;
 
 implementation
 
@@ -58,12 +45,12 @@ begin
  Result:= nil;
  case aActType of
    atNone: Result:= nil;
-   atGoto: Result:= TquideJump.Create;
+   atGoto: Result:= TquideJumpAction.Create;
    atInventory: ;
    atLogic: ;
    atText: Result:= TquideTextAction.Create;
    atVariable: ;
-   atButton: Result:= TquideButton.Create;
+   atButton: Result:= TquideButtonAction.Create;
  end;
  if Result <> nil then
   AddAction(Result);
@@ -118,13 +105,5 @@ begin
   Actions[i].SaveToXML(l_Node.AddChild('Action'));
 end;
 
-{ TquideButton }
-
-constructor TquideButton.Create;
-begin
-  inherited;
-  ActionType:= atButton;
-  Visible['Caption']:= False;
-end;
 
 end.

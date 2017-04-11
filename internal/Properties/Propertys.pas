@@ -410,7 +410,8 @@ end;
 procedure TProperties.DefineButton(const aAlias, aCaption: String;
   aEvent: TNotifyEvent);
 begin
-
+ Define(aAlias, aCaption, ptAction, True);
+ AliasItems[aAlias].Event:= aEvent;
 end;
 
 procedure TProperties.DefineChoice(const aAlias, aCaption: String;
@@ -515,7 +516,18 @@ var
   l_Type: TddPropertyType;
   l_Alias, l_Caption: String;
   l_Visible: Boolean;
-  l_Val: Variant;
+
+
+  function lp_SetValue(aAlias: String): Variant;
+  var
+   l_Val: Variant;
+  begin
+    l_Val:= l_Item[aAlias];
+    if not VarIsNull(l_Val) then
+     Result:= l_Val
+     else
+      Result:= '';
+  end;
 begin
  // Загрузка значений элементов
   for i:= 0 to Pred(Element.ChildNodes.Count) do
@@ -524,22 +536,12 @@ begin
     l_Item:= Element.ChildNodes.Nodes[i];
     if AnsiSameText(l_Item.NodeName, 'Property') then
     begin
-      { TODO : Потом унифицировать }
-      l_Val:= l_Item['Alias'];
-      if not VarIsNull(l_Val) then
-       l_Alias:= l_Val
-      else
-       l_Alias:= '';
+      l_Alias:= lp_SetValue('Alias');
+      l_Caption:= lp_SetValue('Caption');
 
-      l_Val:= l_Item['Caption'];
-      if not VarIsNull(l_Val) then
-       l_Caption:= l_Val
-      else
-       l_Caption:= '';
-
-      if not TryStrToBool(l_Item.ChildValues['Visible'], l_Visible) then
+      if not TryStrToBool(l_Item['Visible'], l_Visible) then
        l_Visible:= True; // Или False
-      l_Type:= String2PropertyType(l_Item.ChildValues['Type']);
+      l_Type:= String2PropertyType(l_Item['Type']);
       if l_Type in propOrdinals then
       begin
        if LoadStruct then

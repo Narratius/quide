@@ -56,7 +56,8 @@ type
 implementation
 
 Uses
- XMLDoc, XMLIntf;
+ XMLDoc, XMLIntf,
+ Propertys;
 
 {
 ******************************** TquideScenario ********************************
@@ -64,6 +65,7 @@ Uses
 constructor TquideScenario.Create;
 begin
   inherited Create;
+  Define('Author', 'Автор', ptString);
   f_VariablesNames := TStringList.Create;
   f_LocationsNames := TStringList.Create;
   f_Chapters := TObjectList<TquideChapter>.Create();
