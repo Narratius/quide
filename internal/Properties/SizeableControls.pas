@@ -237,7 +237,9 @@ begin
   inherited ;
   BevelOuter:= bvNone;
   Caption:= '';
-  Height:= 12;
+  Height:= 18;
+  Font.Size:= 14;
+  Font.Name:= 'Book Antiqua';
   f_InnerControls := TList.Create();
   f_Locked:= 0;
 end;
