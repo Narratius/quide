@@ -58,6 +58,7 @@ var
 begin
  // Добавляем кнопку
  l_Loc:= '';
+ { TODO : Подтянуть список существующих локаций или создать новую }
  if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
  begin
   l_Act:= fLocation.AddAction(atButton);
@@ -142,7 +143,7 @@ procedure TquideLocationDialog.GetActionsValues;
 var
  i: Integer;
 begin
- //  Прочитать знаечения действий
+ //  Прочитать значения действий
  //fLocation.Clear; - нельзя
  { TODO : Нужно реализовать }
  (* *)

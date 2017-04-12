@@ -14,52 +14,70 @@ File_11=TSourceModule,'C:\svn\Quide\internal\QuestScript\quideActions.pas',0,1,3
 File_12=TSourceModule,'C:\svn\Quide\Quide 2014\Main.pas',0,1,871,25,885,0,0,,
 
 [Modules]
-Module0=D:\Clouds\GitHub\quide\Quide 2014\quideLocationDlg.pas
-Module1=D:\Clouds\GitHub\quide\internal\Properties\SizeableControls.pas
-Module2=D:\Clouds\GitHub\quide\internal\Properties\ParamControls.pas
-Module3=D:\Clouds\GitHub\quide\internal\Properties\PropertiesControls.pas
-Module4=D:\Clouds\GitHub\quide\Quide 2014\Main.pas
-Module5=D:\Clouds\GitHub\quide\Quide 2014\Quide2014.dproj
-Module6=D:\Clouds\GitHub\quide\internal\QuestScript\quideScenarios.pas
-Module7=D:\Clouds\GitHub\quide\internal\QuestScript\quideLocations.pas
-Module8=D:\Clouds\GitHub\quide\internal\QuestScript\quideActions.pas
-Module9=D:\Clouds\GitHub\quide\internal\Properties\Propertys.pas
+Module0=C:\#My Work\quide\internal\QuestScript\quideActions.pas
+Module1=C:\#My Work\quide\internal\QuestScript\quideLocations.pas
+Module2=C:\#My Work\quide\Quide 2014\Main.pas
+Module3=C:\#My Work\quide\internal\QuestScript\quideSteps.pas
+Module4=C:\#My Work\quide\internal\QuestScript\quideScenarios.pas
+Module5=C:\#My Work\quide\Quide 2014\quideLocationDlg.pas
+Module6=C:\#My Work\quide\external\simplegraph\SimpleGraph.pas
+Module7=c:\program files (x86)\embarcadero\studio\17.0\source\rtl\win\Winapi.Windows.pas
+Module8=c:\program files (x86)\embarcadero\studio\17.0\SOURCE\RTL\SYS\System.Types.pas
+Module9=default.htm
 Count=10
 EditWindowCount=1
 
-[D:\Clouds\GitHub\quide\Quide 2014\quideLocationDlg.pas]
+[C:\#My Work\quide\internal\QuestScript\quideActions.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\Properties\SizeableControls.pas]
+[C:\#My Work\quide\internal\QuestScript\quideLocations.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\Properties\ParamControls.pas]
+[C:\#My Work\quide\Quide 2014\Main.pas]
 ModuleType=TSourceModule
+FormState=1
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\Properties\PropertiesControls.pas]
+[C:\#My Work\quide\internal\QuestScript\quideSteps.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\Quide 2014\Main.pas]
+[C:\#My Work\quide\internal\QuestScript\quideScenarios.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\Quide 2014\Quide2014.dproj]
-ModuleType=TBaseProject
-
-[D:\Clouds\GitHub\quide\internal\QuestScript\quideScenarios.pas]
+[C:\#My Work\quide\Quide 2014\quideLocationDlg.pas]
 ModuleType=TSourceModule
+FormState=1
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\QuestScript\quideLocations.pas]
+[C:\#My Work\quide\external\simplegraph\SimpleGraph.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\QuestScript\quideActions.pas]
+[c:\program files (x86)\embarcadero\studio\17.0\source\rtl\win\Winapi.Windows.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
 
-[D:\Clouds\GitHub\quide\internal\Properties\Propertys.pas]
+[c:\program files (x86)\embarcadero\studio\17.0\SOURCE\RTL\SYS\System.Types.pas]
 ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[default.htm]
+ModuleType=TURLModule
 
 [EditWindow0]
 ViewCount=10
-CurrentEditView=D:\Clouds\GitHub\quide\Quide 2014\quideLocationDlg.pas
+CurrentEditView=C:\#My Work\quide\internal\QuestScript\quideActions.pas
 View0=0
 View1=1
 View2=2
@@ -78,20 +96,20 @@ State=0
 Left=0
 Top=0
 Width=10000
-Height=9202
+Height=9260
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=10000
-ClientHeight=9202
+ClientHeight=9260
 DockedToMainForm=1
 BorlandEditorCodeExplorer=BorlandEditorCodeExplorer@EditWindow0
 TopPanelSize=0
 LeftPanelSize=1896
 LeftPanelClients=PropertyInspector,DockSite3
-LeftPanelData=00000800010100000000031000000000000001680700000000000001000000005C0E000009000000446F636B53697465330100000000771C00001100000050726F7065727479496E73706563746F72FFFFFFFF
+LeftPanelData=00000800010100000000221000000000000001680700000000000001000000005C0E000009000000446F636B53697465330100000000AF1C00001100000050726F7065727479496E73706563746F72FFFFFFFF
 RightPanelSize=2000
 RightPanelClients=DockSite2,DockSite4
-RightPanelData=00000800010100000000031000000000000001D00700000000000001000000004412000009000000446F636B53697465320100000000771C000009000000446F636B5369746534FFFFFFFF
+RightPanelData=00000800010100000000221000000000000001D00700000000000001000000004412000009000000446F636B53697465320100000000AF1C000009000000446F636B5369746534FFFFFFFF
 BottomPanelSize=1519
 BottomPanelClients=DockSite1,MessageView
 BottomPanelData=0000080001020100000009000000446F636B5369746531724500000000000002EF050000000000000100000000724500000F0000004D65737361676556696577466F726DFFFFFFFF
@@ -100,117 +118,107 @@ BottomMiddlePanelClients=DockSite0,GraphDrawingModel
 BottomMiddelPanelData=0000080001020200000009000000446F636B536974653010000000477261706844726177696E67566965779F1D00000000000002F206000000000000FFFFFFFF
 
 [View0]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\Quide 2014\Quide2014.dpr
-CursorX=3
-CursorY=16
-TopLine=1
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\Quide 2014\Quide2014.dpr
+CustomEditViewType=TWelcomePageView
+WelcomePageURL=bds:/default.htm
 
 [View1]
 CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\Quide 2014\Main.pas
-CursorX=45
-CursorY=1154
-TopLine=1132
+Module=C:\#My Work\quide\Quide 2014\Main.pas
+CursorX=14
+CursorY=494
+TopLine=477
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\Quide 2014\Main.pas
+EditViewName=C:\#My Work\quide\Quide 2014\Main.pas
 
 [View2]
 CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\Quide 2014\quideLocationDlg.pas
-CursorX=1
-CursorY=111
-TopLine=92
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\Quide 2014\quideLocationDlg.pas
-
-[View3]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\Properties\PropertiesControls.pas
-CursorX=34
-CursorY=9
-TopLine=1
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\Properties\PropertiesControls.pas
-
-[View4]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\Properties\ParamControls.pas
-CursorX=35
-CursorY=25
-TopLine=1
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\Properties\ParamControls.pas
-
-[View5]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\Properties\SizeableControls.pas
-CursorX=12
-CursorY=241
-TopLine=235
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\Properties\SizeableControls.pas
-
-[View6]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\Properties\Propertys.pas
-CursorX=1
-CursorY=554
-TopLine=526
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\Properties\Propertys.pas
-
-[View7]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\QuestScript\quideLocations.pas
-CursorX=1
-CursorY=108
-TopLine=87
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\QuestScript\quideLocations.pas
-
-[View8]
-CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\QuestScript\quideScenarios.pas
-CursorX=56
+Module=C:\#My Work\quide\internal\QuestScript\quideLocations.pas
+CursorX=22
 CursorY=7
 TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\QuestScript\quideScenarios.pas
+EditViewName=C:\#My Work\quide\internal\QuestScript\quideLocations.pas
 
-[View9]
+[View3]
 CustomEditViewType=TEditView
-Module=D:\Clouds\GitHub\quide\internal\QuestScript\quideActions.pas
-CursorX=1
-CursorY=1
-TopLine=46
+Module=C:\#My Work\quide\internal\QuestScript\quideActions.pas
+CursorX=17
+CursorY=50
+TopLine=33
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=D:\Clouds\GitHub\quide\internal\QuestScript\quideActions.pas
+EditViewName=C:\#My Work\quide\internal\QuestScript\quideActions.pas
 
-[UndockedDesigner]
-Count=0
+[View4]
+CustomEditViewType=TEditView
+Module=C:\#My Work\quide\external\simplegraph\SimpleGraph.pas
+CursorX=14
+CursorY=1193
+TopLine=1169
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\#My Work\quide\external\simplegraph\SimpleGraph.pas
+
+[View5]
+CustomEditViewType=TEditView
+Module=c:\program files (x86)\embarcadero\studio\17.0\source\rtl\win\Winapi.Windows.pas
+CursorX=1
+CursorY=4004
+TopLine=3983
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=c:\program files (x86)\embarcadero\studio\17.0\source\rtl\win\Winapi.Windows.pas
+
+[View6]
+CustomEditViewType=TEditView
+Module=c:\program files (x86)\embarcadero\studio\17.0\SOURCE\RTL\SYS\System.Types.pas
+CursorX=1
+CursorY=179
+TopLine=167
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=c:\program files (x86)\embarcadero\studio\17.0\SOURCE\RTL\SYS\System.Types.pas
+
+[View7]
+CustomEditViewType=TEditView
+Module=C:\#My Work\quide\internal\QuestScript\quideScenarios.pas
+CursorX=49
+CursorY=41
+TopLine=7
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\#My Work\quide\internal\QuestScript\quideScenarios.pas
+
+[View8]
+CustomEditViewType=TEditView
+Module=C:\#My Work\quide\internal\QuestScript\quideSteps.pas
+CursorX=38
+CursorY=28
+TopLine=7
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\#My Work\quide\internal\QuestScript\quideSteps.pas
+
+[View9]
+CustomEditViewType=TEditView
+Module=C:\#My Work\quide\Quide 2014\quideLocationDlg.pas
+CursorX=1
+CursorY=111
+TopLine=107
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\#My Work\quide\Quide 2014\quideLocationDlg.pas
 
 [Watches]
 Count=1
@@ -227,24 +235,25 @@ State=0
 Left=0
 Top=0
 Width=3823
-Height=1163
+Height=1115
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3823
-ClientHeight=1163
+ClientHeight=1115
 TBDockHeight=212
 LRDockWidth=13604
 Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=6
+Count=7
 Breakpoint0='C:\svn\Quide\Quide 2014\Main.pas',7,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint1='C:\svn\Quide\Quide 2014\quideLocationDlg.pas',111,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint2='C:\svn\Quide\Quide 2014\Main.pas',577,'',0,1,'',1,0,0,'',1,'','','',0,''
+Breakpoint2='C:\svn\Quide\Quide 2014\Main.pas',594,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint3='C:\svn\Quide\internal\QuestScript\quideScenarios.pas',209,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint4='C:\Users\ddudko\Documents\GitHub\quide\internal\Properties\Propertys.pas',321,'',0,1,'',1,0,0,'',1,'','','',0,''
 Breakpoint5='D:\Clouds\GitHub\quide\internal\QuestScript\quideActions.pas',232,'',0,1,'',1,0,0,'',1,'','','',0,''
+Breakpoint6='C:\#My Work\quide\Quide 2014\quideLocationDlg.pas',111,'',0,1,'',1,0,0,'',1,'','','',0,''
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -280,7 +289,7 @@ MaxWidth=8932
 MaxHeight=8519
 ClientWidth=10000
 ClientHeight=9779
-BottomPanelSize=8861
+BottomPanelSize=8917
 BottomPanelClients=EditWindow0
 BottomPanelData=0000080000000000000000000000000000000000000000000000000100000000000000000C0000004564697457696E646F775F30FFFFFFFF
 
@@ -293,11 +302,11 @@ State=0
 Left=0
 Top=0
 Width=2000
-Height=4404
+Height=4356
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=4404
+ClientHeight=4356
 TBDockHeight=5904
 LRDockWidth=2349
 Dockable=1
@@ -310,14 +319,14 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=18
+Top=23
 Width=10000
-Height=1404
+Height=1356
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=10000
-ClientHeight=1404
-TBDockHeight=1404
+ClientHeight=1356
+TBDockHeight=1356
 LRDockWidth=2771
 Dockable=1
 StayOnTop=0
@@ -331,11 +340,11 @@ State=0
 Left=0
 Top=0
 Width=2000
-Height=2538
+Height=2548
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=2538
+ClientHeight=2548
 TBDockHeight=7154
 LRDockWidth=2000
 Dockable=1
@@ -379,6 +388,28 @@ LRDockWidth=1375
 Dockable=1
 StayOnTop=0
 
+[TemplateView]
+PercentageSizes=1
+Create=1
+Visible=0
+Docked=1
+State=0
+Left=-1728
+Top=269
+Width=276
+Height=365
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=276
+ClientHeight=365
+TBDockHeight=365
+LRDockWidth=276
+Dockable=1
+StayOnTop=0
+Name=120
+Description=334
+filter=1
+
 [PropertyInspector]
 PercentageSizes=1
 Create=1
@@ -386,23 +417,198 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=415
+Top=420
 Width=1896
-Height=3577
+Height=3587
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1896
-ClientHeight=3577
-TBDockHeight=9010
+ClientHeight=3587
+TBDockHeight=6990
 LRDockWidth=1896
 Dockable=1
 StayOnTop=0
-SplitPos=111
+SplitPos=168
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Name,
-ExpandedItems=HorzScrollBar=0,LiveBindings=0,Margins=0
+SelectedItem=Caption,OnExecute
+ExpandedItems=GraphConstraints=0,HorzScrollBar=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Anchors=0,BevelEdges=0,Constraints=0,Font=1,Font.Style=0,Images=0,BorderIcons=0,ActiveControl=0,Action=0
+
+[DebugLogView]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=3823
+Height=1115
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=3823
+ClientHeight=1115
+TBDockHeight=413
+LRDockWidth=4953
+Dockable=1
+StayOnTop=0
+
+[ThreadStatusWindow]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=3823
+Height=1115
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=3823
+ClientHeight=1115
+TBDockHeight=212
+LRDockWidth=7406
+Dockable=1
+StayOnTop=0
+Column0Width=145
+Column1Width=100
+Column2Width=115
+Column3Width=250
+
+[LocalVarsWindow]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=3823
+Height=1115
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=3823
+ClientHeight=1115
+TBDockHeight=1538
+LRDockWidth=3484
+Dockable=1
+StayOnTop=0
+
+[CallStackWindow]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=3823
+Height=1115
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=3823
+ClientHeight=1115
+TBDockHeight=2067
+LRDockWidth=3484
+Dockable=1
+StayOnTop=0
+
+[DataExplorerContainer]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=2000
+Height=6750
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=2000
+ClientHeight=6750
+TBDockHeight=4885
+LRDockWidth=7151
+Dockable=1
+StayOnTop=0
+
+[TFileExplorerForm]
+PercentageSizes=1
+Create=1
+Visible=0
+Docked=1
+State=0
+Left=-1419
+Top=-13
+Width=2844
+Height=6202
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=2844
+ClientHeight=6202
+TBDockHeight=6202
+LRDockWidth=2844
+Dockable=1
+StayOnTop=0
+
+[frmDesignPreview]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=2000
+Height=6750
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=2000
+ClientHeight=6750
+TBDockHeight=5962
+LRDockWidth=2510
+Dockable=1
+StayOnTop=0
+
+[FindReferencsForm]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=2339
+Height=1000
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=2339
+ClientHeight=1000
+TBDockHeight=2317
+LRDockWidth=2823
+Dockable=1
+StayOnTop=0
+
+[RefactoringForm]
+PercentageSizes=1
+Create=1
+Visible=1
+Docked=1
+State=0
+Left=0
+Top=0
+Width=2339
+Height=1240
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=2339
+ClientHeight=1240
+TBDockHeight=3212
+LRDockWidth=2823
+Dockable=1
+StayOnTop=0
 
 [ClassBrowserTool]
 PercentageSizes=1
@@ -410,8 +616,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=0
-Top=-101
+Left=-182
+Top=-100
 Width=1849
 Height=3144
 MaxLeft=-1
@@ -461,203 +667,6 @@ LRDockWidth=3562
 Dockable=1
 StayOnTop=0
 
-[frmDesignPreview]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=2000
-Height=6740
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2000
-ClientHeight=6740
-TBDockHeight=5962
-LRDockWidth=2510
-Dockable=1
-StayOnTop=0
-
-[TFileExplorerForm]
-PercentageSizes=1
-Create=1
-Visible=0
-Docked=1
-State=0
-Left=-1419
-Top=-14
-Width=2844
-Height=6202
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2844
-ClientHeight=6202
-TBDockHeight=6202
-LRDockWidth=2844
-Dockable=1
-StayOnTop=0
-
-[TemplateView]
-PercentageSizes=1
-Create=1
-Visible=0
-Docked=1
-State=0
-Left=-1536
-Top=268
-Width=276
-Height=365
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=276
-ClientHeight=365
-TBDockHeight=365
-LRDockWidth=276
-Dockable=1
-StayOnTop=0
-Name=120
-Description=334
-filter=1
-
-[DebugLogView]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=3823
-Height=1163
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=3823
-ClientHeight=1163
-TBDockHeight=413
-LRDockWidth=4953
-Dockable=1
-StayOnTop=0
-
-[ThreadStatusWindow]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=3823
-Height=1163
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=3823
-ClientHeight=1163
-TBDockHeight=212
-LRDockWidth=7406
-Dockable=1
-StayOnTop=0
-Column0Width=145
-Column1Width=100
-Column2Width=115
-Column3Width=250
-
-[LocalVarsWindow]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=3823
-Height=1163
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=3823
-ClientHeight=1163
-TBDockHeight=1538
-LRDockWidth=3484
-Dockable=1
-StayOnTop=0
-
-[CallStackWindow]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=3823
-Height=1163
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=3823
-ClientHeight=1163
-TBDockHeight=2067
-LRDockWidth=3484
-Dockable=1
-StayOnTop=0
-
-[PatchForm]
-PercentageSizes=1
-Create=1
-Visible=0
-Docked=0
-State=0
-Left=0
-Top=0
-Width=2974
-Height=2452
-MaxLeft=-5
-MaxTop=-10
-ClientWidth=2891
-ClientHeight=2077
-TBDockHeight=2452
-LRDockWidth=2974
-Dockable=1
-StayOnTop=0
-
-[FindReferencsForm]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=2339
-Height=1000
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2339
-ClientHeight=1000
-TBDockHeight=2317
-LRDockWidth=2823
-Dockable=1
-StayOnTop=0
-
-[RefactoringForm]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=2339
-Height=1240
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2339
-ClientHeight=1240
-TBDockHeight=3212
-LRDockWidth=2823
-Dockable=1
-StayOnTop=0
-
 [ToDo List]
 PercentageSizes=1
 Create=1
@@ -684,25 +693,6 @@ Column4Width=129
 SortOrder=4
 ShowHints=1
 ShowChecked=1
-
-[DataExplorerContainer]
-PercentageSizes=1
-Create=1
-Visible=1
-Docked=1
-State=0
-Left=0
-Top=0
-Width=2000
-Height=6740
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2000
-ClientHeight=6740
-TBDockHeight=4885
-LRDockWidth=7151
-Dockable=1
-StayOnTop=0
 
 [GraphDrawingModel]
 PercentageSizes=1
@@ -732,11 +722,11 @@ State=0
 Left=0
 Top=0
 Width=3823
-Height=1163
+Height=1115
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3823
-ClientHeight=1163
+ClientHeight=1115
 TBDockHeight=1548
 LRDockWidth=8740
 Dockable=1
@@ -758,11 +748,11 @@ State=0
 Left=0
 Top=0
 Width=1896
-Height=3606
+Height=3558
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1896
-ClientHeight=3606
+ClientHeight=3558
 TBDockHeight=3683
 LRDockWidth=1896
 Dockable=1
@@ -777,11 +767,11 @@ State=0
 Left=0
 Top=0
 Width=2000
-Height=6740
+Height=6750
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=6740
+ClientHeight=6750
 TBDockHeight=4885
 LRDockWidth=5307
 Dockable=1
@@ -817,8 +807,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=8
-Top=8
+Left=0
+Top=0
 Width=2339
 Height=1481
 MaxLeft=-1
@@ -842,14 +832,14 @@ Visible=0
 Docked=1
 State=0
 Left=0
-Top=18
+Top=23
 Width=3823
-Height=1404
+Height=1356
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=3823
-ClientHeight=1404
-TBDockHeight=1404
+ClientHeight=1356
+TBDockHeight=1356
 LRDockWidth=3823
 Dockable=1
 StayOnTop=0
@@ -866,14 +856,14 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=18
+Top=23
 Width=2000
-Height=4644
+Height=4596
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=4644
-TBDockHeight=9010
+ClientHeight=4596
+TBDockHeight=6990
 LRDockWidth=2000
 Dockable=1
 StayOnTop=0
@@ -890,14 +880,14 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=18
+Top=23
 Width=1896
-Height=3606
+Height=3558
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1896
-ClientHeight=3606
-TBDockHeight=9010
+ClientHeight=3558
+TBDockHeight=6990
 LRDockWidth=1896
 Dockable=1
 StayOnTop=0
@@ -914,14 +904,14 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=523
+Top=528
 Width=2000
-Height=2538
+Height=2548
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2000
-ClientHeight=2538
-TBDockHeight=9010
+ClientHeight=2548
+TBDockHeight=6990
 LRDockWidth=2000
 Dockable=1
 StayOnTop=0

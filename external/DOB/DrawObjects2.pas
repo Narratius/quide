@@ -628,7 +628,9 @@ type
   PPoints = ^TPoints;
   Integers = array[0.. (maxInt div sizeof(integer)) -1] of integer;
   PIntegers = ^Integers;
-
+{  PPointL = ^TPointL;
+  TPointL = _POINTL;
+}
 procedure TextAlongBezier(canvas: TCanvas; bezierPts: array of TPoint;
   s: string; curveOffset: integer; outline: TFontOutline);
 var
@@ -636,6 +638,7 @@ var
   currentInsertionDist, charWidthDiv2: integer;
   pt: TPoint;
   flatPts: PPoints;
+
   types: PByte;
   distances: PIntegers;
   angle, spcPxls, bezierLen, relativeDistFRomPt1: single;

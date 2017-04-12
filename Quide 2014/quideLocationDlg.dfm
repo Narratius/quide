@@ -41,7 +41,6 @@ object quideLocationDialog: TquideLocationDialog
     Align = alClient
     PopupMenu = PopupMenu1
     TabOrder = 1
-    ExplicitHeight = 217
   end
   object Panel1: TPanel
     Left = 440
@@ -50,7 +49,6 @@ object quideLocationDialog: TquideLocationDialog
     Height = 224
     Align = alRight
     TabOrder = 2
-    ExplicitHeight = 217
     object Button1: TButton
       Left = 8
       Top = 0
