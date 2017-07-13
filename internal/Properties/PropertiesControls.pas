@@ -378,6 +378,10 @@ end;
 procedure TPropertiesPanel.SetActionValue(aProperty: TddProperty; aControl: TControl);
 begin
  // Кнопка - значение отсутствует
+  if (aControl is TButton)  then
+  begin
+    TButton(aControl).Caption := VarToStr(aProperty.Value)
+  end;
 end;
 
 procedure TPropertiesPanel.SetBooleanValue(aProperty: TddProperty; aControl: TControl);
@@ -473,8 +477,8 @@ procedure TPropertiesPanel.SetStringValue(aProperty: TddProperty; aControl: TCon
 begin
  // Строка ввода
  if aControl is TEdit then
-  TEdit(aControl).Text:= VarToStr(aProperty.Value);
-end;
+  TEdit(aControl).Text:= VarToStr(aProperty.Value)
+ end;
 
 procedure TPropertiesPanel.SetTextValue(aProperty: TddProperty; aControl: TControl);
 begin

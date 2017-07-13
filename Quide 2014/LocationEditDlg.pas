@@ -6,7 +6,7 @@ uses
  Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
  Buttons, ExtCtrls,
  QuestModeler, Menus, ComCtrls, ToolWin, ActnList, ImgList, ListBoxOnChangeU,
-  System.Actions;
+  System.Actions, System.ImageList;
 
 type
   TLocationDlg = class(TForm)

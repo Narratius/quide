@@ -725,7 +725,7 @@ begin
        end;
       ptBoolean: l_Value.Text:= VarToStr(Value);   // TRadioGroup (TCombobox)
 
-      ptAction:;    // TButton
+      ptAction: l_Value.Text:= VarToStr(Value);    // TButton
       ptList, // TListBox
       ptChoice: // TComboBox
        begin

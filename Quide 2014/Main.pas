@@ -502,6 +502,7 @@ begin
      try
        if Execute(l_Loc) then
        begin
+        ScenarioGraph.Modified:= True;
         GraphObject.Text:= l_Loc.Caption;
         CheckConnections;
        end;
@@ -546,6 +547,7 @@ procedure TMainForm.FileNewExecute(Sender: TObject);
 begin
   if IsGraphSaved then
   begin
+    f_Scenario.Clear;
     ScenarioGraph.Clear;
     ScenarioGraph.Zoom := 100;
     ScenarioGraph.CommandMode := cmEdit;
@@ -595,7 +597,7 @@ end;
 procedure TMainForm.FindFreePlace(var aPlace: TRect);
 begin
   // Поиск свободного места для локации
-  aPlace.Create(10, 10, 110, 60);
+  aPlace.Create(10, 10+f_Scenario.Chapters[0].LocationsCount*60, 110, 60+f_Scenario.Chapters[0].LocationsCount*60);
 end;
 
 procedure TMainForm.FileSaveExecute(Sender: TObject);
@@ -816,6 +818,7 @@ end;
 procedure TMainForm.CheckConnections;
 begin
   // Обновляет соединения локаций
+
 end;
 
 procedure TMainForm.actFileGenerateExecute(Sender: TObject);

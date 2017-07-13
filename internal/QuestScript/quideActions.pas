@@ -67,11 +67,8 @@ type
     //1 Переход в другую локацию прямо из текста
   TquideJumpAction = class(TquideAction)
   private
-
-    //Target: TquideLocation;
   public
     constructor Create; override;
-    //property Target: TquideLocation read f_Target write f_Target;
   end;
 
   //1 Кнопка для перехода в другую локацию
@@ -122,8 +119,8 @@ end;
 constructor TquideAction.Create;
 begin
   inherited Create;
-  Visible['Caption']:= False;
-  Visible['Hint']:= False;
+  Visible['Caption']:= False;  // Нет контрола для редактирования
+  Visible['Hint']:= False; // Нет контрола для редактирования
   Define('ActionType', 'Тип действия', ptInteger, False);
 end;
 
@@ -255,7 +252,7 @@ constructor TquideButtonAction.Create;
 begin
   inherited;
   ActionType:= atButton;
-  DefineButton('Button', '', FOnClick);
+  DefineButton('Button', '', FOnClick); // Просто событие для клика
 end;
 
 procedure TquideButtonAction.SetOnClick(const Value: TNotifyEvent);
@@ -268,7 +265,7 @@ end;
 constructor TquideJumpAction.Create;
 begin
   inherited;
-  Define('Target', '', ptString, False);
+  Define('Target', 'Локация для перехода', ptString, False); // Название локации для перехода
   ActionType:= atGoto;
 end;
 

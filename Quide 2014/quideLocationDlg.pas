@@ -62,8 +62,8 @@ begin
  if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
  begin
   l_Act:= fLocation.AddAction(atButton);
-  l_Act.AliasItems['Button'].Caption:= l_Loc;
-  TquideButtonAction(l_Act).Values['Target']:= l_Loc;
+  TquideButtonAction(l_Act).Values['Button']:= l_Loc; // Текст на кнопке
+  TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
   TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
   AddAction(l_Act);
  end;
