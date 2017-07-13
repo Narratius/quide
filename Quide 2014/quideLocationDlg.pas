@@ -110,7 +110,11 @@ var
   I, l_Top: Integer;
 begin
  for I := 0 to Pred(fLocation.ActionsCount) do
+ begin
+  if fLocation[i].ActionType = atButton then
+    TquideButtonAction(fLocation[i]).OnClick:= actEditButtonExecute;
   AddAction(fLocation[i]);
+ end;
 end;
 
 procedure TquideLocationDialog.CreateHeader;

@@ -75,10 +75,10 @@ type
   TquideButtonAction = class(TquideJumpAction)
     constructor Create; override;
   private
-    FOnClick: TNotifyEvent;
     procedure SetOnClick(const Value: TNotifyEvent);
+    function GetOnClick: TNotifyEvent;
   public
-    property OnClick: TNotifyEvent read FOnClick write SetOnClick;
+    property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
   end;
 
 
@@ -252,12 +252,17 @@ constructor TquideButtonAction.Create;
 begin
   inherited;
   ActionType:= atButton;
-  DefineButton('Button', '', FOnClick); // Просто событие для клика
+  DefineButton('Button', '', nil); // Просто событие для клика
+end;
+
+function TquideButtonAction.GetOnClick: TNotifyEvent;
+begin
+ Result:= AliasItems['Button'].Event;
 end;
 
 procedure TquideButtonAction.SetOnClick(const Value: TNotifyEvent);
 begin
-  FOnClick := Value;
+  AliasItems['Button'].Event:= Value;
 end;
 
 { TquideJumpAction }
