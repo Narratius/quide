@@ -10,6 +10,7 @@ type
   TAbout = class(TForm)
     btnOk: TButton;
     Image1: TImage;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
   end;
 
