@@ -3,23 +3,29 @@ unit quideActions;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+  XMLIntf, Contnrs, Classes,
+  quideObject, quideVariables, quideLinks, quideConditions;
 
 type
  TquideActionType = (atNone, atGoto, atInventory, atLogic, atText, atVariable, atButton);
   //1 Базовый объект для действия в локации
   TquideAction = class(TquideObject)
   private
+    f_Index: Integer;
     function pm_GetActionType: TquideActionType;
     procedure pm_SetActionType(Value: TquideActionType);
   public
     constructor Create; override;
     destructor Destroy; override;
     procedure Clear; override;
-    class function Make(aElement: IXMLNode): TquideActionType;
+    class function Make(aElement: IXMLNode): TquideAction;
+    procedure LoadFromXML(Element: IXMLNode);
+    procedure SaveToXML(Element: IXMLNode);
     //1 Тип действия - текст, кнопка, переход...
     property ActionType: TquideActionType read pm_GetActionType write
         pm_SetActionType;
+    property Index: Integer
+     read f_Index write f_Index;
   end;
 
   TquideVariableAction = class(TquideAction)
@@ -54,23 +60,58 @@ type
   private
     f_Condition: TquideCondition;
   public
+    constructor Create; override;
     property Condition: TquideCondition read f_Condition write f_Condition;
   end;
 
-  //1 Переход в другую локацию прямо из текста
-  TquideJump = class(TquideAction)
+    //1 Переход в другую локацию прямо из текста
+  TquideJumpAction = class(TquideAction)
   private
-    f_Target: TquideLocation;
   public
-    property Target: TquideLocation read f_Target write f_Target;
+    constructor Create; override;
   end;
 
   //1 Кнопка для перехода в другую локацию
-  TquideButton = class(TquideJump)
+  TquideButtonAction = class(TquideJumpAction)
+    constructor Create; override;
+  private
+    procedure SetOnClick(const Value: TNotifyEvent);
+    function GetOnClick: TNotifyEvent;
+  public
+    property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
   end;
 
 
 implementation
+
+Uses
+ SysUtils,
+ Propertys;
+
+
+
+const
+ ActionTypeNames: Array[TquideActionType] of String = (
+  'None', 'Goto', 'Inventory', 'Logic', 'Text', 'Variable', 'Button');
+
+function ActionType2String(aType: TquideActionType): String;
+begin
+ Result:= ActionTypeNames[aType];
+end;
+
+function String2ActionType(const aText: String): TquideActionType;
+var
+ i: TquideActionType;
+begin
+ Result:= atNone;
+ for I := Low(i) to High(i) do
+  if AnsiSameText(aText, ActionTypeNames[i]) then
+  begin
+    Result:= i;
+    break;
+  end;
+end;
+
 
 {
 ********************************* TquideAction *********************************
@@ -78,12 +119,19 @@ implementation
 constructor TquideAction.Create;
 begin
   inherited Create;
-  AddProperty('ActionType', 'Тип действия', ptInteger, 0);
+  Visible['Caption']:= False;  // Нет контрола для редактирования
+  Visible['Hint']:= False; // Нет контрола для редактирования
+  Define('ActionType', 'Тип действия', ptInteger, False);
 end;
 
 destructor TquideAction.Destroy;
 begin
   inherited Destroy;
+end;
+
+procedure TquideAction.LoadFromXML(Element: IXMLNode);
+begin
+ inherited LoadFromXML(Element, False);
 end;
 
 procedure TquideAction.Clear;
@@ -92,29 +140,39 @@ begin
   ActionType:= atNone;
 end;
 
-class function TquideAction.Make(aElement: IXMLNode): TquideActionType;
+class function TquideAction.Make(aElement: IXMLNode): TquideAction;
 begin
  Result:= nil;
-  case StringToActionType(aElement.Attributes['Type']) of
-    atGoto: Result:= TquideJump.Create;
-    atInventory: Result:= TdcInventoryAction.Create;
-    atLogic: Result:= TdcLogicAction.Create;
-    atText: Result:= TdcTextAction.Create;
-    atVariable: Result:= TdcVariableAction.Create;
-    atButton: Result:= TdcButtonAction.Create;
+ // Все не так :(
+ (* *)
+  case String2ActionType(aElement.Attributes['Type']) of
+  //case TquideActionType(StrToIntDef(aElement.Attributes['Type'], 0)) of
+    //atGoto: Result:= TquideJump.Create;
+    //atInventory: Result:= TquideInventoryAction.Create;
+    atLogic: Result:= TquideLogicalAction.Create;
+    atText: Result:= TquideTextAction.Create;
+    atVariable: Result:= TquideVariableAction.Create;
+    atButton: Result:= TquideButtonAction.Create;
   end;
   if Result <> nil then
-   Result.Load(aElement);
+   Result.LoadFromXML(aElement);
+  (* *)
 end;
 
 function TquideAction.pm_GetActionType: TquideActionType;
 begin
- Result:= TquideActionType(f_Properties.Values['ActionType'])
+ Result:= TquideActionType(Values['ActionType'])
 end;
 
 procedure TquideAction.pm_SetActionType(Value: TquideActionType);
 begin
- f_Properties.Values['ActionType']:= IntToStr(Ord(Value));
+ Values['ActionType']:= IntToStr(Ord(Value));
+end;
+
+procedure TquideAction.SaveToXML(Element: IXMLNode);
+begin
+ inherited SaveToXML(Element, False);
+ Element.SetAttribute('Type', ActionType2String(ActionType));
 end;
 
 {
@@ -124,6 +182,7 @@ constructor TquideVariableAction.Create;
 begin
   inherited Create;
   f_Variable := TquideVariable.Create();
+  ActionType:= atVariable;
 end;
 
 destructor TquideVariableAction.Destroy;
@@ -139,7 +198,8 @@ constructor TquideTextAction.Create;
 begin
   inherited Create;
   f_Links := TObjectList.Create();
-  AddProperty('Text', 'Текстовое поле', ptString, '');
+  Define('Text', '', ptText);
+  ActionType:= atText;
 end;
 
 destructor TquideTextAction.Destroy;
@@ -170,14 +230,49 @@ end;
 
 function TquideTextAction.pm_GetText: string;
 begin
- Result:= f_Properties.Values['Text'];
+ Result:= Values['Text'];
 end;
 
 procedure TquideTextAction.pm_SetText(const Value: string);
 begin
- f_Properties.Values['Text']:= Value;
+ Values['Text']:= Value;
 end;
 
+{ TquideLogicalAction }
+
+constructor TquideLogicalAction.Create;
+begin
+  inherited;
+  ActionType:= atLogic;
+end;
+
+{ TquideButtonAction }
+
+constructor TquideButtonAction.Create;
+begin
+  inherited;
+  ActionType:= atButton;
+  DefineButton('Button', '', nil); // Просто событие для клика
+end;
+
+function TquideButtonAction.GetOnClick: TNotifyEvent;
+begin
+ Result:= AliasItems['Button'].Event;
+end;
+
+procedure TquideButtonAction.SetOnClick(const Value: TNotifyEvent);
+begin
+  AliasItems['Button'].Event:= Value;
+end;
+
+{ TquideJumpAction }
+
+constructor TquideJumpAction.Create;
+begin
+  inherited;
+  Define('Target', 'Локация для перехода', ptString, False); // Название локации для перехода
+  ActionType:= atGoto;
+end;
 
 
 end.

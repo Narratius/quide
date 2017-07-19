@@ -1,0 +1,142 @@
+====================================================================
+GameVision ® Game Application Framework, tools and tutorials
+are Copyright © 1994-2003 Jarrod Davis Software.
+====================================================================
+ HISTORY  [ + add, - remove, = changed, ^ to-do, * item list ]
+--------------------------------------------------------------------
+[ Build #403.0 ]
+  * Misc fixes and enhancements.
+  = Fixed jittery MOD music playback in windowed mode when mouse
+    moves AppWindow.
+  + Added support for playing midi files
+  + Added support for loading jpeg and bmp textures
+  = Changed GVScript.txt to document some how GVScript works
+    including keywords and language features.
+  * 95% of GV is available from script. There are a few routines
+    that I have to work on such as the routines that pass records
+    and pointers. Those type are better handled with 
+    GV_RegisterStdRoutine rather than GV_RegisterRoutine so that
+    there is more control over param passing.
+  + Added GVScript.pas. All script related routines are in this
+    unit.
+  * Updated documentation
+  = Updated script_starfield demo to show off some of the GVScript
+    features.
+  + Added new scripting system that is based on Delphi/Pascal syntax.
+    You can now use import your classes and routines and register
+    variables and objects.
+  - Removed Lua scripting system. 
+[ Build #402.5 ]
+  + Added GVScript.txt to document the routines that are currently
+    available in script.
+  + Documented the GV_Audio_PlayMusic routine      
+  = GV_Audio_PlayMusic now as a aRezFile paramater to support
+    loading MOD music files from a rezfile. MP3 files can only be
+    played from disk.
+  + GVAudio now can play .IT, .MOD, .S3M, .XM and .MP3 music now.
+    Use the audio routines as you normally would.
+  = Updated the scripting starfield demo showing how the GV core
+    can be called multiple times. It also shows how you can
+    interact with the script code from the host application.
+  = Updated GV so that it can be safely be shutdown and restarted
+    multiple times in a running application.
+  + Added documentation for the GV_Script_XXX routines.
+  + GV_Script_XXX routines. The new scriptiong system is now based
+    on Lua 5.x. GVScript is now fast and robust thanks to lua. I
+    begun to register the GV routines and will continue to update
+    the scripting interface with more and more features over time.
+  + GV_Reset - Reset the GV subsystems so that execution can
+               continue after GV_App_Terminate all been called.
+[ Build #402.4 ]
+  + Added GV_Texture_Alloc and a customtexture demo to show how it
+    works. You can alloc a custom texture that can be locked, updated
+    and rendered just like a texture created with GV_Texture_Load.
+  + Added an updated starfield demo that is completed scripted in
+    Lua 5. Man, I must say, Lua is fast, very fast.
+  + WIP: Lua scripting, MikMod audio system. These sub systems are
+    written in c/c++ so they must reside in a seperate DLL. So,
+    GVUtils.dll has been reintroduced.
+  + Added documentation for the  GV_Sprite & GV_Entity interfaces.
+    Thanks to Robert Dytmire.
+[ Build #402.3 ]
+  = Updated the GVSDK.CHM file. New format, documented new routines.
+  + Added: GV_RenderDevice_GetDirect3D, GV_RenderDevice_GetD3DDevice
+    and GV_Texture_GetD3DTexture to allow you to get the low level
+    d3d, d3ddevice and d3dtexture objects. You must typecase them
+    to their perspective object types yourself as they only return
+    type IInterface. Be sure to release them after use as the reference
+    count of the object is increased after the call. Release by setting
+    to Nil;
+  + Added: GV_App_SetOnActivateEvent, GV_App_GetOnActivateEvent,
+    GV_App_OnActivate so you can manage events when the application
+    is active/inactive.
+  = Fixed a bug in GV_RenderDevice_GetViewport where it was returning
+    the wrong XY values.
+  = Fixed a buffer overrun problem in GV_RenderDevice_SaveFrame that
+    would case an exception error.
+  + Added a 3D starfield simulation demo.
+[ Build #402.2 ]
+  = Updated all samples and added new PolyPoint with autotrace demo.      
+  = Changed the shared memory manager to use windows global allocation
+    routines. Adding certain units to your uses statements would
+    cause exception errors (Forms, FiltCtrl). Also, I made it a
+    seperate unit so that its eaiser to update. Just make sure the
+    unit GVShareMem is now the first unit rather than GVDLL.
+  + Added GV_Entity_PolyPointTrace Autotrace all the frames of entity
+    and add a polypoint collision mask.  Thanks to Anton Zhuchkov
+  + Added support for Alpha channel in textures. To enable, set
+    ColorKey to zero and just load the texture with alpha as
+    normal.      
+  = Fixed a problem with GV_Font_StrWidth routine. It was not
+    including the last char in its calculations.
+[ Build #402 ]
+  + Partial .CHM help. I will keep working on this until I get it
+    complete.      
+  + Fixed a bug in the polygon interface where a new handle was
+    not being return on each allocation. This problem thus effected
+    every interface that used polyon such as the entity interface
+    and the polypoint code.
+  + Added GZFile interface to the GVDLL unit. This set of routines
+    allows you to read/write compressed files and read uncompressed
+    files.
+  = Fixed GV_Timer_GetTickCount declaration in the header. It was set
+    to a return type of Single which sould be a Cardinal
+  = Renamed GV_WrapNumberS to GV_WrapNumberSingle.
+  = Renamed GV_SameSignI to GV_SameSignInteger.
+  = Renamed GV_RandNum_RangeI/S to GV_RandNum_RangeInteger/Single.
+  + Added GV_ClampValueSingle/Integer/Cardinal will clamp a value to
+    the specified min/max values.
+  + Added GV_App_AlreadyRunning. It will ensure that only one instance
+    of your application runs.
+  = GV_Error_Abort, GV_LogFile_Write, GV_Font_Print and simular
+    routines now accept variable number of arguments via the
+    "array of const" construct.
+  = With the addition of the new shared memory manage, all routines
+    that accept/return PChars now use Delphi string types.
+  = Changed the calling convention for all exported routines from
+    stdcall to Delphis default register calling convention
+  * Fixed a problem with GV_Image_Grab where it was not able to
+    lock the texture used to grab the backbuffer
+  + Added GV_Dir_Read/_GetFiles/_GetAllFiles for reading dirs and
+    files with the results placed in an TStringList object.
+  * Fixed a small scaling & rect define problem in the sprite
+    interface
+  + GV_Texture_RenderRectScaled, which allows you to render a scaled
+    rect portion of a texture
+  = GV_Sprite_GetTexture was not being exported with stdcall calling
+    convention and would crash when called. Fixed now.
+  = Changed GV_Texture_Lock to accept a RECT structure so that you
+    can lock a portion of the texture and changed the pitch to a
+    pointer so that you can pass nil if you do not wish to recieve
+    a pitch value.
+[ Build #401 ]
+  * Misc enhancements and fixes
+  + Added GV_RenderDevice_GetAvailableTextureMem. It returns the
+    amount of free texture memory to the nearest MB.
+  = Reorganized the SDK folders
+  + Added header/dll mismatch check on startup. Using GV_Version you
+    can write your own check code.
+  + Added GV_Points_RenderRange so you can render from first-last
+    range of points.
+  + Added GV_Version which returns the GV DLL version string
+

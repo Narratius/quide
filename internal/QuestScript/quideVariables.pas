@@ -2,12 +2,12 @@ unit quideVariables;
 
 interface
 
-uses
-  SysUtils, Windows, Messages, Classes, Graphics, Controls, Forms, Dialogs;
+Uses
+ quideObject;
 
 type
- TdcVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
-  TquideVariable = class(TquideValueObject)
+ TquideVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
+  TquideVariable = class(TquideObject{TquideValueObject})
   private
     f_VarType: TquideVariableType;
   public

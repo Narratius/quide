@@ -9,7 +9,7 @@ uses
   Classes,
   SimpleXML;
 
-procedure OutString(aStr: string);
+procedure OutString(aStr: Ansistring);
 var
  l_Str: string;
 begin
@@ -30,31 +30,50 @@ begin
   ModelFormatError;
 end;
 
-function E(const aString: string): string;
+function E(const aString: TXMLString): TXMLString;
 begin
  Result := AnsiReplaceStr(aString, '#', '##35$');
  Result := AnsiReplaceStr(Result, #13#10, '#/$');
  Result := AnsiReplaceStr(Result, '&', '##38$');
 end;
 
+function GetProperty(aNode: IxmlNode; const aAlias: TxmlString): TxmlString;
+var
+ l_Node, l_Value: IxmlNode;
+ i: Integer;
+ l_Str: TxmlString;
+begin
+  Result:= '';
+  for I := 0 to Pred(aNode.ChildNodes.Count) do
+  begin
+    l_Node:= aNode.ChildNodes[i];
+    l_Str:= E(l_Node.GetChildText('Alias'));
+    if AnsiSameText(l_Str, aAlias) then
+    begin
+     Result:= E(l_Node.GetChildText('Value'));
+     break
+    end;
+  end;
+end;
+
 var
  l_ModelFN, l_QuestFN: string;
- l_Str: string;
+ l_Str, l_Start: TXMLstring;
  l_FS: TFileStream;
  l_MDoc: IXmlDocument;
  l_Root: IXmlNode;
- l_Node: IXmlNode;
- l_Locations: IXmlNode;
+ l_Node, l_Attr: IXmlNode;
+ l_Locations, l_Chapters, l_Actions: IXmlNode;
  l_List: IXmlNodeList;
- I : Integer;
+ I, j : Integer;
 
- procedure QWrite(const aString: string);
+ procedure QWrite(const aString: AnsiString);
  begin
   if aString <> '' then
    l_FS.WriteBuffer(Pointer(aString)^, Length(aString));
  end;
 
- procedure QWriteLn(const aString: string);
+ procedure QWriteLn(const aString: AnsiString);
  begin
   QWrite(aString);
   QWrite(#13#10);
@@ -63,11 +82,22 @@ var
  procedure WriteAction(aAction: IXmlNode);
  var
   l_Type: string;
+  l_text: IxmlNode;
+  i, j: Integer;
  begin
   l_Type := aAction.GetAttr('Type');
   if AnsiSameText(l_Type, 'text') then
   begin
-   QWriteLn('pln '+E(aAction.Text));
+    for I := 0 to Pred(aAction.ChildNodes.Count) do
+    begin
+      if AnsiSameText(aAction.ChildNodes[i].GetChildText('Alias'), 'Text') then
+      begin
+        l_Text:= aAction.ChildNodes[i].SelectSingleNode('Value').SelectSingleNode('Texts');
+        for j := 0 to Pred(l_text.ChildNodes.Count) do
+          QWriteLn('pln '+E(l_text.ChildNodes[j].Text));
+        break
+      end;
+    end;
   end
   else
    OutString('Неизвестный тип действия: '+l_Type);
@@ -78,8 +108,8 @@ var
   l_Target: string;
   l_Text: string;
  begin
-  l_Target := aButton.GetAttr('Target');
-  l_Text := E(aButton.GetAttr('Caption'));
+  l_Target := GetProperty(aButton, 'Target');
+  l_Text := GetProperty(aButton, 'Button');
   QWriteLn('btn '+l_Target+', '+l_Text);
  end;
 
@@ -88,19 +118,21 @@ var
   l_List: IXmlNodeList;
   I: Integer;
  begin
-  QWriteLn(#13#10':'+aLocation.GetAttr('Caption'));
+  QWriteLn(#13#10':'+GetProperty(aLocation, 'Caption'));
   l_List := aLocation.SelectSingleNode('Actions').ChildNodes;
   for I := 0 to Pred(l_List.Count) do
-   WriteAction(l_List.Item[I]);
-  l_List := aLocation.SelectSingleNode('Buttons').ChildNodes;
-  for I := 0 to Pred(l_List.Count) do
-   WriteButton(l_List.Item[I]);
+  begin
+   if AnsiSameText(l_List[i].GetAttr('Type'), 'Button') then
+    WriteButton(l_List[i])
+   else
+    WriteAction(l_List[I]);
+  end;
   QWriteLn('end');
  end;
 
 
 begin
- Writeln('Quide URQ Generator   v. 1.0');
+ Writeln('Quide URQ Generator ver. 2.0');
  if ParamCount = 0 then
  begin
   OutString('Использование: URQGEN <имя файла модели> [<имя файла квеста>]');
@@ -120,25 +152,43 @@ begin
   begin
    l_FS := TFileStream.Create(l_QuestFN, fmCreate);
    try
-    l_Locations := l_Root.SelectSingleNode('Locations');
-    CheckFormat((l_Locations <> nil) and (l_Locations.ChildNodes.Count > 0));
+   (*
+     <Meta>
+     <Chapters>
+      <Chapter>
+        <Property>
+         <Start>
+        <Locations>
+          <Location>
+            <Actions>
+              <Action Type=>
+
+   *)
+    l_Chapters := l_Root.SelectSingleNode('Chapters');
+    CheckFormat((l_Chapters <> nil) and (l_Chapters.ChildNodes.Count > 0));
+    l_Start:= GetProperty(l_Chapters.ChildNodes[0], 'Start');
     l_Node := l_Root.SelectSingleNode('Meta');
     if l_Node <> nil then
     begin
      QWriteLn(':Quide_META');
-     l_Str := E(l_Node.GetChildText('Title'));
+     l_Str:= GetProperty(l_Node, 'Caption');
      QWriteln('gametitle = "'+l_Str+'"');
      QWriteLn('pln #/$'+l_Str);
-     QWriteLn('pln #/$Автор: '+E(l_Node.GetChildText('Author')));
-     QWriteLn('pln #/$'+E(l_Node.GetChildText('Description'))+'#/$');
-     QWriteLn('btn '+l_Locations.GetAttr('Start')+', Начать игру');
+     QWriteLn('pln #/$'+GetProperty(l_node, 'hint')+'#/$');
+     QWriteLn('pln #/$Автор: '+ GetProperty(l_Node, 'Author'));
+     QWriteLn('btn '+l_Start+', Начать игру');
      QWriteLn('end'#13#10);
     end
     else
-     QWriteLn('goto '+l_Locations.GetAttr('Start'));
-    l_List := l_Locations.ChildNodes;
-    for I := 0 to Pred(l_List.Count) do
-     WriteLocation(l_List.Item[I]);
+     QWriteLn('goto '+l_Start);
+
+    for I := 0 to Pred(l_Chapters.ChildNodes.Count) do
+    begin
+      l_Locations:= l_Chapters.ChildNodes[i].SelectSingleNode('Locations');
+      l_List := l_Locations.ChildNodes;
+      for j := 0 to Pred(l_List.Count) do
+       WriteLocation(l_List.Item[j]);
+    end; // for i
    finally
     l_FS.Free;
    end;

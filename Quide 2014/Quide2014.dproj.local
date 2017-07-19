@@ -1,8 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.849,C:\svn\Quide\Quide 2014\Unit1.pas=C:\svn\Quide\Quide 2014\quideGUILink.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.090,=C:\svn\Quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.646,C:\quide_svn\Quide 2014\Quide2014.dproj=C:\quide_svn\Quide 2014\SGDemo.dproj</Transaction>
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>

@@ -110,7 +110,8 @@ begin
      { TODO -oДД -cУлучшение на будущее : Тут может быть больше одного элемента }
      aControl.Top:= TControl(aControls[aControls.Count-1]).Top;
      aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
-     aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
+     if aSize = csAutoSize then
+      aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
      l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
      if l_Delta > 0 then
      begin
@@ -121,7 +122,7 @@ begin
  end
  else
  begin
-  aControl.Top:= cIndent;
+  aControl.Top:= 2*cIndent;
   aControl.Left:= cIndent;
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
@@ -236,7 +237,9 @@ begin
   inherited ;
   BevelOuter:= bvNone;
   Caption:= '';
-  Height:= 12;
+  Height:= 18;
+  //Font.Size:= 14;
+  //Font.Name:= 'Book Antiqua';
   f_InnerControls := TList.Create();
   f_Locked:= 0;
 end;

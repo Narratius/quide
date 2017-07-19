@@ -1,0 +1,58 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = GameVision.dll minimalapp.exe appwindow.exe renderdevice.exe \
+  primitives.exe fonts.exe input.exe texture.exe dynamictexture.exe \
+  customtexture.exe sprite.exe entity.exe polypoint.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+GameVision.dll: ..\sources\GameVision.dpr
+  $(DCC)
+
+minimalapp.exe: samples\tutorials\minimalapp\minimalapp.dpr
+  $(DCC)
+
+appwindow.exe: samples\tutorials\appwindow\appwindow.dpr
+  $(DCC)
+
+renderdevice.exe: samples\tutorials\renderdevice\renderdevice.dpr
+  $(DCC)
+
+primitives.exe: samples\tutorials\primitives\primitives.dpr
+  $(DCC)
+
+fonts.exe: samples\tutorials\fonts\fonts.dpr
+  $(DCC)
+
+input.exe: samples\tutorials\input\input.dpr
+  $(DCC)
+
+texture.exe: samples\tutorials\texture\texture.dpr
+  $(DCC)
+
+sprite.exe: samples\tutorials\sprite\sprite.dpr
+  $(DCC)
+
+dynamictexture.exe: samples\tutorials\dynamictexture\dynamictexture.dpr
+  $(DCC)
+
+entity.exe: samples\tutorials\entity\entity.dpr
+  $(DCC)
+
+polypoint.exe: samples\tutorials\polypoint\polypoint.dpr
+  $(DCC)
+
+customtexture.exe: samples\tutorials\customtexture\customtexture.dpr
+  $(DCC)
+
+

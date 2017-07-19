@@ -1,0 +1,36 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = GameVision.dll polypoint.exe testbed.exe starfield.exe \
+  script_starfield.exe script_testbed.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+polypoint.exe: samples\demos\polypoint\polypoint.dpr
+  $(DCC)
+
+GameVision.dll: ..\sources\GameVision.dpr
+  $(DCC)
+
+testbed.exe: samples\demos\testbed\testbed.dpr
+  $(DCC)
+
+starfield.exe: samples\demos\starfield\starfield.dpr
+  $(DCC)
+
+script_starfield.exe: samples\demos\script_starfield\script_starfield.dpr
+  $(DCC)
+
+script_testbed.exe: samples\demos\script_testbed\script_testbed.dpr
+  $(DCC)
+
+

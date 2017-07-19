@@ -9,22 +9,19 @@ uses
 
 type
   //1 Базовый объект
-  TquideObject = class(TPersistent, IquideStore)
+  TquideObject = class(TProperties)
   private
     f_Changed: Boolean;
-    f_Properties: TProperties;
+    //f_GraphID: DWord;
     function pm_GetCaption: string;
     function pm_GetHint: string;
     procedure pm_SetCaption(const Value: string);
     procedure pm_SetHint(const Value: string);
   protected
-    procedure AddProperty(const aAlias, aCaption: String; aType: TPropertyType;
-        aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
   public
     constructor Create; virtual;
     constructor Make(const aCaption, aHint: string);
     destructor Destroy; override;
-    procedure Assign(aSource: TPersistent);
     //1 Сбрасывает в начальное состояние
     procedure Clear; virtual;
     //1 Проверяет соответствует ли переданное название собственному
@@ -34,6 +31,7 @@ type
     //1 Название
     property Caption: string read pm_GetCaption write pm_SetCaption;
     property Changed: Boolean read f_Changed write f_Changed;
+    //property GraphID: DWord read f_GraphID write f_GraphID;
     //1 Краткое описание
     property Hint: string read pm_GetHint write pm_SetHint;
   end;
@@ -46,9 +44,9 @@ implementation
 }
 constructor TquideObject.Create;
 begin
-  f_Properties := TProperties.Create();
-  AddProperty('Caption', 'Название', ptString, nil);
-  AddProperty('Hint', 'Описание', ptString, nil);
+ inherited Create;
+  Define('Caption', 'Название', ptString);
+  Define('Hint', 'Описание', ptString);
 end;
 
 constructor TquideObject.Make(const aCaption, aHint: string);
@@ -60,35 +58,15 @@ end;
 
 destructor TquideObject.Destroy;
 begin
- FreeAndNil(f_Properties);
 end;
 
-procedure TquideObject.AddProperty(const aAlias, aCaption: String; aType:
-    TPropertyType; aVisible: Boolean = True; aEvent: TNotifyEvent = nil);
-var
- l_P: TProperty;
-begin
- l_P:= Add;
- l_P.Alias:= aAlias;
- l_P.Caption:= aCaption;
- l_P.PropertyType:= aType;
- l_P.Visible:= aVisible;
- l_P.Event:= aEvent;
-end;
 
-procedure TquideObject.Assign(aSource: TPersistent);
-begin
- if aSource is TquideObject then
- begin
-  f_Properties.Assign(aSource.f_Properies);
- end;
-end;
 
 procedure TquideObject.Clear;
 begin
  Caption:= '';
  Hint:= '';
- Cahnged:= False;
+ Changed:= False;
 end;
 
 function TquideObject.ItsMe(const aCaption: String): Boolean;
@@ -99,33 +77,35 @@ end;
 procedure TquideObject.Load(aStream: TStream);
 begin
  Clear;
- f_Properties.Load(aStream);
+ { TODO -oДимка : Чтение-запись не работает }
+ //Properties.Load(aStream);
  Changed:= False;
 end;
 
 function TquideObject.pm_GetCaption: string;
 begin
- Result:= f_Properties.Values['Caption'];
+ Result:= Values['Caption'];
 end;
 
 function TquideObject.pm_GetHint: string;
 begin
- Result:= f_Properties.Values['Hint'];
+ Result:= Values['Hint'];
 end;
 
 procedure TquideObject.pm_SetCaption(const Value: string);
 begin
- f_Properties.Values['Caption']:= Value;
+ Values['Caption']:= Value;
 end;
 
 procedure TquideObject.pm_SetHint(const Value: string);
 begin
- f_Properties.Values['Hint']:= Value;
+ Values['Hint']:= Value;
 end;
 
 procedure TquideObject.Save(aStream: TStream);
 begin
- f_Properties.Save(aStream);
+ { TODO -oДимка : Чтение-запись не работает }
+ //f_Properties.Save(aStream);
  Changed:= False;
 end;
 

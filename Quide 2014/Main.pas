@@ -1,12 +1,3 @@
-{------------------------------------------------------------------------------}
-{                                                                              }
-{  TSimpleGraph Demonstration Program                                          }
-{  by Kambiz R. Khojasteh                                                      }
-{                                                                              }
-{  kambiz@delphiarea.com                                                       }
-{  http://www.delphiarea.com                                                   }
-{                                                                              }
-{------------------------------------------------------------------------------}
 
 {$I DELPHIAREA.INC}
 
@@ -18,11 +9,11 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   SimpleGraph {$IFDEF COMPILER7_UP}, XPMan {$ENDIF}, Dialogs, ExtDlgs,
   Menus, ActnList, ImgList, StdCtrls, ComCtrls, ToolWin, JPEG, Buttons,
-  System.Actions;
+  System.Actions, quideScenarios, System.ImageList;
 
 type
   TMainForm = class(TForm)
-    SimpleGraph: TSimpleGraph;
+
     ToolBar: TToolBar;
     StatusBar: TStatusBar;
     ImageList: TImageList;
@@ -66,7 +57,7 @@ type
     ToolButton9: TToolButton;
     ToolButton10: TToolButton;
     ObjectsNone: TAction;
-    ObjectsRoundRect: TAction;
+    actNewLocation: TAction;
     Opjects1: TMenuItem;
     ToolButton12: TToolButton;
     ToolButton14: TToolButton;
@@ -118,43 +109,25 @@ type
     Help1: TMenuItem;
     About2: TMenuItem;
     FormatToolBar: TToolBar;
-    cbxFontName: TComboBox;
-    cbxFontSize: TComboBox;
-    btnBoldface: TToolButton;
-    btnItalic: TToolButton;
-    btnUnderline: TToolButton;
     FormatBold: TAction;
     FormatItalic: TAction;
     FormatUnderline: TAction;
     FormatAlignLeft: TAction;
     FormatCenter: TAction;
     FormatAlignRight: TAction;
-    ToolButton27: TToolButton;
-    ToolButton28: TToolButton;
-    ToolButton29: TToolButton;
     ExportMetafile: TAction;
     SavePictureDialog: TSavePictureDialog;
     ToolButton30: TToolButton;
-    ToolButton17: TToolButton;
-    ToolButton25: TToolButton;
     ViewZoomIn: TAction;
     ViewZoomOut: TAction;
     ToolButton32: TToolButton;
     FormatAlignTop: TAction;
     FormatVCenter: TAction;
     FormatAlignBottom: TAction;
-    ToolButton36: TToolButton;
-    ToolButton37: TToolButton;
-    ToolButton38: TToolButton;
-    ToolButton39: TToolButton;
     ToolButton40: TToolButton;
     ViewGrid: TAction;
     ToolButton42: TToolButton;
-    ToolButton44: TToolButton;
-    ToolButton45: TToolButton;
-    ToolButton46: TToolButton;
     ToolButton47: TToolButton;
-    ToolButton48: TToolButton;
     EditLockLinks: TAction;
     EditLockLinks1: TMenuItem;
     InsertTriangle2: TMenuItem;
@@ -214,8 +187,6 @@ type
     N20: TMenuItem;
     PanMode1: TMenuItem;
     ClipboardNative: TAction;
-    ClipboardBitmap: TAction;
-    ClipboardMetafile: TAction;
     ClipboardFormats1: TMenuItem;
     Native1: TMenuItem;
     Bitmap1: TMenuItem;
@@ -225,19 +196,16 @@ type
     FixScrollBars1: TMenuItem;
     Align1: TMenuItem;
     Align2: TMenuItem;
-    BackgroundLabel: TLabel;
     ViewTransparent: TAction;
     ransparent1: TMenuItem;
-    ToolButton26: TToolButton;
     EditSize: TAction;
     Size1: TMenuItem;
     Size2: TMenuItem;
-    ToolButton31: TToolButton;
+    ScenarioGraph: TSimpleGraph;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
     procedure FileSaveAsExecute(Sender: TObject);
-    procedure ExportMetafileExecute(Sender: TObject);
     procedure FilePrintExecute(Sender: TObject);
     procedure FileExitExecute(Sender: TObject);
     procedure EditCutExecute(Sender: TObject);
@@ -245,25 +213,15 @@ type
     procedure EditPasteExecute(Sender: TObject);
     procedure EditDeleteExecute(Sender: TObject);
     procedure EditSelectAllExecute(Sender: TObject);
-    procedure EditSendToBackExecute(Sender: TObject);
-    procedure EditBringToFrontExecute(Sender: TObject);
     procedure EditLockNodesExecute(Sender: TObject);
     procedure EditPropertiesExecute(Sender: TObject);
-    procedure FormatBoldExecute(Sender: TObject);
-    procedure FormatItalicExecute(Sender: TObject);
-    procedure FormatUnderlineExecute(Sender: TObject);
-    procedure FormatAlignLeftExecute(Sender: TObject);
-    procedure FormatCenterExecute(Sender: TObject);
-    procedure FormatAlignRightExecute(Sender: TObject);
     procedure HelpAboutExecute(Sender: TObject);
     procedure ObjectsNoneExecute(Sender: TObject);
-    procedure ObjectsRoundRectExecute(Sender: TObject);
+    procedure actNewLocationExecute(Sender: TObject);
     procedure ObjectsLinkExecute(Sender: TObject);
     procedure ViewZoomInExecute(Sender: TObject);
     procedure ViewZoomOutExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject;var CanClose: Boolean);
-    procedure cbxFontSizeChange(Sender: TObject);
-    procedure cbxFontNameChange(Sender: TObject);
     procedure SimpleGraphDblClick(Sender: TObject);
     procedure SimpleGraphNodeDblClick(Graph: TSimpleGraph;
       Node: TGraphNode);
@@ -275,9 +233,6 @@ type
       GraphObject: TGraphObject);
     procedure SimpleGraphObjectDblClick(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
-    procedure FormatAlignTopExecute(Sender: TObject);
-    procedure FormatVCenterExecute(Sender: TObject);
-    procedure FormatAlignBottomExecute(Sender: TObject);
     procedure ViewGridExecute(Sender: TObject);
     procedure SimpleGraphInfoTip(Graph: TSimpleGraph;
       GraphObject: TGraphObject; var InfoTip: String);
@@ -307,7 +262,6 @@ type
     procedure ViewWholeGraphExecute(Sender: TObject);
     procedure SimpleGraphObjectChange(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
-    procedure ExportBitmapExecute(Sender: TObject);
     procedure SimpleGraphObjectInitInstance(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
     procedure SimpleGraphMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -323,12 +277,7 @@ type
     procedure SimpleGraphNodeMoveResize(Graph: TSimpleGraph;
       Node: TGraphNode);
     procedure ClipboardNativeExecute(Sender: TObject);
-    procedure ClipboardBitmapExecute(Sender: TObject);
-    procedure ClipboardMetafileExecute(Sender: TObject);
     procedure ViewFixScrollsExecute(Sender: TObject);
-    procedure EditAlignExecute(Sender: TObject);
-    procedure ClipboardBitmapUpdate(Sender: TObject);
-    procedure ClipboardMetafileUpdate(Sender: TObject);
     procedure ClipboardNativeUpdate(Sender: TObject);
     procedure EditAlignUpdate(Sender: TObject);
     procedure EditBringToFrontUpdate(Sender: TObject);
@@ -342,14 +291,11 @@ type
     procedure EditPasteUpdate(Sender: TObject);
     procedure EditSelectAllUpdate(Sender: TObject);
     procedure EditSendToBackUpdate(Sender: TObject);
-    procedure ExportBitmapUpdate(Sender: TObject);
-    procedure ExportMetafileUpdate(Sender: TObject);
     procedure FileMergeUpdate(Sender: TObject);
     procedure FilePrintUpdate(Sender: TObject);
     procedure FileSaveAsUpdate(Sender: TObject);
     procedure FileSaveUpdate(Sender: TObject);
     procedure ObjectsNoneUpdate(Sender: TObject);
-    procedure ObjectsRoundRectUpdate(Sender: TObject);
     procedure ViewActualSizeUpdate(Sender: TObject);
     procedure ViewFixScrollsUpdate(Sender: TObject);
     procedure ViewGridUpdate(Sender: TObject);
@@ -362,13 +308,25 @@ type
     procedure ViewTransparentUpdate(Sender: TObject);
     procedure ViewTransparentExecute(Sender: TObject);
     procedure EditSizeUpdate(Sender: TObject);
-    procedure EditSizeExecute(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure actScenarioPropertiesExecute(Sender: TObject);
+    procedure actFileGenerateExecute(Sender: TObject);
+    procedure ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
+      GraphObject: TGraphObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
+
+    f_Scenario: TquideScenario;
     function IsGraphSaved: Boolean;
     procedure ShowHint(Sender: TObject);
     function ForEachCallback(GraphObject: TGraphObject; Action: Integer): Boolean;
+    // Quide
+    procedure MakeScript;
+    procedure DestroyScript;
+    procedure CheckConnections;
+    procedure FindFreePlace(var aPlace: TRect);
+    // Quide
   end;
 
 var
@@ -380,11 +338,13 @@ implementation
 
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
-  AboutDelphiArea, AlignDlg, SizeDlg;
+  AboutDelphiArea, AlignDlg, SizeDlg,
+  PropertyUtils,
+  quideLocations, quideLocationDlg;
 
 resourcestring
   SAppTitle      = 'Quest IDE 2014';
-  SSaveChanges   = 'Сценарий был изменен, Вы хотите сохранить его?';
+  SSaveChanges   = 'Сценарий был изменен, Вы хотите сохранить изменения?';
   SViewOnly      = 'View Only';
   SEditing       = 'Editing';
   SPan           = 'Pan Mode';
@@ -455,10 +415,6 @@ begin
       GraphObject.BringToFront;
     FEO_MAKESELECTABLE:
       GraphObject.Options := GraphObject.Options + [goSelectable];
-    FEO_SETFONTFACE:
-      GraphObject.Font.Name := cbxFontName.Text;
-    FEO_SETFONTSIZE:
-      GraphObject.Font.Size := cbxFontSize.Tag;
     FEO_SETFONTBOLD:
       GraphObject.Font.Style := GraphObject.Font.Style + [fsBold];
     FEO_SETFONTITALIC:
@@ -520,16 +476,41 @@ end;
 function TMainForm.IsGraphSaved: Boolean;
 begin
   Result := True;
-  if SimpleGraph.Modified then
+  if ScenarioGraph.Modified then
     case MessageDlg(SSaveChanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0) of
       mrYes:
         begin
           FileSave.Execute;
-          Result := not SimpleGraph.Modified;
+          Result := not ScenarioGraph.Modified;
         end;
       mrCancel:
         Result := False;
     end;
+end;
+
+procedure TMainForm.ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
+  GraphObject: TGraphObject);
+var
+  l_Loc: TquideLocation;
+begin
+  if GraphObject is TRoundRectangularNode then
+  begin
+   l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(GraphObject.ID);
+   if l_Loc <> nil then
+   begin
+     with TquideLocationDialog.Create(Self) do
+     try
+       if Execute(l_Loc) then
+       begin
+        ScenarioGraph.Modified:= True;
+        GraphObject.Text:= l_Loc.Caption;
+        CheckConnections;
+       end;
+     finally
+       Free;
+     end;
+   end;
+  end;
 end;
 
 procedure TMainForm.ShowHint(Sender: TObject);
@@ -543,24 +524,33 @@ begin
   Application.OnHint := ShowHint;
   SimpleGraphCommandModeChange(nil);
   SimpleGraphZoomChange(nil);
-  cbxFontName.Items := Screen.Fonts;
   if ParamCount > 0 then
   begin
-    SimpleGraph.LoadFromFile(ParamStr(1));
+    ScenarioGraph.LoadFromFile(ParamStr(1));
     SaveDialog.FileName := ExpandFileName(ParamStr(1));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end
   else
+  begin
    Caption:= Application.Title;
+   SaveDialog.FileName:= SUntitled;
+  end;
+ MakeScript;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+ DestroyScript;
 end;
 
 procedure TMainForm.FileNewExecute(Sender: TObject);
 begin
   if IsGraphSaved then
   begin
-    SimpleGraph.Clear;
-    SimpleGraph.Zoom := 100;
-    SimpleGraph.CommandMode := cmEdit;
+    f_Scenario.Clear;
+    ScenarioGraph.Clear;
+    ScenarioGraph.Zoom := 100;
+    ScenarioGraph.CommandMode := cmEdit;
     IsReadonly := False;
     SaveDialog.FileName := SUntitled;
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
@@ -572,98 +562,83 @@ begin
   OpenDialog.Options := OpenDialog.Options - [ofHideReadOnly];
   if IsGraphSaved and OpenDialog.Execute then
   begin
-    SimpleGraph.LoadFromFile(OpenDialog.FileName);
-    SimpleGraph.Zoom := 100;
+    ScenarioGraph.LoadFromFile(OpenDialog.FileName);
+    ScenarioGraph.Zoom := 100;
     IsReadonly := ofReadonly in OpenDialog.Options;
     if IsReadonly then
-      SimpleGraph.CommandMode := cmViewOnly
+      ScenarioGraph.CommandMode := cmViewOnly
     else
-      SimpleGraph.CommandMode := cmEdit;
+      ScenarioGraph.CommandMode := cmEdit;
     SaveDialog.FileName := OpenDialog.FileName;
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
+    f_Scenario.LoadFromFile(ChangeFileExt(OpenDialog.FileName, '.xml'));
+    // Нужно слинковать с визуалкой...
   end;
 end;
 
 procedure TMainForm.FileMergeUpdate(Sender: TObject);
 begin
-  FileMerge.Enabled := not IsReadonly and (SimpleGraph.Objects.Count > 0);
+  FileMerge.Enabled := not IsReadonly and (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.FileMergeExecute(Sender: TObject);
 begin
   OpenDialog.Options := OpenDialog.Options + [ofHideReadOnly];
   if OpenDialog.Execute then
-    with SimpleGraph do
+    with ScenarioGraph do
       MergeFromFile(OpenDialog.FileName, 0, GraphBounds.Bottom + 4 * GridSize);
 end;
 
 procedure TMainForm.FileSaveUpdate(Sender: TObject);
 begin
-  FileSave.Enabled := SimpleGraph.Modified;
+  FileSave.Enabled := ScenarioGraph.Modified;
+end;
+
+procedure TMainForm.FindFreePlace(var aPlace: TRect);
+begin
+  // Поиск свободного места для локации
+  aPlace.Create(10, 10+f_Scenario.Chapters[0].LocationsCount*60, 110, 60+f_Scenario.Chapters[0].LocationsCount*60);
 end;
 
 procedure TMainForm.FileSaveExecute(Sender: TObject);
 begin
   if SaveDialog.FileName <> SUntitled then
   begin
-    SimpleGraph.SaveToFile(SaveDialog.FileName);
+    ScenarioGraph.SaveToFile(SaveDialog.FileName);
+    f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end
   else
   begin
     if SaveDialog.Execute then
-      SimpleGraph.SaveToFile(SaveDialog.FileName);
+    begin
+      ScenarioGraph.SaveToFile(SaveDialog.FileName);
+      f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
+    end;
   end;
   Caption := SaveDialog.FileName + ' - ' + Application.Title;
 end;
 
 procedure TMainForm.FileSaveAsUpdate(Sender: TObject);
 begin
-  FileSaveAs.Enabled := (SimpleGraph.Objects.Count > 0);
+  FileSaveAs.Enabled := (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.FileSaveAsExecute(Sender: TObject);
 begin
   if SaveDialog.Execute then
   begin
-    SimpleGraph.SaveToFile(SaveDialog.FileName);
-    SimpleGraph.CommandMode := cmEdit;
+    ScenarioGraph.SaveToFile(SaveDialog.FileName);
+    ScenarioGraph.CommandMode := cmEdit;
     IsReadonly := False;
+    f_Scenario.SaveToFile(ChangeFileExt(SaveDialog.FileName, '.xml'));
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
   end;
 end;
 
-procedure TMainForm.ExportMetafileUpdate(Sender: TObject);
-begin
-  ExportMetafile.Enabled := (SimpleGraph.Objects.Count > 0);
-end;
-
-procedure TMainForm.ExportMetafileExecute(Sender: TObject);
-begin
-  SavePictureDialog.Filter := GraphicFilter(TMetafile);
-  SavePictureDialog.DefaultExt := GraphicExtension(TMetafile);
-  SavePictureDialog.FileName := ChangeFileExt(SaveDialog.FileName, '.' + SavePictureDialog.DefaultExt);
-  if SavePictureDialog.Execute then
-    SimpleGraph.SaveAsMetafile(SavePictureDialog.FileName);
-end;
-
-procedure TMainForm.ExportBitmapUpdate(Sender: TObject);
-begin
-  ExportBitmap.Enabled := (SimpleGraph.Objects.Count > 0);
-end;
-
-procedure TMainForm.ExportBitmapExecute(Sender: TObject);
-begin
-  SavePictureDialog.Filter := GraphicFilter(TBitmap);
-  SavePictureDialog.DefaultExt := GraphicExtension(TBitmap);
-  SavePictureDialog.FileName := ChangeFileExt(SaveDialog.FileName, '.' + SavePictureDialog.DefaultExt);
-  if SavePictureDialog.Execute then
-    SimpleGraph.SaveAsBitmap(SavePictureDialog.FileName);
-end;
-
 procedure TMainForm.FilePrintUpdate(Sender: TObject);
 begin
-  FilePrint.Enabled :=(Printer.Printers.Count > 0) and (SimpleGraph.Objects.Count > 0);
+  FilePrint.Enabled :=(Printer.Printers.Count > 0) and (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.FilePrintExecute(Sender: TObject);
@@ -677,7 +652,7 @@ begin
     Printer.Title := Application.Title;
     Printer.BeginDoc;
     try
-      SimpleGraph.Print(Printer.Canvas, Rect);
+      ScenarioGraph.Print(Printer.Canvas, Rect);
     finally
       Printer.EndDoc;
     end;
@@ -691,7 +666,7 @@ end;
 
 procedure TMainForm.EditCutUpdate(Sender: TObject);
 begin
-  EditCut.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
+  EditCut.Enabled := not IsReadonly and (ScenarioGraph.SelectedObjects.Count > 0);
 end;
 
 procedure TMainForm.EditCutExecute(Sender: TObject);
@@ -702,12 +677,12 @@ end;
 
 procedure TMainForm.EditCopyUpdate(Sender: TObject);
 begin
-  EditCopy.Enabled :=(SimpleGraph.SelectedObjects.Count > 0);
+  EditCopy.Enabled :=(ScenarioGraph.SelectedObjects.Count > 0);
 end;
 
 procedure TMainForm.EditCopyExecute(Sender: TObject);
 begin
-  SimpleGraph.CopyToClipboard(True);
+  ScenarioGraph.CopyToClipboard(True);
 end;
 
 procedure TMainForm.EditPasteUpdate(Sender: TObject);
@@ -717,361 +692,275 @@ end;
 
 procedure TMainForm.EditPasteExecute(Sender: TObject);
 begin
-  SimpleGraph.PasteFromClipboard;
+  ScenarioGraph.PasteFromClipboard;
 end;
 
 procedure TMainForm.EditDeleteUpdate(Sender: TObject);
 begin
-  EditDelete.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
+  EditDelete.Enabled := not IsReadonly and (ScenarioGraph.SelectedObjects.Count > 0);
 end;
 
 procedure TMainForm.EditDeleteExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_DELETE, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_DELETE, True);
+  { TODO : Нужно удалить связанные объекты }
 end;
 
 procedure TMainForm.EditSelectAllUpdate(Sender: TObject);
 begin
   EditSelectAll.Enabled := not IsReadonly and
-    (SimpleGraph.Objects.Count > SimpleGraph.SelectedObjects.Count);
+    (ScenarioGraph.Objects.Count > ScenarioGraph.SelectedObjects.Count);
 end;
 
 procedure TMainForm.EditSelectAllExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SELECT, False);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_SELECT, False);
 end;
 
 procedure TMainForm.EditInvertSelectionUpdate(Sender: TObject);
 begin
-  EditInvertSelection.Enabled := not IsReadonly and (SimpleGraph.Objects.Count > 0);
+  EditInvertSelection.Enabled := not IsReadonly and (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.EditInvertSelectionExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_INVERTSELECTION, False);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_INVERTSELECTION, False);
 end;
 
 procedure TMainForm.EditMakeAllSelectableUpdate(Sender: TObject);
 begin
-  EditMakeAllSelectable.Enabled := not IsReadonly and (SimpleGraph.Objects.Count > 0);
+  EditMakeAllSelectable.Enabled := not IsReadonly and (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.EditMakeAllSelectableExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_MAKESELECTABLE, False);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_MAKESELECTABLE, False);
 end;
 
 procedure TMainForm.EditSendToBackUpdate(Sender: TObject);
 begin
-  EditSendToBack.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
-end;
-
-procedure TMainForm.EditSendToBackExecute(Sender: TObject);
-begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SENDTOBACK, True);
+  EditSendToBack.Enabled := not IsReadonly and (ScenarioGraph.SelectedObjects.Count > 0);
 end;
 
 procedure TMainForm.EditBringToFrontUpdate(Sender: TObject);
 begin
-  EditBringToFront.Enabled := not IsReadonly and (SimpleGraph.SelectedObjects.Count > 0);
-end;
-
-procedure TMainForm.EditBringToFrontExecute(Sender: TObject);
-begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_BRINGTOFRONT, True);
+  EditBringToFront.Enabled := not IsReadonly and (ScenarioGraph.SelectedObjects.Count > 0);
 end;
 
 procedure TMainForm.EditAlignUpdate(Sender: TObject);
 begin
-  EditAlign.Enabled := (SimpleGraph.SelectedObjects.Count > 1);
-end;
-
-procedure TMainForm.EditAlignExecute(Sender: TObject);
-var
-  H: THAlignOption;
-  V: TVAlignOption;
-begin
-  if TAlignDialog.Execute(H, V) then
-    SimpleGraph.AlignSelection(H, V);
+  EditAlign.Enabled := (ScenarioGraph.SelectedObjects.Count > 1);
 end;
 
 procedure TMainForm.EditSizeUpdate(Sender: TObject);
 begin
-  EditSize.Enabled := (SimpleGraph.SelectedObjects.Count > 1);
-end;
-
-procedure TMainForm.EditSizeExecute(Sender: TObject);
-var
-  Horz, Vert: TResizeOption;
-begin
-  if TSizeDialog.Execute(Horz, Vert) then
-    SimpleGraph.ResizeSelection(Horz, Vert);
+  EditSize.Enabled := (ScenarioGraph.SelectedObjects.Count > 1);
 end;
 
 procedure TMainForm.EditLockNodesUpdate(Sender: TObject);
 begin
-  EditLockNodes.Checked := SimpleGraph.LockNodes;
+  EditLockNodes.Checked := ScenarioGraph.LockNodes;
   EditLockNodes.Enabled := not IsReadonly;
 end;
 
 procedure TMainForm.EditLockNodesExecute(Sender: TObject);
 begin
-  SimpleGraph.LockNodes := not SimpleGraph.LockNodes;
+  ScenarioGraph.LockNodes := not ScenarioGraph.LockNodes;
 end;
 
 procedure TMainForm.EditLockLinksUpdate(Sender: TObject);
 begin
-  EditLockLinks.Checked := SimpleGraph.LockLinks;
+  EditLockLinks.Checked := ScenarioGraph.LockLinks;
   EditLockLinks.Enabled := not IsReadonly;
 end;
 
 procedure TMainForm.EditLockLinksExecute(Sender: TObject);
 begin
-  SimpleGraph.LockLinks := not SimpleGraph.LockLinks;
+  ScenarioGraph.LockLinks := not ScenarioGraph.LockLinks;
 end;
 
 procedure TMainForm.EditPropertiesExecute(Sender: TObject);
 var
   LinkCount: Integer;
 begin
-  if SimpleGraph.SelectedObjects.Count = 0 then
-    TDesignerProperties.Execute(SimpleGraph)
+  if ScenarioGraph.SelectedObjects.Count = 0 then
+    TDesignerProperties.Execute(ScenarioGraph)
   else
   begin
-    LinkCount := SimpleGraph.SelectedObjectsCount(TGraphLink);
+    LinkCount := ScenarioGraph.SelectedObjectsCount(TGraphLink);
     if LinkCount = 0 then
-      TNodeProperties.Execute(SimpleGraph.SelectedObjects)
-    else if LinkCount = SimpleGraph.SelectedObjects.Count then
-      TLinkProperties.Execute(SimpleGraph.SelectedObjects)
+      TNodeProperties.Execute(ScenarioGraph.SelectedObjects)
+    else if LinkCount = ScenarioGraph.SelectedObjects.Count then
+      TLinkProperties.Execute(ScenarioGraph.SelectedObjects)
     else
-      TObjectProperties.Execute(SimpleGraph.SelectedObjects);
+      TObjectProperties.Execute(ScenarioGraph.SelectedObjects);
   end;
 end;
 
 procedure TMainForm.ClipboardNativeUpdate(Sender: TObject);
 begin
-  ClipboardNative.Checked := cfNative in SimpleGraph.ClipboardFormats;
+  ClipboardNative.Checked := cfNative in ScenarioGraph.ClipboardFormats;
+end;
+
+procedure TMainForm.DestroyScript;
+begin
+ FreeAndNil(f_Scenario);
 end;
 
 procedure TMainForm.ClipboardNativeExecute(Sender: TObject);
 begin
-  if cfNative in SimpleGraph.ClipboardFormats then
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats - [cfNative]
+  if cfNative in ScenarioGraph.ClipboardFormats then
+    ScenarioGraph.ClipboardFormats := ScenarioGraph.ClipboardFormats - [cfNative]
   else
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats + [cfNative];
+    ScenarioGraph.ClipboardFormats := ScenarioGraph.ClipboardFormats + [cfNative];
 end;
 
-procedure TMainForm.ClipboardBitmapUpdate(Sender: TObject);
+procedure TMainForm.CheckConnections;
 begin
-  ClipboardBitmap.Checked := cfBitmap in SimpleGraph.ClipboardFormats;
+  // Обновляет соединения локаций
+
 end;
 
-procedure TMainForm.ClipboardBitmapExecute(Sender: TObject);
+procedure TMainForm.actFileGenerateExecute(Sender: TObject);
 begin
-  if cfBitmap in SimpleGraph.ClipboardFormats then
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats - [cfBitmap]
-  else
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats + [cfBitmap];
+ // Генерация игры
 end;
 
-procedure TMainForm.ClipboardMetafileUpdate(Sender: TObject);
+procedure TMainForm.actScenarioPropertiesExecute(Sender: TObject);
 begin
-  ClipboardMetafile.Checked := cfMetafile in SimpleGraph.ClipboardFormats;
-end;
-
-procedure TMainForm.ClipboardMetafileExecute(Sender: TObject);
-begin
-  if cfMetafile in SimpleGraph.ClipboardFormats then
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats - [cfMetafile]
-  else
-    SimpleGraph.ClipboardFormats := SimpleGraph.ClipboardFormats + [cfMetafile];
-end;
-
-procedure TMainForm.FormatBoldExecute(Sender: TObject);
-begin
-  FormatBold.Checked := not FormatBold.Checked;
-  if FormatBold.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTBOLD, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTBOLD, True);
-end;
-
-procedure TMainForm.FormatItalicExecute(Sender: TObject);
-begin
-  FormatItalic.Checked := not FormatItalic.Checked;
-  if FormatItalic.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTITALIC, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTITALIC, True);
-end;
-
-procedure TMainForm.FormatUnderlineExecute(Sender: TObject);
-begin
-  FormatUnderline.Checked := not FormatUnderline.Checked;
-  if FormatUnderline.Checked then
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTUNDERLINE, True)
-  else
-    SimpleGraph.ForEachObject(ForEachCallback, FEO_RESETFONTUNDERLINE, True);
-end;
-
-procedure TMainForm.FormatAlignLeftExecute(Sender: TObject);
-begin
-  FormatAlignLeft.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTLEFT, True);
-end;
-
-procedure TMainForm.FormatCenterExecute(Sender: TObject);
-begin
-  FormatCenter.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTCENTER, True);
-end;
-
-procedure TMainForm.FormatAlignRightExecute(Sender: TObject);
-begin
-  FormatAlignRight.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETALIGNMENTRIGHT, True);
-end;
-
-procedure TMainForm.FormatAlignTopExecute(Sender: TObject);
-begin
-  FormatAlignTop.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTTOP, True);
-end;
-
-procedure TMainForm.FormatVCenterExecute(Sender: TObject);
-begin
-  FormatVCenter.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTCENTER, True);
-end;
-
-procedure TMainForm.FormatAlignBottomExecute(Sender: TObject);
-begin
-  FormatAlignBottom.Checked := True;
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETLAYOUTBOTTOM, True);
+ // Редактирование свойств сценария
+  ShowPropDialog('Свойства сценария', f_Scenario);
 end;
 
 procedure TMainForm.ObjectsNoneUpdate(Sender: TObject);
 begin
-  ObjectsNone.Checked :=(SimpleGraph.CommandMode in [cmEdit, cmViewOnly]);
+  ObjectsNone.Checked :=(ScenarioGraph.CommandMode in [cmEdit, cmViewOnly]);
 end;
 
 procedure TMainForm.ObjectsNoneExecute(Sender: TObject);
 begin
   if IsReadonly then
-    SimpleGraph.CommandMode := cmViewOnly
+    ScenarioGraph.CommandMode := cmViewOnly
   else
-    SimpleGraph.CommandMode := cmEdit;
+    ScenarioGraph.CommandMode := cmEdit;
 end;
 
-procedure TMainForm.ObjectsRoundRectUpdate(Sender: TObject);
-begin
-  ObjectsRoundRect.Checked :=(SimpleGraph.CommandMode = cmInsertNode) and
-    (SimpleGraph.DefaultNodeClass = TRoundRectangularNode);
-  ObjectsRoundRect.Enabled := not IsReadonly;
-end;
-
-procedure TMainForm.ObjectsRoundRectExecute(Sender: TObject);
+procedure TMainForm.actNewLocationExecute(Sender: TObject);
 var
  B: TRect;
- N1, N2: TGraphNode;
+ l_N1, l_N2: TGraphNode;
+ l_Loc: TquideLocation;
 begin
  // сначала вызываем окно редактирования локации, потом добавляем визуалку
- (*  Original
-  SimpleGraph.DefaultNodeClass := TRoundRectangularNode;
-  SimpleGraph.CommandMode := cmInsertNode;
- *)
- b.Create(10, 10, 110, 60);
- N1:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
- b.Create(10, 100, 110, 150);
- N2:= SimpleGraph.InsertNode(B, TRoundRectangularNode);
- SimpleGraph.InsertLink(N1, N2);
+ FindFreePlace(B);
+ l_N1:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
+
+ l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
+ l_Loc.Caption:= Format('Новая локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
+
+ with TquideLocationDialog.Create(Self) do
+ try
+   if Execute(l_Loc) then
+   begin
+    l_N1.Text:= l_Loc.Caption;
+    l_Loc.Values['GraphObject']:= l_N1.ID;
+    CheckConnections;
+   end;
+ finally
+   Free;
+ end;
+
+ // Линковка чуть позже
+ //b.Create(10, 100, 110, 150);
+ //l_N2:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
+ //ScenarioGraph.InsertLink(l_N1, l_N2);
 end;
 
 procedure TMainForm.ObjectsLinkExecute(Sender: TObject);
 begin
-  SimpleGraph.CommandMode := cmInsertLink;
+  ScenarioGraph.CommandMode := cmInsertLink;
 end;
 
 procedure TMainForm.ViewZoomInUpdate(Sender: TObject);
 begin
-  ViewZoomIn.Enabled := (SimpleGraph.Zoom < High(TZoom));
+  ViewZoomIn.Enabled := (ScenarioGraph.Zoom < High(TZoom));
 end;
 
 procedure TMainForm.ViewZoomInExecute(Sender: TObject);
 begin
-  SimpleGraph.ChangeZoomBy(+10, zoCenter);
+  ScenarioGraph.ChangeZoomBy(+10, zoCenter);
 end;
 
 procedure TMainForm.ViewZoomOutUpdate(Sender: TObject);
 begin
-  ViewZoomOut.Enabled := (SimpleGraph.Zoom > Low(TZoom));
+  ViewZoomOut.Enabled := (ScenarioGraph.Zoom > Low(TZoom));
 end;
 
 procedure TMainForm.ViewZoomOutExecute(Sender: TObject);
 begin
-  SimpleGraph.ChangeZoomBy(-10, zoCenter);
+  ScenarioGraph.ChangeZoomBy(-10, zoCenter);
 end;
 
 procedure TMainForm.ViewActualSizeUpdate(Sender: TObject);
 begin
-  ViewActualSize.Enabled := (SimpleGraph.Zoom <> 100);
+  ViewActualSize.Enabled := (ScenarioGraph.Zoom <> 100);
 end;
 
 procedure TMainForm.ViewActualSizeExecute(Sender: TObject);
 begin
-  SimpleGraph.ChangeZoom(100, zoTopLeft);
+  ScenarioGraph.ChangeZoom(100, zoTopLeft);
 end;
 
 procedure TMainForm.ViewWholeGraphUpdate(Sender: TObject);
 begin
-  ViewWholeGraph.Enabled := (SimpleGraph.Objects.Count > 0);
+  ViewWholeGraph.Enabled := (ScenarioGraph.Objects.Count > 0);
 end;
 
 procedure TMainForm.ViewWholeGraphExecute(Sender: TObject);
 begin
-  SimpleGraph.ZoomGraph;
+  ScenarioGraph.ZoomGraph;
 end;
 
 procedure TMainForm.ViewGridUpdate(Sender: TObject);
 begin
-  ViewGrid.Checked := SimpleGraph.ShowGrid;
+  ViewGrid.Checked := ScenarioGraph.ShowGrid;
 end;
 
 procedure TMainForm.ViewGridExecute(Sender: TObject);
 begin
-  SimpleGraph.ShowGrid := not SimpleGraph.ShowGrid;
+  ScenarioGraph.ShowGrid := not ScenarioGraph.ShowGrid;
 end;
 
 procedure TMainForm.ViewFixScrollsUpdate(Sender: TObject);
 begin
-  ViewFixScrolls.Checked := SimpleGraph.FixedScrollBars;
+  ViewFixScrolls.Checked := ScenarioGraph.FixedScrollBars;
 end;
 
 procedure TMainForm.ViewFixScrollsExecute(Sender: TObject);
 begin
-  SimpleGraph.FixedScrollBars := not SimpleGraph.FixedScrollBars;
+  ScenarioGraph.FixedScrollBars := not ScenarioGraph.FixedScrollBars;
 end;
 
 procedure TMainForm.ViewTransparentUpdate(Sender: TObject);
 begin
-  ViewTransparent.Checked := SimpleGraph.Transparent;
+  ViewTransparent.Checked := ScenarioGraph.Transparent;
 end;
 
 procedure TMainForm.ViewTransparentExecute(Sender: TObject);
 begin
-  SimpleGraph.Transparent := not SimpleGraph.Transparent;
+  ScenarioGraph.Transparent := not ScenarioGraph.Transparent;
 end;
 
 procedure TMainForm.ViewPanUpdate(Sender: TObject);
 begin
-  ViewPan.Checked := (SimpleGraph.CommandMode = cmPan);
-  ViewPan.Enabled := (SimpleGraph.HorzScrollBar.IsScrollBarVisible or
-    SimpleGraph.VertScrollBar.IsScrollBarVisible);
+  ViewPan.Checked := (ScenarioGraph.CommandMode = cmPan);
+  ViewPan.Enabled := (ScenarioGraph.HorzScrollBar.IsScrollBarVisible or
+    ScenarioGraph.VertScrollBar.IsScrollBarVisible);
 end;
 
 procedure TMainForm.ViewPanExecute(Sender: TObject);
 begin
-  SimpleGraph.CommandMode := cmPan;
+  ScenarioGraph.CommandMode := cmPan;
 end;
 
 procedure TMainForm.HelpAboutExecute(Sender: TObject);
@@ -1103,60 +992,54 @@ procedure TMainForm.FormCloseQuery(Sender: TObject;var CanClose: Boolean);
 begin
   if IsGraphSaved then
   begin
-    SimpleGraph.Clear;
+    ScenarioGraph.Clear;
     CanClose := True;
   end
   else
     CanClose := False;
 end;
 
-procedure TMainForm.cbxFontSizeChange(Sender: TObject);
-begin
-  cbxFontSize.Tag := StrToIntDef(cbxFontSize.Text, cbxFontSize.Tag);
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTSIZE, True);
-end;
-
-procedure TMainForm.cbxFontNameChange(Sender: TObject);
-begin
-  cbxFontName.Text := cbxFontName.Items[cbxFontName.ItemIndex];
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SETFONTFACE, True);
-end;
-
 procedure TMainForm.LinkRemovePointExecute(Sender: TObject);
 begin
-  with TGraphLink(SimpleGraph.SelectedObjects[0]) do
+  with TGraphLink(ScenarioGraph.SelectedObjects[0]) do
     RemovePoint(LinkRemovePoint.Tag);
 end;
 
 procedure TMainForm.LinkAddPointExecute(Sender: TObject);
 begin
-  with TGraphLink(SimpleGraph.SelectedObjects[0]) do
+  with TGraphLink(ScenarioGraph.SelectedObjects[0]) do
     AddBreakPoint(TargetPt);
 end;
 
 procedure TMainForm.LinkGrowExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_GROW25, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_GROW25, True);
 end;
 
 procedure TMainForm.LinkShrinkExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_SHRINK25, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_SHRINK25, True);
+end;
+
+procedure TMainForm.MakeScript;
+begin
+ f_Scenario:= TquideScenario.Create;
+ f_Scenario.AddChapter;
 end;
 
 procedure TMainForm.LinkRotateCWExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_ROTATE90CW, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_ROTATE90CW, True);
 end;
 
 procedure TMainForm.LinkRotateCCWExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_ROTATE90CCW, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_ROTATE90CCW, True);
 end;
 
 procedure TMainForm.LinkReverseExecute(Sender: TObject);
 begin
-  SimpleGraph.ForEachObject(ForEachCallback, FEO_REVERSEDIRECTION, True);
+  ScenarioGraph.ForEachObject(ForEachCallback, FEO_REVERSEDIRECTION, True);
 end;
 
 procedure TMainForm.ObjectsPopupPopup(Sender: TObject);
@@ -1165,8 +1048,8 @@ var
   Index: Integer;
   Link: TGraphLink;
 begin
-  if (SimpleGraph.SelectedObjects.Count = 1) and
-     (SimpleGraph.SelectedObjects[0] is TGraphLink) then
+  if (ScenarioGraph.SelectedObjects.Count = 1) and
+     (ScenarioGraph.SelectedObjects[0] is TGraphLink) then
   begin
     LinkRemovePoint.Visible := True;
     LinkAddPoint.Visible := True;
@@ -1175,8 +1058,8 @@ begin
     LinkRotateCW.Visible := True;
     LinkRotateCCW.Visible := True;
     LinkReverse.Visible := True;
-    TargetPt := SimpleGraph.CursorPos;
-    Link := TGraphLink(SimpleGraph.SelectedObjects[0]);
+    TargetPt := ScenarioGraph.CursorPos;
+    Link := TGraphLink(ScenarioGraph.SelectedObjects[0]);
     HT := Link.HitTest(TargetPt);
     Index := HiWord(HT);
     LinkRemovePoint.Enabled := ((HT and GHT_POINT) <> 0) and not Link.IsFixedPoint(Index, False);
@@ -1218,13 +1101,46 @@ end;
 
 procedure TMainForm.SimpleGraphObjectDblClick(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
+var
+ N1: TGraphNode;
+ LinkCount: Integer;
+ l_Loc: TquideLocation;
 begin
-  EditProperties.Execute;
+ // Редактирование локации
+
+  if ScenarioGraph.SelectedObjects.Count = 0 then
+    TDesignerProperties.Execute(ScenarioGraph)
+  else
+  begin
+    LinkCount := ScenarioGraph.SelectedObjectsCount(TGraphLink);
+    if LinkCount = 0 then
+    begin
+      N1:= TGraphNode(ScenarioGraph.SelectedObjects[0]);
+      l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(N1.ID);
+      if L_loc <> nil then
+       with TquideLocationDialog.Create(Self) do
+       try
+         if Execute(l_Loc) then
+         begin
+          N1.Text:= l_Loc.Caption;
+          l_Loc.Values['GraphObject']:= N1.ID;
+         end;
+       finally
+         Free;
+       end;
+
+    end
+    else if LinkCount = ScenarioGraph.SelectedObjects.Count then
+      TLinkProperties.Execute(ScenarioGraph.SelectedObjects)
+    else
+      TObjectProperties.Execute(ScenarioGraph.SelectedObjects);
+  end;
+  //EditProperties.Execute;
 end;
 
 procedure TMainForm.SimpleGraphGraphChange(Sender: TObject);
 begin
-  if SimpleGraph.Modified then
+  if ScenarioGraph.Modified then
     StatusBar.Panels[4].Text := SModified
   else
     StatusBar.Panels[4].Text := '';
@@ -1232,12 +1148,12 @@ end;
 
 procedure TMainForm.SimpleGraphZoomChange(Sender: TObject);
 begin
-  StatusBar.Panels[5].Text := Format('%d%%', [SimpleGraph.Zoom]);
+  StatusBar.Panels[5].Text := Format('%d%%', [ScenarioGraph.Zoom]);
 end;
 
 procedure TMainForm.SimpleGraphCommandModeChange(Sender: TObject);
 begin
-  case SimpleGraph.CommandMode of
+  case ScenarioGraph.CommandMode of
     cmViewOnly:
       StatusBar.Panels[0].Text := SViewOnly;
     cmPan:
@@ -1254,7 +1170,7 @@ end;
 procedure TMainForm.SimpleGraphNodeMoveResize(Graph: TSimpleGraph;
   Node: TGraphNode);
 begin
-  if Node.Selected and (SimpleGraph.SelectedObjects.Count = 1) then
+  if Node.Selected and (ScenarioGraph.SelectedObjects.Count = 1) then
   begin
     StatusBar.Panels[1].Text := Format('(%d, %d)', [Node.Left, Node.Top]);
     StatusBar.Panels[2].Text := Format('%d x %d', [Node.Width, Node.Height]);
@@ -1264,14 +1180,14 @@ end;
 procedure TMainForm.SimpleGraphObjectSelect(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
 begin
-  if SimpleGraph.SelectedObjects.Count = 1 then
-    SimpleGraphObjectChange(Graph, SimpleGraph.SelectedObjects[0])
+  if ScenarioGraph.SelectedObjects.Count = 1 then
+    SimpleGraphObjectChange(Graph, ScenarioGraph.SelectedObjects[0])
   else
   begin
     StatusBar.Panels[1].Text := '';
     StatusBar.Panels[2].Text := '';
-    if SimpleGraph.SelectedObjects.Count > 1 then
-      StatusBar.Panels[3].Text := Format(SMultiSelect, [SimpleGraph.SelectedObjects.Count])
+    if ScenarioGraph.SelectedObjects.Count > 1 then
+      StatusBar.Panels[3].Text := Format(SMultiSelect, [ScenarioGraph.SelectedObjects.Count])
     else
       StatusBar.Panels[3].Text := '';
   end;
@@ -1359,10 +1275,8 @@ procedure TMainForm.SimpleGraphObjectChange(Graph: TSimpleGraph; GraphObject: TG
 var
   PosFirstLine: Integer;
 begin
-  if (SimpleGraph.SelectedObjects.Count = 1) and (SimpleGraph.SelectedObjects[0] = GraphObject) then
+  if (ScenarioGraph.SelectedObjects.Count = 1) and (ScenarioGraph.SelectedObjects[0] = GraphObject) then
   begin
-    cbxFontName.Text := GraphObject.Font.Name;
-    cbxFontSize.Text := IntToStr(GraphObject.Font.Size);
     FormatBold.Checked := (fsBold in GraphObject.Font.Style);
     FormatItalic.Checked := (fsItalic in GraphObject.Font.Style);
     FormatUnderline.Checked := (fsUnderline in GraphObject.Font.Style);
@@ -1407,9 +1321,6 @@ begin
     Include(FontStyle, fsUnderline);
   with GraphObject.Font do
   begin
-    if cbxFontName.Text <> '' then
-      Name := cbxFontName.Text;
-    Size := cbxFontSize.Tag;
     Style := FontStyle;
   end;
   if GraphObject is TGraphNode then
@@ -1432,7 +1343,7 @@ end;
 procedure TMainForm.SimpleGraphMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 begin
-  with SimpleGraph.ClientToGraph(X, Y) do
+  with ScenarioGraph.ClientToGraph(X, Y) do
     StatusBar.Panels[6].Text := Format('(%d, %d)', [X, Y]);
 end;
 
@@ -1441,13 +1352,13 @@ procedure TMainForm.SimpleGraphMouseWheelDown(Sender: TObject;
 var
   I: Integer;
 begin
-  MousePos := SimpleGraph.ScreenToClient(MousePos);
-  if PtInRect(SimpleGraph.ClientRect, MousePos) then
+  MousePos := ScenarioGraph.ScreenToClient(MousePos);
+  if PtInRect(ScenarioGraph.ClientRect, MousePos) then
   begin
     for I := 1 to 5 do
     begin
-      SimpleGraph.ChangeZoomBy(-1, zoCursor);
-      SimpleGraph.Update;
+      ScenarioGraph.ChangeZoomBy(-1, zoCursor);
+      ScenarioGraph.Update;
     end;
     Handled := True;
   end;
@@ -1458,13 +1369,13 @@ procedure TMainForm.SimpleGraphMouseWheelUp(Sender: TObject;
 var
   I: Integer;
 begin
-  MousePos := SimpleGraph.ScreenToClient(MousePos);
-  if PtInRect(SimpleGraph.ClientRect, MousePos) then
+  MousePos := ScenarioGraph.ScreenToClient(MousePos);
+  if PtInRect(ScenarioGraph.ClientRect, MousePos) then
   begin
     for I := 1 to 5 do
     begin
-      SimpleGraph.ChangeZoomBy(+1, zoCursor);
-      SimpleGraph.Update;
+      ScenarioGraph.ChangeZoomBy(+1, zoCursor);
+      ScenarioGraph.Update;
     end;
     Handled := True;
   end;

@@ -1,0 +1,565 @@
+---------------------------------------------------------------------------
+[ KEYWORDS ]
+---------------------------------------------------------------------------
+and        array      begin        break      case
+class      const      constructor  continue   do
+downto     else       end          except     exit
+halt       finally    for          function   goto
+if         inherited  label        mod        namespace
+not        on         of           or         procedure
+private    public     print        property   raise
+record     repeat     shl          shr        string
+then       to         try          type       var
+until      uses       while        with       xor
+
+---------------------------------------------------------------------------
+[ BASE TYPES ]
+---------------------------------------------------------------------------
+Cardinal
+Double
+Boolean
+Int64
+Integer
+String
+Variant
+
+You can omit declaration of Variant types in your GVScript scripts. For
+example the following script:
+
+  function MyFunc(X);
+  var Y;
+  begin
+    Y := Random(100);
+    result := X + Y + Y;
+  end;
+  print MyFunc(3);
+
+  is equivalent to
+
+  function MyFunc(X: Variant): Variant;
+  var Y: Variant;
+  begin
+    Y := Random(100);
+    result := X + Y + Y;
+  end;
+  print MyFunc(3);
+
+
+---------------------------------------------------------------------------
+[ OPERATORS ]
+---------------------------------------------------------------------------
+Arithmetic Operators:
+  *     Multiplies two numbers.
+  /     Divides two numbers and returns a floating-point result.
+  Div   Divides two numbers and returns an integer result.
+  Mod   Divides two numbers and returns only the remainder.
+  +     Sums two numbers.
+  -     Finds the difference between two numbers or indicates the negative
+        value of a numeric expression.
+
+Comparison Operators:
+  <     Boolean "less than".
+  <=    Boolean "less than or equal to".
+  >     Boolean "greater than".
+  >=    Boolean "greater than or equal to".
+  =     Boolean "equal to".
+  <>    Boolean "not equal to".
+
+Logical/Bitwise Operators:
+  AND   logical conjunction or bitwise AND on two expressions.
+  NOT   logical negation or bitwise NOT on an expression.
+  OR    logical disjunction on two expressions.
+  XOR   logical exclusive OR or bitwise exclusive OR on two expressions.
+
+Bitwise Operators:
+  shl   Left shifts the bits of an expression.
+  shr   Right shifts the bits of an expression.
+
+Miscellaneous Operators:
+
+Operator Precedence:
+ [] ()                  Field access, array indexing, function calls, and
+                        expression grouping
++ - not @               Unary operators, object creation, delegate creation
+* / div mod shl shr and Multiplication, division, integer division, modulo
+                        division, bitwise shifts, logical and, bitwise and
++ - or xor              Addition, subtraction, logical or, bitwise or,
+                        logical xor, bitwise xor
+< <= > >= = <>          Less than, less than or equal, greater than, greater
+                        than or equal, equality, inequality
+
+
+---------------------------------------------------------------------------
+[ STATEMENTS ]
+---------------------------------------------------------------------------
+
+** TODO **
+
+---------------------------------------------------------------------------
+[ FEATURES ]
+---------------------------------------------------------------------------
+GVScript implements a subset of Object Pascal. For example, the following
+script is admissible:
+
+  program P;
+  type
+    TMyClass = class;
+
+    TMyArray = array[1..3] of String;
+
+    TMyClass = class(TObject)
+    private
+      function GetProp: Integer;
+    public
+      function MyFunc(U: Integer; V: Integer): Integer;
+      procedure MyProc;
+      property MyProp: Integer read GetProp;
+    end;
+
+    TMyRec = record
+      X, Y: Integer;
+    end;
+
+  function GlobalFunc: Integer; forward;
+
+  function TMyClass.MyFunc(U: Integer; V: Integer): Integer;
+  begin
+    result := U + V + GlobalFunc;
+  end;
+
+  procedure TMyClass.MyProc;
+  begin
+    writeln('here');
+  end;
+
+  function TMyClass.GetProp: Integer;
+  begin
+    result := 11;
+  end;
+
+  function GlobalFunc: Integer;
+  begin
+    result := 700;
+  end;
+
+  var
+    X: TMyClass;
+    A: TMyArray;
+    R: TMyRec;
+  begin
+    X := TMyClass.Create;
+    A[1] := 'abc';
+    A[2] := 'pqr';
+    A[3] := 'uv';
+    R.X := 100;
+    writeln(X.MyFunc(4, 5));
+    X.MyProc;
+    writeln(X.MyProp);
+    writeln(R.X);
+  end;
+
+From another hand, GVScript has a few extra features which are absent in
+the Object Pascal.
+
+PROGRAM STRUCTURE
+A GVScript program is the list of statements. In this relation, GVScript
+is more similar with VBScript or JavaScript.
+
+For example, the following script
+
+  program P;
+  type
+    TMyRec = record
+      X, Y: Integer;
+    end;
+  var
+    R: TMyRec;
+  begin
+    print R;
+  end.
+
+contains four executable statements:
+program P;
+
+Creates namespace P.
+
+  type
+    TMyRec = record
+      X, Y: Integer;
+    end;
+
+Creates record type TMyRec.
+
+  var
+    R: TMyRec;
+
+Creates variable R.
+
+  print R;
+
+Printes variable R.
+
+DECLARATION OF VARIABLES
+You can omit declaration of a variable. In such case, the variable obtains
+Variant type. For example, the following script
+
+  function MyFunc(X);
+  var Y;
+  begin
+    Y := Random(100);
+    result := X + Y + Y;
+  end;
+
+is equivalent to
+
+  function MyFunc(X: Variant): Variant;
+  var Y: Variant;
+  begin
+    Y := Random(100);
+    result := X + Y + Y;
+  end;
+
+You can join declaration of a variable with its initialization. Local
+variables are available for initialization too:
+
+  procedure MyProc;
+  var
+    X: Integer = Random(100);
+    Y = 54.3;
+  begin
+  ..................
+  end;
+
+CLASS TYPES
+GVScript supports shared(static) fields of classes. The definition of a
+static member must begin with the reserved word class. For example,
+
+  type
+    TFoo = class (TObject)
+      class var X: String;
+      class function F(): Integer;
+      class procedure P();
+    end;
+
+You can initialize fields of classes:
+
+  type
+    TMyClass = class(TObject)
+      X: Integer = 100;
+      S: String = 'abc';
+      constructor Create;
+  ........................
+     end;
+
+You can define a method's body directly in the class declaration:
+
+  type
+    TMyForm = class(TForm)
+       constructor Create(Owner: TComponent);
+       begin
+         inherited;
+         Top := 100;
+         Left := 200;
+         Caption := 'MyForm';
+       end;
+    end;
+
+Note, that you cannot use nested routines in such case. If you want to use
+the nested routines inside of the method body, you must define such method
+outside of the class declaration.
+
+RECORD TYPES
+You can use methods and properties of records:
+
+  type
+    TPoint = record
+    private
+      function GetNorm: Integer;
+      begin
+        result := X*X + Y*Y;
+      end;
+    public
+      X, Y: Integer;
+      property Norm: Integer read GetNorm;
+    end;
+
+Note, that you cannot use nested routines in such case. If you want to use
+the nested routines inside of the method body, you must define such method
+outside of the record declaration.
+
+You can initialize fields of records:
+
+  type
+    TRandomPoint = record
+      X: Integer = Random(100);
+      Y: Integer = Random(100);
+    end;
+
+Method Initialize gives you one more way to initialize the record fields:
+
+  type
+    TRandomPoint = record
+      X, Y: Integer;
+      procedure Initialize;
+      begin
+        X := Random(100);
+        Y := Random(100);
+      end;
+    end;
+
+You can inherit the record types:
+
+  type
+    TRandomCircle = record (TRandomPoint)
+      R: Integer = Random(100);
+    end;
+
+ARRAY TYPES
+GVScript supports 2 kinds of arrays:
+
+Native arrays:
+  var A[10, 2];
+
+The native array is multi-dimensional zero-based array with elements of
+Variant type.
+
+Object Pascal arrays:
+
+  type
+    TMyArray[1..2, 3..5] of TPoint;
+
+This kind of arrays is derived from native arrays at compile-time. For
+example, declaration
+
+  type
+    TMyArray = array [3..5] of Integer;
+
+is equivalent to
+
+  type TMyArray = record
+    var L = 3;
+    var H = 5;
+    var fItems[H - L];
+    procedure Initialize;
+    var
+      I: Integer;
+    begin
+      for I:=L to H do
+       fItems[I - L] := 0;
+    end;
+    function GetItem(I: Integer): Integer;
+    begin
+      result := @ fItems[I - L];
+    end;
+    procedure SetItem(I: Integer; Value: Integer);
+    begin
+      fItems[I - L] := Value;
+    end;
+    property Items[I: Integer]: Integer; read GetItem write SetItem; default;
+  end;
+
+You can allocate your arrays dynamically:
+
+  procedure P(N: Integer);
+  var
+    A: array[3..N] of Double;
+  begin
+  ...............
+  end;
+
+NAMESPACES
+GVScript supports namespaces. For example:
+
+  namespace Shapes
+    type
+      TPoint = class(TObject)
+         X, Y: Integer;
+         constructor Create(X, Y: Integer);
+         begin
+           inherited Create;
+           Self.X := X;
+           Self.Y := Y;
+         end;
+      end;
+
+      TCircle = class(TPoint)
+        R: Integer;
+        constructor Create(X, Y, R);
+      end;
+
+    constructor TCircle.Create(X, Y, R);
+    begin
+      inherited Create(X, Y);
+      Self.R := R;
+    end;
+
+  end;
+
+  var
+    Point = Shapes.TPoint.Create(3, 5);
+    Circle = Shapes.TCircle.Create(3, 5, 7);
+  begin
+    print Point, Circle;
+  end.
+
+REGULAR EXPRESSIONS
+GVScript supports the regular expression literals. For example:
+
+  var r = /[_a-zA-Z\d\-\.]+@[_a-zA-Z\d\-]+(\.[_a-zA-Z\d\-]+)+/g;
+      s = 'My e-mails are jarroddavis@jarroddavis.com and support@jarroddavis.com';
+  repeat
+   if r.exec(s) = nil then
+     Break
+   else
+   begin
+     print r[0];
+     print r.MatchPos[0];
+     print r.MatchLen[0];
+     print r.LastIndex;
+   end;
+  until false;
+
+Output:
+  jarroddavis@jarroddavis.com
+  16
+  24
+  41
+  support@jarroddavis.com
+  45
+  17
+  63
+
+STRINGS
+Double quoted string constants are allowed.
+
+  const s: String = "My name is 's'  ";
+
+You can use backslashes to represent special characters:
+
+  const z: String = 'Two \n lines';
+
+Long string literals are allowed:
+
+  const s: String = """This
+  is a long
+  string literal""";
+
+  You can use string literals with parameters. For example:
+  print '''
+
+  First Name: %s
+  Last Name: %s
+
+  ''' with ['Ivan', 'Sidorov'];
+
+It is equivalent to:
+
+  print Format ('''
+
+  First Name: %s
+  Last Name: %s
+
+  ''', ['Ivan', 'Sidorov'] );
+
+FORWARD DECLARATIONS
+You need no to use forward declarations in GVScript. In another words, you
+can use a function call before declaration of the function. For example:
+
+  Fact(5);
+  function Fact(N: Integer): Integer;
+  begin
+    if N = 1 then
+      result := 1
+    else
+      result := N * Fact(N - 1);
+  end;
+
+CONTROL STRUCTURES
+The Break statement permits optional label that causes the flow of control
+to exit an outer for, while, or repeat statement and continue at the next
+statement.
+
+  var
+    I, J: Integer;
+  label
+    Outer;
+  begin
+    print 'Start';
+    Outer:
+    for I:=1 to 3 do
+      for J:=1 to 4 do
+      begin
+        if (I = 2) and (J = 3) then
+          Break Outer;
+        print I, J;
+      end;
+  end;
+
+Output:
+  11
+  12
+  13
+  14
+  21
+  22
+
+The Continue statement permits optional label that causes the flow of
+control to proceed to the next iteration of the outer for, while, or repeat
+statement.
+
+  var
+    I, J: Integer;
+  label
+    Outer;
+  begin
+    print 'Start';
+    Outer:
+    for I:=1 to 3 do
+      for J:=1 to 4 do
+      begin
+        if (I = 2) and (J = 3) then
+          Continue Outer;
+        print I, J;
+      end;
+  end;
+
+Output:
+  11
+  12
+  13
+  14
+  21
+  22
+  31
+  32
+  33
+  34
+
+SYNTAX
+Remember, that GVScript program is list of statements. Therefore you can
+disregard Object Pascal synax rules to make your scripts more laconic. For
+example, the following scripts are admissible:
+
+  print "Hello, world!";
+
+  type
+    TMyRec = record
+      X, Y: Integer;
+    end;
+  var
+    R: TMyRec;
+  begin
+    R.X := 10;
+    Y.Y := 12;
+  end;
+
+  record TMyRec
+    X, Y: Integer;
+  end;
+  var
+    R: TMyRec;
+  R.X := 10;
+  Y.Y := 12;
+
+(this is equivalent of the script above).
+

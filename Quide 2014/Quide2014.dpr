@@ -12,7 +12,9 @@ uses
   MarginsProp in 'MarginsProp.pas' {MarginDialog},
   AlignDlg in 'AlignDlg.pas' {AlignDialog},
   SizeDlg in 'SizeDlg.pas' {SizeDialog},
-  quideGUILink in 'quideGUILink.pas';
+  quideGUILink in 'quideGUILink.pas',
+  quideLocationDlg in 'quideLocationDlg.pas' {quideLocationDialog},
+  quideActionControls in 'quideActionControls.pas';
 
 {$R *.res}
 

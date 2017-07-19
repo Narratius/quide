@@ -14,7 +14,6 @@ type
     procedure FormCreate(Sender: TObject);
   private
     f_WorkPanel: TPropertiesPanel;
-    FProperties: TProperties;
     procedure SetProperties(const Value: TProperties);
     procedure ResizePanel;
     function GetProperties: TProperties;
@@ -53,6 +52,7 @@ begin
   f_WorkPanel.Left:= 0;
   f_WorkPanel.Top:= 0;
   f_WorkPanel.Height:= ClientHeight;
+  f_WorkPanel.Width:= Button1.Left - 10;
 end;
 
 function TPropDialog.GetProperties: TProperties;
@@ -64,6 +64,7 @@ end;
 procedure TPropDialog.ResizePanel;
 begin
  // Подогнать панель и диалог под контролы
+ { TODO : Нужно реализовать, иначе фигня, а не диалог }
 end;
 
 procedure TPropDialog.SetProperties(const Value: TProperties);
