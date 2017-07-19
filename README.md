@@ -1,5 +1,6 @@
 # quide
-Automatically exported from code.google.com/p/quide
-
+QUest IDE
 
 Визуальный редактор сценария текстовых игр
+Сценарий сохраняется в XML.
+Поддержка внешних конвертеров в другие форматы, например в FURQ.
