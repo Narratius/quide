@@ -33,7 +33,7 @@ type
 implementation
 
 Uses
-  SysUtils;
+  SysUtils, Propertys;
 
 {
 ******************************** TquideChapter *********************************
@@ -42,6 +42,7 @@ constructor TquideChapter.Create;
 begin
   inherited Create;
   f_Locations := TObjectList<TquideLocation>.Create();
+  Define('Start', 'Начало игры', ptString)
 end;
 
 destructor TquideChapter.Destroy;

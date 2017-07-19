@@ -160,11 +160,14 @@ begin
  l_Doc.Active:= True;
  l_Doc.LoadFromFile(aFileName);
  l_Node:= l_Doc.ChildNodes.FindNode('Scenario');
- LoadFromXML(l_Node, False);
- l_Chaps:= l_Node.ChildNodes.FindNode('Chapters');
- if l_Chaps <> nil then
-  for I := 0 to l_Chaps.ChildNodes.Count-1 do
-   AddChapter.LoadFromXML(l_Chaps.ChildNodes.Get(i));
+ if l_Node <> nil then
+ begin
+   LoadFromXML(l_Node.ChildNodes.FindNode('Meta'), False);
+   l_Chaps:= l_Node.ChildNodes.FindNode('Chapters');
+   if l_Chaps <> nil then
+    for I := 0 to l_Chaps.ChildNodes.Count-1 do
+     AddChapter.LoadFromXML(l_Chaps.ChildNodes.Get(i));
+ end;
 end;
 
 function TquideScenario.pm_GetChapters(Index: Integer): TquideChapter;
@@ -217,9 +220,11 @@ begin
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
  l_Doc.Active:= True;
+ l_Doc.Encoding:= 'UTF-8';//'Windows-1251';
  l_Scenario:= l_Doc.AddChild('Scenario');
  // Собственные атрибуты
- SaveToXML(l_Scenario, False);
+ l_Node:= l_Scenario.AddChild('Meta');
+ SaveToXML(l_Node, False);
  // Главы
  l_Node:= l_Scenario.AddChild('Chapters');
  for I := 0 to ChaptersCount-1 do
