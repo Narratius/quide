@@ -4,14 +4,19 @@ interface
 
 uses
  Generics.Collections, Xml.XMLIntf,
- quideObject, quideActions;
+ quideObject, quideActions, Propertys;
 
 type
   TquideLocation = class(TquideObject)
   private
     f_Actions: TObjectList<TquideAction>;
+    f_ID: Integer;
+    f_Found: Boolean;
     function pm_GetActions(Index: Integer): TquideAction;
     function pm_GetActionsCount: Integer;
+    function FindAction(aItem: TddProperty): Boolean;
+    function pm_GetLinks(Index: Integer): String;
+    function pm_GetLinksCount: Integer;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -19,22 +24,45 @@ type
     procedure LoadFromXML(Element: IXMLNode);
     procedure SaveToXML(Element: IXMLNode);
     procedure AddAction(aAction: TquideAction); overload;
+    function ActionByID(aActionID: Integer): TquideAction;
+    procedure CheckTargets(const OldCaption, NewCaption: String);
     property Actions[Index: Integer]: TquideAction read pm_GetActions; default;
     //1 Количество действий на локации
     property ActionsCount: Integer read pm_GetActionsCount;
+    property LinksCount: Integer
+      read pm_GetLinksCount;
+    property Links[Index: Integer]: String
+      read pm_GetLinks;
   end;
 
 
 implementation
 
 Uses
- SysUtils,
- Propertys;
+ SysUtils;
 
 
 {
 ******************************** TquideLocation ********************************
 }
+function TquideLocation.ActionByID(aActionID: Integer): TquideAction;
+var
+ i: Integer;
+begin
+  Result:= nil;
+  f_ID:= aActionID;
+  f_Found:= False;
+  for I := 0 to Pred(ActionsCount) do
+  begin
+    Actions[i].IterateAll(FindAction);
+    if f_Found then
+    begin
+      Result:= Actions[i];
+      break
+    end;
+  end;
+end;
+
 procedure TquideLocation.AddAction(aAction: TquideAction);
 begin
  aAction.Index:= f_Actions.Add(aAction);
@@ -56,6 +84,23 @@ begin
   AddAction(Result);
 end;
 
+procedure TquideLocation.CheckTargets(const OldCaption, NewCaption: String);
+var
+ i: Integer;
+begin
+  if not AnsiSameText(OldCaption, NewCaption) then
+
+   for I := 0 to Pred(ActionsCount) do
+    if Actions[i].ActionType = atButton then
+    begin
+      if Actions[i].Values['Target'] = OldCaption then
+      begin
+        Actions[i].Values['Target'] := NewCaption;
+        break
+      end;
+    end;
+end;
+
 constructor TquideLocation.Create;
 begin
   inherited Create;
@@ -67,6 +112,16 @@ destructor TquideLocation.Destroy;
 begin
   FreeAndNil(f_Actions);
   inherited Destroy;
+end;
+
+function TquideLocation.FindAction(aItem: TddProperty): Boolean;
+begin
+  Result:= True;
+  if aItem.ID = f_ID  then
+  begin
+    f_Found:= True;
+    Result:= False;
+  end;
 end;
 
 procedure TquideLocation.LoadFromXML(Element: IXMLNode);
@@ -93,6 +148,34 @@ begin
 end;
 
 
+
+function TquideLocation.pm_GetLinks(Index: Integer): String;
+var
+  i, l_Count: Integer;
+begin
+  l_Count:= -1;
+  Result:= '';
+  for I := 0 to pred(ActionsCount) do
+    if Actions[i].ActionType = atButton then
+    begin
+     Inc(l_Count);
+     if l_Count = Index then
+     begin
+      Result:= TquideButtonAction(Actions[i]).Values['Target'];
+      break
+     end;
+    end;
+end;
+
+function TquideLocation.pm_GetLinksCount: Integer;
+var
+ i: Integer;
+begin
+  Result:= 0;
+  for I := 0 to pred(ActionsCount) do
+    if Actions[i].ActionType = atButton then
+     Inc(Result);
+end;
 
 procedure TquideLocation.SaveToXML(Element: IXMLNode);
 var

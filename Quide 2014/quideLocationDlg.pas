@@ -49,20 +49,25 @@ implementation
 
 {$R *.dfm}
 
+Uses
+  quideButtonEditDlg;
+
 { TForm1 }
 
 procedure TquideLocationDialog.actButtonExecute(Sender: TObject);
 var
- l_Loc: String;
+ l_Loc, l_Cap: String;
  l_Act: TquideAction;
 begin
  // Добавляем кнопку
- l_Loc:= '';
+ l_Loc:= ''; l_Cap:= '';
  { TODO : Подтянуть список существующих локаций или создать новую }
- if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
+ if ButtonEditDlg(l_Cap, l_Loc, nil) then
+
+ //if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
  begin
   l_Act:= fLocation.AddAction(atButton);
-  TquideButtonAction(l_Act).Values['Button']:= l_Loc; // Текст на кнопке
+  TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
   TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
   TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
   AddAction(l_Act);
@@ -70,9 +75,20 @@ begin
 end;
 
 procedure TquideLocationDialog.actEditButtonExecute(Sender: TObject);
+var
+ l_Loc, l_Cap: String;
+ l_Act: TquideAction;
 begin
  // Изменяем свойства кнопки
- ShowMessage('Click!');
+ l_Act:= fLocation.ActionByID((Sender as TControl).Tag);
+
+ l_Cap:= TquideButtonAction(l_Act).Values['Button']; // Текст на кнопке
+ l_Loc:= TquideButtonAction(l_Act).Values['Target']; // Название локации для перехода
+ if ButtonEditDlg(l_Cap, l_Loc, nil) then
+ begin
+  TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
+  TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
+ end;
 end;
 
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);

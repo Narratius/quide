@@ -56,6 +56,11 @@ begin
   end;
 end;
 
+function LocName(const aLocName: String):String;
+begin
+  Result:= AnsiReplaceStr(aLocName, ' ', '_');
+end;
+
 var
  l_ModelFN, l_QuestFN: string;
  l_Str, l_Start: TXMLstring;
@@ -110,7 +115,7 @@ var
  begin
   l_Target := GetProperty(aButton, 'Target');
   l_Text := GetProperty(aButton, 'Button');
-  QWriteLn('btn '+l_Target+', '+l_Text);
+  QWriteLn('btn '+LocName(l_Target)+', '+l_Text);
  end;
 
  procedure WriteLocation(aLocation: IXmlNode);
@@ -118,7 +123,7 @@ var
   l_List: IXmlNodeList;
   I: Integer;
  begin
-  QWriteLn(#13#10':'+GetProperty(aLocation, 'Caption'));
+  QWriteLn(#13#10':'+LocName(GetProperty(aLocation, 'Caption')));
   l_List := aLocation.SelectSingleNode('Actions').ChildNodes;
   for I := 0 to Pred(l_List.Count) do
   begin
@@ -166,7 +171,7 @@ begin
    *)
     l_Chapters := l_Root.SelectSingleNode('Chapters');
     CheckFormat((l_Chapters <> nil) and (l_Chapters.ChildNodes.Count > 0));
-    l_Start:= GetProperty(l_Chapters.ChildNodes[0], 'Start');
+    l_Start:= LocName(GetProperty(l_Chapters.ChildNodes[0], 'Start'));
     l_Node := l_Root.SelectSingleNode('Meta');
     if l_Node <> nil then
     begin

@@ -17,7 +17,8 @@ type
     constructor Create; override;
     destructor Destroy; override;
     function AddLocation: TquideLocation;
-    procedure Delete(Index: Integer);
+    procedure Delete(Index: Integer); overload;
+    procedure Delete(Loc: TquideLocation); overload;
     procedure LoadFromXML(Element: IXMLNode);
     procedure SaveToXML(Element: IXMLNode);
     //1 Возвращает локацию с указанным именем или nil
@@ -43,6 +44,11 @@ begin
   inherited Create;
   f_Locations := TObjectList<TquideLocation>.Create();
   Define('Start', 'Начало игры', ptString)
+end;
+
+procedure TquideChapter.Delete(Loc: TquideLocation);
+begin
+  Delete(f_Locations.IndexOf(Loc))
 end;
 
 destructor TquideChapter.Destroy;

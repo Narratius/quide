@@ -27,6 +27,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
+    procedure Clear; override;
     //1 Создает Главу и добавляет в список
     function AddChapter: TquideChapter;
     function AddVariable(const aAlias, aHint: String; aVarType:
@@ -62,6 +63,17 @@ Uses
 {
 ******************************** TquideScenario ********************************
 }
+procedure TquideScenario.Clear;
+begin
+  inherited;
+  f_Chapters.Clear;
+  f_Inventory.Clear;
+  f_Variables.Clear;
+  f_Chapters.Clear;
+  f_LocationsNames.Clear;
+  f_VariablesNames.Clear;
+end;
+
 constructor TquideScenario.Create;
 begin
   inherited Create;

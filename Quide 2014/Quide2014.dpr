@@ -14,7 +14,8 @@ uses
   SizeDlg in 'SizeDlg.pas' {SizeDialog},
   quideGUILink in 'quideGUILink.pas',
   quideLocationDlg in 'quideLocationDlg.pas' {quideLocationDialog},
-  quideActionControls in 'quideActionControls.pas';
+  quideActionControls in 'quideActionControls.pas',
+  quideButtonEditDlg in 'quideButtonEditDlg.pas' {ButtonEditDialog};
 
 {$R *.res}
 

@@ -9,7 +9,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   SimpleGraph {$IFDEF COMPILER7_UP}, XPMan {$ENDIF}, Dialogs, ExtDlgs,
   Menus, ActnList, ImgList, StdCtrls, ComCtrls, ToolWin, JPEG, Buttons,
-  System.Actions, quideScenarios, System.ImageList;
+  System.Actions, quideScenarios, System.ImageList, PngImageList;
 
 type
   TMainForm = class(TForm)
@@ -202,6 +202,7 @@ type
     Size1: TMenuItem;
     Size2: TMenuItem;
     ScenarioGraph: TSimpleGraph;
+    PngImageList1: TPngImageList;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -324,7 +325,7 @@ type
     // Quide
     procedure MakeScript;
     procedure DestroyScript;
-    procedure CheckConnections;
+    procedure CheckConnections(const OldCaption, NewCaption: String);
     procedure FindFreePlace(var aPlace: TRect);
     // Quide
   end;
@@ -340,13 +341,13 @@ uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
   AboutDelphiArea, AlignDlg, SizeDlg,
   PropertyUtils,
-  quideLocations, quideLocationDlg;
+  quideLocations, quideLocationDlg, quideSteps;
 
 resourcestring
   SAppTitle      = 'Quest IDE 2014';
   SSaveChanges   = 'Сценарий был изменен, Вы хотите сохранить изменения?';
   SViewOnly      = 'View Only';
-  SEditing       = 'Editing';
+  SEditing       = 'Редактирование';
   SPan           = 'Pan Mode';
   SInsertingLink = 'Inserting Link/Line';
   SInsertingNode = 'Inserting Node';
@@ -396,6 +397,13 @@ const
   FEO_ROTATE90CCW        = 22;
   FEO_GROW25             = 23;
   FEO_SHRINK25           = 24;
+
+const
+  locLeft   = 10;
+  locTop    = 10;
+  locWidth  = 110;
+  locHeight = 60;
+  locRight  = 10;
 
 function TMainForm.ForEachCallback(GraphObject: TGraphObject; Action: Integer): Boolean;
 var
@@ -492,6 +500,7 @@ procedure TMainForm.ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
 var
   l_Loc: TquideLocation;
+  l_OldCaption: String;
 begin
   if GraphObject is TRoundRectangularNode then
   begin
@@ -500,17 +509,18 @@ begin
    begin
      with TquideLocationDialog.Create(Self) do
      try
+       l_OldCaption:= l_Loc.Caption;
        if Execute(l_Loc) then
        begin
         ScenarioGraph.Modified:= True;
         GraphObject.Text:= l_Loc.Caption;
-        CheckConnections;
-       end;
+        CheckConnections(l_OldCaption, l_Loc.Caption);
+       end; // Execute
      finally
        Free;
-     end;
+     end; // try..finally
    end;
-  end;
+  end; // l_Loc <> nil
 end;
 
 procedure TMainForm.ShowHint(Sender: TObject);
@@ -548,6 +558,7 @@ begin
   if IsGraphSaved then
   begin
     f_Scenario.Clear;
+    f_Scenario.AddChapter;
     ScenarioGraph.Clear;
     ScenarioGraph.Zoom := 100;
     ScenarioGraph.CommandMode := cmEdit;
@@ -573,6 +584,7 @@ begin
     Caption := SaveDialog.FileName + ' - ' + Application.Title;
     f_Scenario.LoadFromFile(ChangeFileExt(OpenDialog.FileName, '.xml'));
     // Нужно слинковать с визуалкой...
+    CheckConnections('', '');
   end;
 end;
 
@@ -595,9 +607,18 @@ begin
 end;
 
 procedure TMainForm.FindFreePlace(var aPlace: TRect);
+var
+ l_Count, l_Col, l_Row: Integer;
+ l_Origin: TPoint;
 begin
   // Поиск свободного места для локации
-  aPlace.Create(10, 10+f_Scenario.Chapters[0].LocationsCount*60, 110, 60+f_Scenario.Chapters[0].LocationsCount*60);
+  l_Count:= ScenarioGraph.Height div (2*locTop + locHeight);
+  l_Col:= Pred(f_Scenario.Chapters[0].LocationsCount) div l_Count;
+  l_Row:= Pred(f_Scenario.Chapters[0].LocationsCount) - l_Col*l_Count;
+  l_Origin.X:= locLeft+l_Col*(locLeft+locRight+locWidth);
+  l_Origin.Y:= locTop+l_Row*(2*locTop + locHeight);
+  aPlace.Create(l_Origin, locWidth, locHeight);
+  { TODO : Есть косяк с изменением размера формы - не учитываются уже размещенные локации }
 end;
 
 procedure TMainForm.FileSaveExecute(Sender: TObject);
@@ -816,9 +837,62 @@ begin
 end;
 
 procedure TMainForm.CheckConnections;
-begin
-  // Обновляет соединения локаций
+var
+ i, j: Integer;
+ l_Chapter: TquideChapter;
+ l_Loc: TquideLocation;
+ B: TRect;
+ l_N1, l_N2: TGraphNode;
+ l_Target: string;
 
+ function lp_LinkExists(A, B: TGraphObject): Boolean;
+ var
+  i: Integer;
+  l_Link: TGraphLink;
+ begin
+   Result:= False;
+   for i := 0 to ScenarioGraph.Objects.Count-1 do
+   begin
+     if ScenarioGraph.Objects[i].IsLink then
+     begin
+       l_Link:= ScenarioGraph.Objects[i] as TGraphLink;
+       if (l_Link.Source = A) and (l_Link.Target = B) then
+       begin
+         Result:= True;
+         Break
+       end;
+     end;
+   end;
+ end;
+begin
+  { Нужно пройтись по всем локациям и соединить исходящие кнопки }
+  l_Chapter:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1];
+  for I := 0 to Pred(l_Chapter.LocationsCount) do
+  begin
+    l_Loc:= l_Chapter.Locations[i];
+    l_Loc.CheckTargets(OldCaption, NewCaption);
+    l_N1:= ScenarioGraph.FindObjectByID(l_Loc.Values['GraphObject']) as TGraphNode;
+    for j := 0 to Pred(l_Loc.LinksCount) do
+    begin
+      l_Target:= l_Loc.Links[j];
+      l_Loc:= l_Chapter.IsValidLocation(l_Target);
+      if l_Loc = nil then
+      begin
+       // сначала вызываем окно редактирования локации, потом добавляем визуалку
+       l_Loc:= l_Chapter.AddLocation;
+       l_Loc.Caption:= l_Target;
+
+       FindFreePlace(B);
+       l_N2:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
+       l_N2.Text:= l_Loc.Caption;
+       l_Loc.Values['GraphObject']:= l_N2.ID;
+      end // l_Loc = nil
+      else
+        l_N2:= ScenarioGraph.FindObjectByID(l_Loc.Values['GraphObject']) as TGraphNode;
+      if not lp_LinkExists(l_N1, l_N2) then
+        ScenarioGraph.InsertLink(l_N1, l_N2);
+    end; // for j
+  end;
 end;
 
 procedure TMainForm.actFileGenerateExecute(Sender: TObject);
@@ -852,28 +926,26 @@ var
  l_Loc: TquideLocation;
 begin
  // сначала вызываем окно редактирования локации, потом добавляем визуалку
- FindFreePlace(B);
- l_N1:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
-
  l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
- l_Loc.Caption:= Format('Новая локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
+ l_Loc.Caption:= Format('Локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
 
  with TquideLocationDialog.Create(Self) do
  try
    if Execute(l_Loc) then
    begin
+    FindFreePlace(B);
+    l_N1:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
+
     l_N1.Text:= l_Loc.Caption;
     l_Loc.Values['GraphObject']:= l_N1.ID;
-    CheckConnections;
-   end;
+    CheckConnections('', '');
+   end
+   else
+    f_Scenario.Chapters[f_Scenario.ChaptersCount-1].Delete(l_loc);
  finally
    Free;
  end;
 
- // Линковка чуть позже
- //b.Create(10, 100, 110, 150);
- //l_N2:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
- //ScenarioGraph.InsertLink(l_N1, l_N2);
 end;
 
 procedure TMainForm.ObjectsLinkExecute(Sender: TObject);
