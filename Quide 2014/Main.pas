@@ -203,6 +203,9 @@ type
     Size2: TMenuItem;
     ScenarioGraph: TSimpleGraph;
     PngImageList1: TPngImageList;
+    FileProperties: TAction;
+    N5: TMenuItem;
+    actStartLocation: TAction;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -314,6 +317,7 @@ type
     procedure actFileGenerateExecute(Sender: TObject);
     procedure ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
+    procedure FilePropertiesExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
@@ -514,6 +518,7 @@ begin
        begin
         ScenarioGraph.Modified:= True;
         GraphObject.Text:= l_Loc.Caption;
+        GraphObject.Hint:= l_Loc.Hint;
         CheckConnections(l_OldCaption, l_Loc.Caption);
        end; // Execute
      finally
@@ -618,6 +623,10 @@ begin
   l_Origin.X:= locLeft+l_Col*(locLeft+locRight+locWidth);
   l_Origin.Y:= locTop+l_Row*(2*locTop + locHeight);
   aPlace.Create(l_Origin, locWidth, locHeight);
+  if ScenarioGraph.FindObjectAt(l_Origin.X, l_Origin.Y) <> nil then
+  begin
+    //Пересчитать координаты
+  end;
   { TODO : Есть косяк с изменением размера формы - не учитываются уже размещенные локации }
 end;
 
@@ -660,6 +669,12 @@ end;
 procedure TMainForm.FilePrintUpdate(Sender: TObject);
 begin
   FilePrint.Enabled :=(Printer.Printers.Count > 0) and (ScenarioGraph.Objects.Count > 0);
+end;
+
+procedure TMainForm.FilePropertiesExecute(Sender: TObject);
+begin
+  //
+  ShowPropDialog('Свойства игры', f_Scenario);
 end;
 
 procedure TMainForm.FilePrintExecute(Sender: TObject);
@@ -840,7 +855,7 @@ procedure TMainForm.CheckConnections;
 var
  i, j: Integer;
  l_Chapter: TquideChapter;
- l_Loc: TquideLocation;
+ l_Loc1, l_Loc2: TquideLocation;
  B: TRect;
  l_N1, l_N2: TGraphNode;
  l_Target: string;
@@ -865,30 +880,32 @@ var
    end;
  end;
 begin
+  if f_Scenario.Chapters[f_Scenario.ChaptersCount-1].Values['Start'] = OldCaption then
+    f_Scenario.Chapters[f_Scenario.ChaptersCount-1].Values['Start']:= NewCaption;
   { Нужно пройтись по всем локациям и соединить исходящие кнопки }
   l_Chapter:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1];
   for I := 0 to Pred(l_Chapter.LocationsCount) do
   begin
-    l_Loc:= l_Chapter.Locations[i];
-    l_Loc.CheckTargets(OldCaption, NewCaption);
-    l_N1:= ScenarioGraph.FindObjectByID(l_Loc.Values['GraphObject']) as TGraphNode;
-    for j := 0 to Pred(l_Loc.LinksCount) do
+    l_Loc1:= l_Chapter.Locations[i];
+    l_Loc1.CheckTargets(OldCaption, NewCaption);
+    l_N1:= ScenarioGraph.FindObjectByID(l_Loc1.Values['GraphObject']) as TGraphNode;
+    for j := 0 to Pred(l_Loc1.LinksCount) do
     begin
-      l_Target:= l_Loc.Links[j];
-      l_Loc:= l_Chapter.IsValidLocation(l_Target);
-      if l_Loc = nil then
+      l_Target:= l_Loc1.Links[j];
+      l_Loc2:= l_Chapter.IsValidLocation(l_Target);
+      if l_Loc2 = nil then
       begin
        // сначала вызываем окно редактирования локации, потом добавляем визуалку
-       l_Loc:= l_Chapter.AddLocation;
-       l_Loc.Caption:= l_Target;
+       l_Loc2:= l_Chapter.AddLocation;
+       l_Loc2.Caption:= l_Target;
 
        FindFreePlace(B);
        l_N2:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
-       l_N2.Text:= l_Loc.Caption;
-       l_Loc.Values['GraphObject']:= l_N2.ID;
+       l_N2.Text:= l_Loc2.Caption;
+       l_Loc2.Values['GraphObject']:= l_N2.ID;
       end // l_Loc = nil
       else
-        l_N2:= ScenarioGraph.FindObjectByID(l_Loc.Values['GraphObject']) as TGraphNode;
+        l_N2:= ScenarioGraph.FindObjectByID(l_Loc2.Values['GraphObject']) as TGraphNode;
       if not lp_LinkExists(l_N1, l_N2) then
         ScenarioGraph.InsertLink(l_N1, l_N2);
     end; // for j
@@ -924,8 +941,10 @@ var
  B: TRect;
  l_N1, l_N2: TGraphNode;
  l_Loc: TquideLocation;
+ l_NeedStart: Boolean;
 begin
  // сначала вызываем окно редактирования локации, потом добавляем визуалку
+ l_NeedStart:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount = 0;
  l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].AddLocation;
  l_Loc.Caption:= Format('Локация %d', [f_Scenario.Chapters[f_Scenario.ChaptersCount-1].LocationsCount]);
 
@@ -937,7 +956,10 @@ begin
     l_N1:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
 
     l_N1.Text:= l_Loc.Caption;
+    l_N1.Hint:= l_Loc.Hint;
     l_Loc.Values['GraphObject']:= l_N1.ID;
+    if l_NeedStart then
+      f_Scenario.Chapters[f_Scenario.ChaptersCount-1].Values['Start']:= l_Loc.Caption;
     CheckConnections('', '');
    end
    else

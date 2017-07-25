@@ -564,8 +564,9 @@ begin
           try
            for j:= 0 to Pred(l_E.ChildNodes.Count) do
             if AnsiSameText(l_E.ChildNodes.Nodes[j].NodeName, 'Text') then
-            l_Strings.Add(l_E.ChildValues[j]);
-           Values[l_Alias]:= l_Strings.Text;
+             if not VarIsNull(l_E.ChildValues[j]) then
+               l_Strings.Add(l_E.ChildValues[j]);
+            Values[l_Alias]:= l_Strings.Text;
           finally
            FreeAndNil(l_Strings);
           end;

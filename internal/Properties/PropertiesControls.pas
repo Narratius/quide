@@ -222,7 +222,7 @@ begin
  with f_Controls[Length(f_Controls)-1] do
  begin
   Caption:= aProperty.Caption;
-  Size:= csFixed;
+  Size:= csAutoSize;
  end;
 end;
 

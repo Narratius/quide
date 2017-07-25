@@ -200,7 +200,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <Debugger_RunParams>C:\Users\Stud\Documents\Кнопка.xml</Debugger_RunParams>
+        <Debugger_RunParams>C:\Users\Stud\Documents\Кулон.xml</Debugger_RunParams>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.0.1.2;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Build>2</VerInfo_Build>
