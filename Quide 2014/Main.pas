@@ -54,12 +54,9 @@ type
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
-    ToolButton9: TToolButton;
-    ToolButton10: TToolButton;
     ObjectsNone: TAction;
     actNewLocation: TAction;
     Opjects1: TMenuItem;
-    ToolButton12: TToolButton;
     ToolButton14: TToolButton;
     EditBringToFront: TAction;
     EditSendToBack: TAction;
@@ -140,7 +137,6 @@ type
     ZoomOut1: TMenuItem;
     ViewActualSize: TAction;
     ActualSize1: TMenuItem;
-    ToolButton11: TToolButton;
     LinkRemovePoint: TAction;
     LinkAddPoint: TAction;
     LinkGrow: TAction;
@@ -183,7 +179,6 @@ type
     FileMerge: TAction;
     Merge1: TMenuItem;
     ViewPan: TAction;
-    ToolButton18: TToolButton;
     N20: TMenuItem;
     PanMode1: TMenuItem;
     ClipboardNative: TAction;

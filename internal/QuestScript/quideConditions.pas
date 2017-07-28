@@ -1,4 +1,6 @@
 unit quideConditions;
+{  Условия. Панель с несколькими элементами }
+
 
 interface
 
@@ -7,6 +9,12 @@ uses
 
 type
   TquideCondition = class(TquideObject)
+  { Переменная    - TquideVariable
+    Условие       - <, >, <=, >=, =, <>
+    Значение      - Value
+    Действие True - TquideAction
+    Действие False- TquideAction
+    }
   end;
 
 

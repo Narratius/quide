@@ -39,12 +39,22 @@ type
 
 implementation
 
+var
+  gNextID : Integer;
+
+ function GetObjectID: Integer;
+ begin
+   Result:= gNextID;
+   Inc(gNextID);
+ end;
+
 {
 ********************************* TquideObject *********************************
 }
 constructor TquideObject.Create;
 begin
  inherited Create;
+  Define('ID', 'Идентификатор', ptInteger, False);
   Define('Caption', 'Название', ptString);
   Define('Hint', 'Описание', ptString);
 end;
@@ -109,6 +119,7 @@ begin
  Changed:= False;
 end;
 
-
-
+initialization
+  gNextID:= 0;
+finalization
 end.

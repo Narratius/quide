@@ -94,7 +94,10 @@ begin
    if (l_Ctrl.Left <> LeftIndent) then
    begin
     if f_Controls[i].Size = csAutoSize then
+    begin
      l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
+     l_Ctrl.Anchors := l_Ctrl.Anchors + [akRight];
+    end;
     l_Ctrl.Left:= LeftIndent;
    end;
   end;

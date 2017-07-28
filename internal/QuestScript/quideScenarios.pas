@@ -31,7 +31,8 @@ type
     //1 Создает Главу и добавляет в список
     function AddChapter: TquideChapter;
     function AddVariable(const aAlias, aHint: String; aVarType:
-        TquideVariableType; aValue: string): TquideVariable;
+        TquideVariableType; aValue: string): TquideVariable; overload;
+    function AddVariable: TquideVariable; overload;
     //1 Удаление указанной главы
     procedure Delete(Index: Integer);
     function IsValidLocation(const aCaption: String): TquideLocation;
@@ -63,6 +64,12 @@ Uses
 {
 ******************************** TquideScenario ********************************
 }
+function TquideScenario.AddVariable: TquideVariable;
+begin
+ Result:= TquideVariable.Create;
+ f_Variables.Add(Result);
+end;
+
 procedure TquideScenario.Clear;
 begin
   inherited;
@@ -109,12 +116,11 @@ end;
 function TquideScenario.AddVariable(const aAlias, aHint: String; aVarType:
     TquideVariableType; aValue: string): TquideVariable;
 begin
- Result:= TquideVariable.Create;
+ Result:= AddVariable;
  Result.Caption:= aAlias;
  Result.Hint:= aHint;
  Result.VarType:= aVarType;
  //Result.Value:= aValue; пока нет класса со значением
- f_Variables.Add(Result);
 end;
 
 procedure TquideScenario.Delete(Index: Integer);
@@ -131,8 +137,8 @@ var
   l_Loc: TquideLocation;
 begin
   Result:= nil;
-  (*
-  for i:= 0 to Pred(StepsCount) do
+
+  for i:= 0 to Pred(ChaptersCount) do
   begin
    l_Loc:= Chapters[i].IsValidLocation(aCaption);
    if l_Loc <> nil then
@@ -140,7 +146,7 @@ begin
     Result:= l_Loc;
     break;
    end;
-   *)
+  end;
 end;
 
 function TquideScenario.IsValidVariable(const aCaption: String): TquideVariable;
@@ -158,7 +164,7 @@ end;
 
 procedure TquideScenario.LoadFromFile(const aFileName: String);
 var
- l_Node, l_Chaps: IXMLNode;
+ l_Root, l_Node: IXMLNode;
  l_Doc: IXMLDocument;
  i: Integer;
 begin
@@ -171,14 +177,20 @@ begin
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
  l_Doc.Active:= True;
  l_Doc.LoadFromFile(aFileName);
- l_Node:= l_Doc.ChildNodes.FindNode('Scenario');
- if l_Node <> nil then
+ l_Root:= l_Doc.ChildNodes.FindNode('Scenario');
+ if l_Root <> nil then
  begin
-   LoadFromXML(l_Node.ChildNodes.FindNode('Meta'), False);
-   l_Chaps:= l_Node.ChildNodes.FindNode('Chapters');
-   if l_Chaps <> nil then
-    for I := 0 to l_Chaps.ChildNodes.Count-1 do
-     AddChapter.LoadFromXML(l_Chaps.ChildNodes.Get(i));
+   LoadFromXML(l_Root.ChildNodes.FindNode('Meta'), False);
+   // Главы
+   l_Node:= l_Root.ChildNodes.FindNode('Chapters');
+   if l_Node <> nil then
+    for I := 0 to l_Node.ChildNodes.Count-1 do
+     AddChapter.LoadFromXML(l_Node.ChildNodes.Get(i));
+   //Переменные
+   l_Node:= l_Root.ChildNodes.FindNode('Variables');
+   if l_Node <> nil then
+    for I := 0 to l_Node.ChildNodes.Count-1 do
+     AddVariable.LoadFromXML(l_Node.ChildNodes.Get(i), False);
  end;
 end;
 
@@ -241,6 +253,10 @@ begin
  l_Node:= l_Scenario.AddChild('Chapters');
  for I := 0 to ChaptersCount-1 do
   Chapters[i].SaveToXML(l_Node.AddChild('Chapter'));
+ // Переменные
+ l_Node:= l_Scenario.AddChild('Variables');
+ for I := 0 to VariablesCount-1 do
+  Variables[i].SaveToXML(l_Node.AddChild('Variable'), False);
  l_Doc.SaveToFile(aFileName);
 end;
 
