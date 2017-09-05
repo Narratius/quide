@@ -6,7 +6,7 @@ Uses
  quideObject;
 
 type
- TquideVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
+  TquideVariableType = (vtNumeric, vtText, vtBoolean, vtEnum);
   TquideVariable = class(TquideObject{TquideValueObject})
   private
     f_VarType: TquideVariableType;
@@ -14,8 +14,9 @@ type
     property VarType: TquideVariableType read f_VarType write f_VarType;
   end;
 
-
 implementation
+
+
 
 
 

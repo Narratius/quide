@@ -201,6 +201,11 @@ type
     FileProperties: TAction;
     N5: TMenuItem;
     actStartLocation: TAction;
+    ActVariables: TAction;
+    ActInventory: TAction;
+    N21: TMenuItem;
+    N22: TMenuItem;
+    N23: TMenuItem;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -310,6 +315,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure actScenarioPropertiesExecute(Sender: TObject);
     procedure actFileGenerateExecute(Sender: TObject);
+    procedure ActVariablesExecute(Sender: TObject);
     procedure ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
     procedure FilePropertiesExecute(Sender: TObject);
@@ -668,8 +674,7 @@ end;
 
 procedure TMainForm.FilePropertiesExecute(Sender: TObject);
 begin
-  //
-  ShowPropDialog('Свойства игры', f_Scenario);
+  f_Scenario.Changed:= ShowPropDialog('Свойства игры', f_Scenario);
 end;
 
 procedure TMainForm.FilePrintExecute(Sender: TObject);
@@ -963,6 +968,11 @@ begin
    Free;
  end;
 
+end;
+
+procedure TMainForm.ActVariablesExecute(Sender: TObject);
+begin
+ // ShowPropDialog('Переменные', f_Scenario.AliasItems['Variables'])
 end;
 
 procedure TMainForm.ObjectsLinkExecute(Sender: TObject);

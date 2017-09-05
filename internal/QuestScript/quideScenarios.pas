@@ -59,7 +59,7 @@ implementation
 
 Uses
  XMLDoc, XMLIntf,
- Propertys;
+ Propertys, PropertyUtils;
 
 {
 ******************************** TquideScenario ********************************
@@ -88,7 +88,17 @@ begin
   f_VariablesNames := TStringList.Create;
   f_LocationsNames := TStringList.Create;
   f_Chapters := TObjectList<TquideChapter>.Create();
-  f_Variables := TObjectList<TquideVariable>.Create();
+  //f_Variables := TObjectList<TquideVariable>.Create();
+  DefineList('Variables', 'Переменные', True,
+    NewProperty('Caption', 'Название', ptString,
+    NewChoiceProperty('VarType', 'Тип',  // vtNumeric, vtText, vtBoolean, vtEnum
+      NewChoice(0, 'Число',
+      NewChoice(1, 'Строка',
+      NewChoice(2, 'Булеан',
+      NewChoice(3, 'Перечисление',
+      nil)))),
+    NewProperty('Value', 'Значение', ptString,
+    nil))));
   f_Inventory := TObjectList<TquideInventoryItem>.Create();
   Changed:= False;
 end;
@@ -116,10 +126,17 @@ end;
 function TquideScenario.AddVariable(const aAlias, aHint: String; aVarType:
     TquideVariableType; aValue: string): TquideVariable;
 begin
- Result:= AddVariable;
- Result.Caption:= aAlias;
- Result.Hint:= aHint;
- Result.VarType:= aVarType;
+ // Нельзя добавлять переменные с одинаковыми именами
+ if IsValidVariable(aAlias) = nil then
+ begin
+   Result:= AddVariable;
+   Result.Caption:= aAlias;
+   Result.Hint:= aHint;
+   Result.VarType:= aVarType;
+   VariablesNames.Add(aAlias);
+ end
+ else
+   Result:= nil; // Или Exception?
  //Result.Value:= aValue; пока нет класса со значением
 end;
 
@@ -171,7 +188,7 @@ begin
  // Очистка текущего состояния
  f_Chapters.Clear;
  f_Inventory.Clear;
- f_Variables.Clear;
+ //f_Variables.Clear;
  // Загрузка из файла
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
@@ -187,10 +204,12 @@ begin
     for I := 0 to l_Node.ChildNodes.Count-1 do
      AddChapter.LoadFromXML(l_Node.ChildNodes.Get(i));
    //Переменные
+   (*
    l_Node:= l_Root.ChildNodes.FindNode('Variables');
    if l_Node <> nil then
     for I := 0 to l_Node.ChildNodes.Count-1 do
      AddVariable.LoadFromXML(l_Node.ChildNodes.Get(i), False);
+   *)
  end;
 end;
 
@@ -254,9 +273,11 @@ begin
  for I := 0 to ChaptersCount-1 do
   Chapters[i].SaveToXML(l_Node.AddChild('Chapter'));
  // Переменные
+ (*
  l_Node:= l_Scenario.AddChild('Variables');
  for I := 0 to VariablesCount-1 do
   Variables[i].SaveToXML(l_Node.AddChild('Variable'), False);
+ *)
  l_Doc.SaveToFile(aFileName);
 end;
 

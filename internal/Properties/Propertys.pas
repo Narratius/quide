@@ -119,10 +119,8 @@ type
     procedure pm_SetChanged(const Value: Boolean);
     procedure pm_SetValues(Alias: String; const Value: Variant);
     function pm_GetCount: Integer;
-    procedure SaveValues(Element: IXMLNode);
+    procedure SaveValues(Element: IXMLNode; SaveStruct: Boolean);
     procedure LoadValues(Element: IXMLNode; LoadStruct: Boolean);
-    procedure SaveHeader(Element: IXMLNode);
-    procedure LoadHeader(Element: IXMLNode);
     function pm_GetVisible(Alias: String): Boolean;
     procedure pm_SetVisible(Alias: String; const Value: Boolean);
     function GetHints(Alias: String): String;
@@ -138,9 +136,19 @@ type
     function Clone: Pointer;
     procedure Define(const aAlias, aCaption: String; aType: TddPropertyType;
         aVisible: Boolean = True);
+
+    procedure DefineBoolean(const aAlias, aCaption: String);
     procedure DefineButton(const aAlias, aCaption: String; aEvent: TNotifyEvent);
+    procedure DefineChar(const aAlias, aCaption: String);
     procedure DefineChoice(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddChoiceLink = nil);
+    procedure DefineInteger(const aAlias, aCaption: String);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
+    procedure DefinePassword(const aAlias, aCaption: String);
+    //procedure DefineProperties(const aAlias, aCaption: String);
+    procedure DefineString(const aAlias, aCaption: String);
+    procedure DefineText(const aAlias, aCaption: String);
+
+
     procedure IterateAll(aFunc: TddPropertyFunc);
     procedure LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
     procedure SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
@@ -407,11 +415,21 @@ begin
  Add(TddProperty.Create(aAlias, aCaption, aType, aVisible));
 end;
 
+procedure TProperties.DefineBoolean(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptBoolean, True);
+end;
+
 procedure TProperties.DefineButton(const aAlias, aCaption: String;
   aEvent: TNotifyEvent);
 begin
  Define(aAlias, aCaption, ptAction, True);
  AliasItems[aAlias].Event:= aEvent;
+end;
+
+procedure TProperties.DefineChar(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptChar, True);
 end;
 
 procedure TProperties.DefineChoice(const aAlias, aCaption: String;
@@ -424,6 +442,11 @@ begin
  l_P.SetChoice(aItem);
 end;
 
+procedure TProperties.DefineInteger(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptInteger, True);
+end;
+
 procedure TProperties.DefineList(const aAlias, aCaption: String; aVisible: Boolean;
   aItem: TddPropertyLink);
 var
@@ -432,6 +455,21 @@ begin
  Define(aAlias, aCaption, ptList, aVisible);
  l_P:= AliasItems[aAlias];
  l_P.SetItem(aItem);
+end;
+
+procedure TProperties.DefinePassword(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptPassword, True);
+end;
+
+procedure TProperties.DefineString(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptString, True);
+end;
+
+procedure TProperties.DefineText(const aAlias, aCaption: String);
+begin
+  Define(aAlias, aCaption, ptText, True);
 end;
 
 function TProperties.Encrypt(const aText: String): String;
@@ -491,19 +529,11 @@ begin
  if Element <> nil then
  begin
    if LoadStruct then
-   begin
     f_Items.Clear;
-    LoadHeader(Element);
-   end;
    LoadValues(Element, LoadStruct);
  end;
 end;
 
-
-procedure TProperties.LoadHeader(Element: IXMLNode);
-begin
-  // Загрузка структуры элемента и создание элементов
-end;
 
 procedure TProperties.LoadValues(Element: IXMLNode; LoadStruct: Boolean);
 var
@@ -537,16 +567,21 @@ begin
     if AnsiSameText(l_Item.NodeName, 'Property') then
     begin
       l_Alias:= lp_SetValue('Alias');
-      l_Caption:= lp_SetValue('Caption');
+      if LoadStruct then
+      begin
+        l_Caption:= lp_SetValue('Caption');
+        if not TryStrToBool(l_Item['Visible'], l_Visible) then
+         l_Visible:= True; // Или False
+        l_Type:= String2PropertyType(l_Item['Type']);
+      end
+      else
+        l_Type:= AliasItems[l_Alias].PropertyType;
 
-      if not TryStrToBool(l_Item['Visible'], l_Visible) then
-       l_Visible:= True; // Или False
-      l_Type:= String2PropertyType(l_Item['Type']);
+
       if l_Type in propOrdinals then
       begin
        if LoadStruct then
         Define(l_Alias, l_Caption, l_Type, l_Visible);
-       //Values[l_Alias]:= {l_Item['Value']//}l_Item.ChildValues['Value'];
        Values[l_Alias]:= l_Item.ChildNodes.FindNode('Value').Text;
        { TODO : Нужно расшифровать строку }
        if l_Type = ptPassword then
@@ -575,23 +610,32 @@ begin
         end;
       end
       else
-      if l_Type in [ptList, ptChoice] then
+      if l_Type = ptChoice then
+      begin
+       if LoadStruct then
+        DefineChoice(l_Alias, l_Caption, l_Visible);
+       l_E:= l_Item.ChildNodes.FindNode('Value');
+       for j := 0 to l_E.ChildNodes.Count-1 do
+       begin
+         if AnsiSameText(l_E.ChildNodes.Get(j).NodeName, 'ItemIndex') then
+           Values[l_Alias]:= l_E.ChildNodes.Get(j).Text;
+       end;
+      end
+      else
+      if l_Type = ptList then
       begin
        if LoadStruct then
        begin
-        if l_Type = ptList then
-         DefineList(l_Alias, l_Caption, l_Visible)
-        else
-         DefineChoice(l_Alias, l_Caption, l_Visible);
-       end;
-       // Прочитать описание элемента списка
-       l_E:= l_Item.ChildNodes.FindNode('Properties');
-       l_SubItem:= TProperties.Create;
-       try
-        l_SubItem.LoadFromXML(l_E, LoadStruct);
-        AliasItems[l_Alias].ListItem:= l_SubItem;
-       finally
-        FreeAndNil(l_SubItem);
+         DefineList(l_Alias, l_Caption, l_Visible);
+         // Прочитать описание элемента списка
+         l_E:= l_Item.ChildNodes.FindNode('Properties');
+         l_SubItem:= TProperties.Create;
+         try
+          l_SubItem.LoadFromXML(l_E, True{LoadStruct});
+          AliasItems[l_Alias].ListItem:= l_SubItem;
+         finally
+          FreeAndNil(l_SubItem);
+         end;
        end;
        // Прочитать сам список
        l_E:= l_Item.ChildNodes.FindNode('Value');
@@ -599,21 +643,10 @@ begin
        begin
          if AnsiSameText(l_E.ChildNodes.Get(j).NodeName, 'Item') then
          begin
-          // В принципе, можно считывать только Value - все остальное у нас уже есть
           k:= AliasItems[l_Alias].AddItem;
-          l_SubItem:= TProperties.Create; // потом вынести за скобки
-          try
-           l_SubItem.LoadFromXML(l_E.ChildNodes.Get(j), LoadStruct);
-           AliasItems[l_Alias].ListItems[k].Assign(l_SubItem);
-          finally
-           FreeAndNil(l_SubItem);
-          end;
-         end; // Item
+          AliasItems[l_Alias].ListItems[k].LoadValues(l_E.ChildNodes.Get(j), LoadStruct);
+         end;
        end; // for j
-       if l_Type = ptChoice then
-       begin
-         // прочитать значение ItemIndex
-       end;
       end; // ptList
     end; // Property
   end; // for i
@@ -671,21 +704,14 @@ begin
  Changed:= True;
 end;
 
-procedure TProperties.SaveHeader(Element: IXMLNode);
-begin
- // Сохраение структуры элемента
-end;
-
 procedure TProperties.SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
 begin
- if SaveStruct then
-  SaveHeader(Element);
- SaveValues(Element);
+ SaveValues(Element, SaveStruct);
 end;
 
 
 
-procedure TProperties.SaveValues(Element: IXMLNode);
+procedure TProperties.SaveValues(Element: IXMLNode; SaveStruct: Boolean);
 var
   i, j: Integer;
   l_E: IXMLNode;
@@ -699,9 +725,12 @@ begin
    begin
     l_Item:= Element.AddChild('Property');
     l_Item.AddChild('Alias').Text:= Alias;
-    l_Item.AddChild('Caption').Text:= Caption;
-    l_Item.AddChild('Visible').Text:= BoolToStr(Visible, True);
-    l_Item.AddChild('Type').Text:= PropertyType2String(PropertyType);
+    if SaveStruct then
+    begin
+      l_Item.AddChild('Caption').Text:= Caption;
+      l_Item.AddChild('Visible').Text:= BoolToStr(Visible, True);
+      l_Item.AddChild('Type').Text:= PropertyType2String(PropertyType);
+    end; // SaveStruct
     l_Value:= l_Item.AddChild('Value');
      case PropertyType of
       ptChar,
@@ -727,15 +756,16 @@ begin
       ptBoolean: l_Value.Text:= VarToStr(Value);   // TRadioGroup (TCombobox)
 
       ptAction: l_Value.Text:= VarToStr(Value);    // TButton
-      ptList, // TListBox
-      ptChoice: // TComboBox
+      ptChoice: // Для комбобокса нужно добавить сохранение ItemIndex
+        l_Value.AddChild('ItemIndex').Text:= VarToStr(Value);
+      ptList: // TListBox
        begin
-        // Записываем описание эталонного элемента
-        ListItem.SaveToXML(l_Item.AddChild('Properties'), True);
+        if SaveStruct then
+         // Записываем описание эталонного элемента
+         ListItem.SaveToXML(l_Item.AddChild('Properties'), True);
         // Теперь скидываем все элементы списка
         for j := 0 to ListItemsCount-1 do
-         ListItems[j].SaveToXML(l_Value.AddChild('Item'), True);
-        // Для комбобокса нужно добавить сохранение ItemIndex
+         ListItems[j].SaveToXML(l_Value.AddChild('Item'), False);
        end; // ptList
       ptProperties: ; // TScrollBox (Вложенные свойства)
       ptPassword: l_Value.Text:= Encrypt(VarToStrDef(Value, ''));

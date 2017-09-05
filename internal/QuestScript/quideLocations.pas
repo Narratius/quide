@@ -74,10 +74,10 @@ begin
  case aActType of
    atNone: Result:= nil;
    atGoto: Result:= TquideJumpAction.Create;
-   atInventory: ;
-   atLogic: ;
+   atInventory: Result:= nil;
+   atLogic: Result:= TquideLogicalAction.Create;
    atText: Result:= TquideTextAction.Create;
-   atVariable: ;
+   atVariable: Result:= TquideVariableAction.Create;
    atButton: Result:= TquideButtonAction.Create;
  end;
  if Result <> nil then

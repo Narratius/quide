@@ -23,10 +23,15 @@ function LinkToProperties(aLink: TddPropertyLink): TProperties;
 
 function ShowPropDialog(const aCaption: String; aProperties: TProperties): Boolean;
 
+procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean);
+
 implementation
 
 Uses
  Forms, UITypes, SysUtils,
+ XMLDoc, XMLIntf,
  PropertiesDialog;
 
 function NewProperty(const aAlias, aCaption: String; aPropertyType: TddPropertyType; aNext: TddPropertyLink = nil): TddPropertyLink;
@@ -105,6 +110,40 @@ begin
  finally
   Free;
  end;
+end;
+
+
+procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
+var
+ l_XML: IXMLDocument;
+begin
+  l_XML:= TXMLDocument.Create(nil);
+  try
+   l_XML.Options:= l_XML.Options + [doNodeAutoIndent];
+   l_XML.Active:= True;
+   l_XML.Encoding:= 'UTF-8';//'Windows-1251';
+   aProperties.SaveToXML(l_XML.AddChild('Properties'), aSaveStruct);
+   l_XML.SaveToFile(aFileName);
+  finally
+    l_XML:= nil;
+  end;
+end;
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean);
+var
+ l_XML: IXMLDocument;
+ l_Node: IXMLNode;
+begin
+  l_XML:= TXMLDocument.Create(nil);
+  try
+   l_XML.Options:= l_XML.Options + [doNodeAutoIndent];
+   l_XML.Active:= True;
+   l_XML.Encoding:= 'UTF-8';//'Windows-1251';
+   l_XML.LoadFromFile(aFileName);
+   aProperties.LoadFromXML(l_XML.ChildNodes.FindNode('Properties'), aLoadStruct);
+  finally
+    l_XML:= nil;
+  end;
 end;
 
 end.

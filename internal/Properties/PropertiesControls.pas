@@ -415,10 +415,11 @@ begin
  begin
   TComboBox(aControl).Items.Clear;
   for I := 0 to aProperty.ListItemsCount-1 do
-  begin
    TComboBox(aControl).Items.add(aProperty.ListItems[i].Values['caption']);
-  end;
-  TComboBox(aControl).ItemIndex:= aProperty.Value;
+  if VarIsEmpty(aProperty.Value) then
+    TComboBox(aControl).ItemIndex:= -1
+  else
+   TComboBox(aControl).ItemIndex:= StrToInt(VarToStrDef(aProperty.Value, '-1'));
  end;
 end;
 

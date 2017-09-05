@@ -24,9 +24,12 @@ type
     MenuText: TMenuItem;
     MenuButton: TMenuItem;
     actEditButton: TAction;
+    menuVariable: TMenuItem;
+    actVariable: TAction;
     procedure actNewTextExecute(Sender: TObject);
     procedure actButtonExecute(Sender: TObject);
     procedure actEditButtonExecute(Sender: TObject);
+    procedure actVariableExecute(Sender: TObject);
   private
     FLocation: TquideLocation;
     f_Header : TPropertiesPanel;
@@ -95,6 +98,11 @@ procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);
 begin
  // Добавляем текст
  AddAction(fLocation.AddAction(atText));
+end;
+
+procedure TquideLocationDialog.actVariableExecute(Sender: TObject);
+begin
+  AddAction(fLocation.AddAction(atVariable));
 end;
 
 procedure TquideLocationDialog.AddAction(aAction: TquideAction);
