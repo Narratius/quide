@@ -42,8 +42,8 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition:
-        TControlPosition); stdcall;
+    procedure AddControl(aControl: TControl; aSize: TControlSize; aCtrlPosition,
+        aLabelPosition: TControlPosition); stdcall;
     procedure ResizeControls;
     procedure SizeChanged; stdcall;
     property OnSizeChanged: TNotifyEvent read pm_GetOnSizeChanged write
@@ -69,8 +69,8 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition:
-        TControlPosition); stdcall;
+    procedure AddControl(aControl: TControl; aSize: TControlSize; aCtrlPosition,
+        aLabelPosition: TControlPosition); stdcall;
     procedure SelfResize(Sender: TObject);
     procedure SizeChanged; stdcall;
     property Value: Variant read pm_GetValue write pm_SetValue;
@@ -78,8 +78,9 @@ type
         pm_SetOnSizeChanged;
   end;
 
-procedure AddInnerControl(aParent: TWinControl; aControls: TList; aMyControlResized: TNotifyEvent;
-    aControl: TControl; aSize: TControlSize; aPosition: TControlPosition); stdcall;
+procedure AddInnerControl(aParent: TWinControl; aControls: TList;
+    aMyControlResized: TNotifyEvent; aControl: TControl; aSize: TControlSize;
+    aCtrlPosition, aLabelPosition: TControlPosition); stdcall;
 
 const
  cDefaultHeight = -1;
@@ -90,15 +91,26 @@ implementation
 uses
  Math;
 
-procedure AddInnerControl(aParent: TWinControl; aControls: TList; aMyControlResized: TNotifyEvent;
-    aControl: TControl; aSize: TControlSize; aPosition: TControlPosition);
+procedure AddInnerControl(aParent: TWinControl; aControls: TList;
+    aMyControlResized: TNotifyEvent; aControl: TControl; aSize: TControlSize;
+    aCtrlPosition, aLabelPosition: TControlPosition);
 var
   l_IC: ISizeableControl;
   l_Delta: Integer;
 begin
  if aControls.Count > 0 then
  begin
-  case aPosition of
+  // CtrlPosition  - расположение контролов относительно друг друга
+  case aCtrlPosition of
+    cpNewLine:
+      begin
+      end;
+    cpInline:
+      begin
+      end;
+  end;
+  // LabelPosition - метки относительно контрола
+  case aLabelPosition of
    cpNewLine:
     begin
      aControl.Top:= cIndent + TControl(aControls[aControls.Count-1]).Top + TControl(aControls[aControls.Count-1]).Height;
@@ -121,12 +133,13 @@ begin
   end;
  end
  else
+ // первый контрол на форме
  begin
   aControl.Top:= 2*cIndent;
   aControl.Left:= cIndent;
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
- if (aSize = csAutoSize) and (aPosition = cpNewLine) then
+ if (aSize = csAutoSize) and (aLabelPosition = cpNewLine) then
  begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
   aControl.Anchors:= aControl.Anchors + [akRight];
@@ -251,9 +264,9 @@ begin
 end;
 
 procedure TSizeablePanel.AddControl(aControl: TControl; aSize: TControlSize;
-    aPosition: TControlPosition);
+    aCtrlPosition, aLabelPosition: TControlPosition);
 begin
- AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aPosition);
+ AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aCtrlPosition, aLabelPosition);
 end;
 
 procedure TSizeablePanel.Lock;
@@ -326,10 +339,10 @@ begin
  inherited Destroy;
 end;
 
-procedure TSizeableScrollBox.AddControl(aControl: TControl; aSize: TControlSize;
-    aPosition: TControlPosition);
+procedure TSizeableScrollBox.AddControl(aControl: TControl; aSize:
+    TControlSize; aCtrlPosition, aLabelPosition: TControlPosition);
 begin
- AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aPosition);
+ AddInnerControl(Self, f_InnerControls, MyControlResized, aControl, aSize, aCtrlPosition, aLabelPosition);
  f_EnableResize:= True;
 end;
 

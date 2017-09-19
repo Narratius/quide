@@ -25,6 +25,7 @@ type
   TProperties = class;
   TddProperty = class(TPersistent)
   private
+    FNewLine: Boolean;
     f_Alias: string;
     f_Caption: String;
     f_Event: TNotifyEvent;
@@ -73,6 +74,7 @@ type
     property ListItem: TProperties read f_ListItem write pm_SetItem;
     property ListItems[Index: Integer]: TProperties read pm_GetItems;
     property ListItemsCount: Integer read pm_GetItemsCount;
+    property NewLine: Boolean read FNewLine write FNewLine default True;
     property OnChange: TNotifyEvent read f_OnChange write f_OnChange;
   end;
 
@@ -129,6 +131,8 @@ type
     procedure InnerOnChange(Sender: TObject);
     function Encrypt(const aText: String): String;
     function Decrypt(const aText: String): String;
+    function GetNewLines(Alias: String): Boolean;
+    procedure SetNewLines(Alias: String; Value: Boolean);
   public
     constructor Create; virtual;
     function Add(aProp: TddProperty): TddProperty;
@@ -158,6 +162,7 @@ type
     property Count: Integer read pm_GetCount;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Hints[Alias: String]: String read GetHints write SetHints;
+    property NewLines[Alias: String]: Boolean read GetNewLines write setNewLines;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
     property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;
     property OnChange: TNotifyEvent read FOnChange write SetOnChange;
@@ -337,6 +342,7 @@ begin
   Visible:= aVisible;
   Value:= Unassigned;
   f_ListItems:= TObjectList<TProperties>.Create;
+  fNewLine:= True;
 end;
 
 
@@ -501,6 +507,11 @@ end;
 function TProperties.GetHints(Alias: String): String;
 begin
  Result:= AliasItems[Alias].Hint;
+end;
+
+function TProperties.GetNewLines(Alias: String): Boolean;
+begin
+  Result:= AliasItems[Alias].NewLine;
 end;
 
 procedure TProperties.InnerOnChange(Sender: TObject);
@@ -777,6 +788,11 @@ end;
 procedure TProperties.SetHints(Alias: String; const Value: String);
 begin
  AliasItems[Alias].Hint:= Value;
+end;
+
+procedure TProperties.SetNewLines(Alias: String; Value: Boolean);
+begin
+  AliasItems[Alias].NewLine:= Value;
 end;
 
 procedure TProperties.SetOnChange(const Value: TNotifyEvent);

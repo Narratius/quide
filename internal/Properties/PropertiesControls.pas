@@ -55,6 +55,7 @@ type
     function SetOneValue(aProperty: TddProperty): Boolean;
     function GetOneValue(aProperty: TddProperty): Boolean;
     function ControlByTag(aTag: Integer): TControl;
+
   public
     constructor Create(aOwner: TComponent); override;
     procedure CorrectControl(aControlRec: TControlRec); virtual;
@@ -82,18 +83,22 @@ end;
 
 procedure TPropertiesPanel.AdjustControls;
 var
- i: Integer;
+ i, l_Cur, j, l_Count: Integer;
  l_Ctrl: TControl;
+ l_Width: Integer;
 begin
  // ¬ыравнивание контролов относительно меток
- for I := 0 to Pred(ControlCount) do
-  if (f_Controls[i].Position = cpInline) then
+ // —ледующий контрол может располагатьс€ на этой же строке
+ i:= 0;
+ while I < ControlCount do
+ begin
+  if (f_Controls[i].LabelPosition = cpInline) then
   begin
    l_Ctrl:= ControlByTag(f_Controls[i].Tag);
    //—двигать только тех, у кого Inline
    if (l_Ctrl.Left <> LeftIndent) then
    begin
-    if f_Controls[i].Size = csAutoSize then
+    if (f_Controls[i].Size = csAutoSize) then
     begin
      l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
      l_Ctrl.Anchors := l_Ctrl.Anchors + [akRight];
@@ -101,6 +106,41 @@ begin
     l_Ctrl.Left:= LeftIndent;
    end;
   end;
+  (*
+  else
+  begin
+    l_Cur:= i; // отсюда начнем подгонку
+    Inc(i);
+    l_Count:= 0;
+    while i < ControlCount do
+    begin
+      if f_Controls[i].Position = cpInline then
+      begin
+       Inc(i);
+       Inc(l_Count);
+      end
+      else
+       break
+    end; // while
+    if l_Count > 0 then
+    begin
+      l_Width:= l_Ctrl.Width div Succ(l_Count);
+      for j := l_Cur to i do
+      begin
+         l_Ctrl:= ControlByTag(f_Controls[j].Tag);
+         //—двигать только тех, у кого Inline
+         if (l_Ctrl.Left <> LeftIndent) then
+         begin
+          l_Ctrl.Width:= l_Width - (LeftIndent - l_Ctrl.Left);
+          //l_Ctrl.Anchors := l_Ctrl.Anchors + [akRight];
+          l_Ctrl.Left:= LeftIndent;
+         end;
+      end;
+    end;
+  end;
+  *)
+  Inc(i);
+ end; //while i
 end;
 
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
@@ -247,7 +287,7 @@ begin
  MakeCustomControl(TComboBox);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
-   Position:= cpInline;
+   LabelPosition:= cpInline;
  // нужно заполнить список элементов
 end;
 
@@ -273,7 +313,7 @@ begin
  MakeCustomControl(TEdit);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
-   Position:= cpInline;
+   LabelPosition:= cpInline;
 end;
 
 procedure TPropertiesPanel.MakeListControl(aProperty: TddProperty);
@@ -338,7 +378,7 @@ begin
  MakeCustomControl(TEdit);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
-   Position:= cpInline;
+   LabelPosition:= cpInline;
  with f_Controls[Length(f_Controls)-1] do
  begin
   Size:= csFixed;
@@ -354,8 +394,12 @@ begin
   Caption:= aProperty.Caption;
  MakeCustomControl(TEdit);
  if not LabelTop then
-  with f_Controls[Length(f_Controls)-1] do
-   Position:= cpInline;
+  f_Controls[Length(f_Controls)-1].LabelPosition:= cpInline;
+
+ if aProperty.NewLine then  // <- Ёто расположение контролов относительно друг друга
+  f_Controls[Length(f_Controls)-1].CtrlPosition:= cpNewLine
+ else
+  f_Controls[Length(f_Controls)-1].CtrlPosition:= cpInline;
 end;
 
 procedure TPropertiesPanel.MakeTextControl(aProperty: TddProperty);
@@ -368,7 +412,7 @@ begin
 // !!!
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
-   Position:= cpInline;
+   LabelPosition:= cpInline;
 end;
 
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);

@@ -17,8 +17,8 @@ type
 
   IControlContainer = interface(IInterface)
     ['{D2FBC108-88B0-4800-B449-4532600E4F80}']
-    procedure AddControl(aControl: TControl; aSize: TControlSize; aPosition:
-        TControlPosition); stdcall;
+    procedure AddControl(aControl: TControl; aSize: TControlSize; aCtrlPosition,
+        aLabelPosition: TControlPosition); stdcall;
     procedure Lock; stdcall;
     function Locked: Boolean; stdcall;
     procedure Unlock; stdcall;

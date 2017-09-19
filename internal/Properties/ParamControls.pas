@@ -9,7 +9,8 @@ type
   TControlRec = record
     Caption: string;
     ControlClass: TControlClass;
-    Position: TControlPosition;
+    CtrlPosition: TControlPosition;
+    LabelPosition: TControlPosition;
     Size: TControlSize;
     Height: Integer;
     Width: Integer;
@@ -36,7 +37,8 @@ type
 const
  cDefControlRec : TControlRec = (Caption: '';
                                  ControlClass: TSizeableMemo;
-                                 Position: cpNewLine;
+                                 CtrlPosition: cpNewLine;
+                                 LabelPosition: cpNewLine;
                                  Size: csAutoSize;
                                  Height: 0;
                                  Width: 0;
@@ -123,7 +125,7 @@ begin
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);
    end;
-   AddControl(l_C, aControls[i].Size, aControls[i].Position);
+   AddControl(l_C, aControls[i].Size, aControls[i].CtrlPosition, aControls[i].LabelPosition);
    f_LeftIndent:= Max(f_LeftIndent, l_C.Left);
    // Тут можно запомнить Макс. левую позицию контрола
    TuneupControl(l_C)

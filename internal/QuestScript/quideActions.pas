@@ -183,6 +183,9 @@ begin
   inherited Create;
   f_Variable := TquideVariable.Create();
   ActionType:= atVariable;
+  DefineChoice('Variables', '');
+  DefineString('VarValue', '=');
+  NewLines['VarValue']:= False;
 end;
 
 destructor TquideVariableAction.Destroy;
@@ -198,7 +201,7 @@ constructor TquideTextAction.Create;
 begin
   inherited Create;
   f_Links := TObjectList.Create();
-  Define('Text', '', ptText);
+  DefineText('Text', '');
   ActionType:= atText;
 end;
 
