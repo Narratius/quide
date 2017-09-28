@@ -594,7 +594,6 @@ begin
        if LoadStruct then
         Define(l_Alias, l_Caption, l_Type, l_Visible);
        Values[l_Alias]:= l_Item.ChildNodes.FindNode('Value').Text;
-       { TODO : Нужно расшифровать строку }
        if l_Type = ptPassword then
         Values[l_Alias]:= Decrypt(Values[l_Alias]);
       end

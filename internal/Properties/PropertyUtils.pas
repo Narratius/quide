@@ -21,7 +21,8 @@ function NewChoice(aID: Integer; aCaption: String; aNext: TddChoiceLink = nil): 
 
 function LinkToProperties(aLink: TddPropertyLink): TProperties;
 
-function ShowPropDialog(const aCaption: String; aProperties: TProperties): Boolean;
+function ShowPropDialog(const aCaption: String; aProperties: TProperties;
+    aLabelTop: Boolean = False): Boolean;
 
 procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
 
@@ -101,10 +102,12 @@ end;
 
 
 
-function ShowPropDialog(const aCaption: String; aProperties: TProperties): Boolean;
+function ShowPropDialog(const aCaption: String; aProperties: TProperties;
+    aLabelTop: Boolean = False): Boolean;
 begin
  with TPropDialog.Create(Application) do
  try
+  LabelTop:= aLabelTop;
   Caption:= aCaption;
   Result:= Execute(aProperties);
  finally

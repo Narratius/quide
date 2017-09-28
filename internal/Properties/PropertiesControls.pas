@@ -24,7 +24,7 @@ type
     procedure MakeBooleanControl(aProperty: TddProperty); virtual;
     procedure MakeCharControl(aProperty: TddProperty); virtual;
     procedure MakeChoiceControl(aProperty: TddProperty); virtual;
-    procedure MakeCustomControl(aControlClass: TControlClass);
+    procedure MakeCustomControl(aControlClass: TControlClass; aNewLine: Boolean);
     procedure MakeIntegerControl(aProperty: TddProperty); virtual;
     procedure MakeListControl(aProperty: TddProperty); virtual;
     procedure MakePropertiesControl(aProperty: TddProperty); virtual;
@@ -65,6 +65,10 @@ type
     property Properties: TProperties read f_Properties write pm_SetProperties;
     property LabelTop: Boolean read FLabelTop write SetLabelTop;
   end;
+
+
+const
+  DefLabelClass : TControlClass = TLabel;
 
 implementation
 
@@ -261,7 +265,7 @@ end;
 
 procedure TPropertiesPanel.MakeActionControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TButton);
+ MakeCustomControl(TButton, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
  begin
   Caption:= aProperty.Caption;
@@ -273,7 +277,7 @@ procedure TPropertiesPanel.MakeBooleanControl(aProperty: TddProperty);
 begin
  // ѕочему комбобокс?!
  //MakeCustomControl(TLabel);
- MakeCustomControl(TCheckBox);
+ MakeCustomControl(TCheckBox, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  //MakeCustomControl(TComboBox);
@@ -281,10 +285,10 @@ end;
 
 procedure TPropertiesPanel.MakeChoiceControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TComboBox);
+ MakeCustomControl(TComboBox, aProperty.NewLine);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
    LabelPosition:= cpInline;
@@ -298,19 +302,30 @@ begin
  SetValues;
 end;
 
-procedure TPropertiesPanel.MakeCustomControl(aControlClass: TControlClass);
+procedure TPropertiesPanel.MakeCustomControl(aControlClass: TControlClass;
+    aNewLine: Boolean);
 begin
  AddDefControl;
  with f_Controls[Length(f_Controls)-1] do
+ begin
   ControlClass:= aControlClass;
+  if not LabelTop then
+   LabelPosition:= cpInline
+  else
+   LabelPosition:= cpNewLine;
+  if aNewLine then
+    CtrlPosition:= cpNewLine
+  else
+    CtrlPosition:= cpInline;
+ end; // with
 end;
 
 procedure TPropertiesPanel.MakeIntegerControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TEdit);
+ MakeCustomControl(TEdit, aProperty.NewLine);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
    LabelPosition:= cpInline;
@@ -319,7 +334,7 @@ end;
 procedure TPropertiesPanel.MakeListControl(aProperty: TddProperty);
 begin
  { TGroupBox, в который встроены TListBox и три TButton  }
-  MakeCustomControl(TPropertiesListControl);
+  MakeCustomControl(TPropertiesListControl, aProperty.NewLine);
   with f_Controls[Length(f_Controls)-1] do
     Caption:= aProperty.Caption;
 end;
@@ -327,15 +342,15 @@ end;
 procedure TPropertiesPanel.MakePasswordControl(aProperty: TddProperty);
 begin
   MakeStringControl(aProperty);
-  //TEdit(f_Controls[Length(f_Controls)-1]).PasswordChar:= '*';
+  // TEdit(f_Controls[Length(f_Controls)-1]).PasswordChar:= '*';
 end;
 
 procedure TPropertiesPanel.MakePropertiesControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TSizeableScrollBox);
+ MakeCustomControl(TSizeableScrollBox, aProperty.NewLine);
 end;
 
 function TPropertiesPanel.MakePropertyControl(aProperty: TddProperty): Boolean;
@@ -361,6 +376,8 @@ begin
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
+  { TODO : ”становить CtrlPosition и LabelPosition }
+
    f_Controls[i].ReadOnly:= aProperty.ReadOnly;
    f_Controls[i].Tag:= aProperty.ID;
    f_Controls[i].Event:= aProperty.Event;
@@ -372,10 +389,10 @@ end;
 
 procedure TPropertiesPanel.MakeCharControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
- MakeCustomControl(TEdit);
+ MakeCustomControl(TEdit, aProperty.NewLine);
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
    LabelPosition:= cpInline;
@@ -389,26 +406,21 @@ end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
+ begin
   Caption:= aProperty.Caption;
- MakeCustomControl(TEdit);
- if not LabelTop then
-  f_Controls[Length(f_Controls)-1].LabelPosition:= cpInline;
-
- if aProperty.NewLine then  // <- Ёто расположение контролов относительно друг друга
-  f_Controls[Length(f_Controls)-1].CtrlPosition:= cpNewLine
- else
-  f_Controls[Length(f_Controls)-1].CtrlPosition:= cpInline;
+ end;
+ MakeCustomControl(TEdit, aProperty.NewLine);
 end;
 
 procedure TPropertiesPanel.MakeTextControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel);
+ MakeCustomControl(TLabel, aProperty.NewLine);
  with f_Controls[Length(f_Controls)-1] do
   Caption:= aProperty.Caption;
  //MakeCustomControl(TSizeableMemo);
- MakeCustomControl(TRichEdit);
+ MakeCustomControl(TRichEdit, aProperty.NewLine);
 // !!!
  if not LabelTop then
   with f_Controls[Length(f_Controls)-1] do
@@ -419,7 +431,7 @@ procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
  MakeControls;
- AdjustControls;
+ //AdjustControls;   <- ¬ернуть, иначе нет выравнивание по левой границе
 end;
 
 procedure TPropertiesPanel.SetActionValue(aProperty: TddProperty; aControl: TControl);

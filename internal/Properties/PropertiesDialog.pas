@@ -17,10 +17,13 @@ type
     procedure SetProperties(const Value: TProperties);
     procedure ResizePanel;
     function GetProperties: TProperties;
+    function pm_GetLabelTop: Boolean;
+    procedure pm_Setf_LabelTop(const Value: Boolean);
     { Private declarations }
   public
     { Public declarations }
     function Execute(var aProp: TProperties): Boolean;
+    property LabelTop: Boolean read pm_GetLabelTop write pm_Setf_LabelTop;
     property WorkPanel: TPropertiesPanel read f_WorkPanel;
     property Properties: TProperties read GetProperties write SetProperties;
   end;
@@ -59,6 +62,16 @@ function TPropDialog.GetProperties: TProperties;
 begin
  f_WorkPanel.GetValues;
  Result:= f_WorkPanel.Properties;
+end;
+
+function TPropDialog.pm_GetLabelTop: Boolean;
+begin
+ Result:= f_WorkPanel.LabelTop
+end;
+
+procedure TPropDialog.pm_Setf_LabelTop(const Value: Boolean);
+begin
+ f_WorkPanel.LabelTop:= Value;
 end;
 
 procedure TPropDialog.ResizePanel;

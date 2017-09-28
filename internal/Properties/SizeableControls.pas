@@ -97,19 +97,92 @@ procedure AddInnerControl(aParent: TWinControl; aControls: TList;
 var
   l_IC: ISizeableControl;
   l_Delta: Integer;
+  l_PrevControl: TControl;
+  l_Top, l_Left, l_PrevTop, l_PrevLeft: Integer;
 begin
  if aControls.Count > 0 then
  begin
+  l_PrevControl:= TControl(aControls[aControls.Count-1]);
+  l_Top:= cIndent + l_PrevControl.Top + l_PrevControl.Height;
+  l_Left:= cIndent;
+  l_PrevTop:= l_PrevControl.Top;
+  l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width  + cIndent;
+ end
+ else // первый контрол на форме
+ begin
+  l_Top:= cIndent;
+  l_Left:= cIndent;
+ end;
   // CtrlPosition  - расположение контролов относительно друг друга
+  // LabelPosition - метки относительно контрола
+  if (aCtrlPosition = cpNewLine) and (aLabelPosition = cpNewLine) then
+  begin
+    aControl.Top:= l_Top;
+    aControl.Left:= l_Left;
+    aParent.Height:= aParent.Height + aControl.Height + cIndent;
+  end
+  else
+  if (aCtrlPosition = cpNewLine) and (aLabelPosition = cpInline) then
+  begin
+    Нужно обрабатывать случай, когда нет метки
+    if aControl is TLabel then
+    begin
+     aControl.Top:= l_Top;
+     aControl.Left:= l_Left;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end
+    else
+    begin
+     aControl.Top:= l_PrevTop;
+     aControl.Left:= l_PrevLeft;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end;
+  end
+  else
+  if (aCtrlPosition = cpInline) and (aLabelPosition = cpNewLine) then
+  begin
+    if aControl is TLabel then
+    begin
+     aControl.Top:= l_PrevTop;
+     aControl.Left:= l_PrevLeft;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end
+    else
+    begin
+     aControl.Top:= l_PrevTop;
+     aControl.Left:= l_PrevLeft;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end;
+  end
+  else
+  if (aCtrlPosition = cpInline) and (aLabelPosition = cpInLine) then
+  begin
+    if aControl is TLabel then
+    begin
+     aControl.Top:= l_PrevTop;
+     aControl.Left:= l_PrevLeft;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end
+    else
+    begin
+     aControl.Top:= l_PrevTop;
+     aControl.Left:= l_PrevLeft;
+     aParent.Height:= aParent.Height + aControl.Height + cIndent;
+    end;
+  end;
+
+  (*
   case aCtrlPosition of
     cpNewLine:
       begin
+        aControl.Top:= l_Top;
+        aControl.Left:= l_Left;
       end;
     cpInline:
       begin
       end;
   end;
-  // LabelPosition - метки относительно контрола
+
   case aLabelPosition of
    cpNewLine:
     begin
@@ -120,7 +193,7 @@ begin
    cpInline:
     begin
      { TODO -oДД -cУлучшение на будущее : Тут может быть больше одного элемента }
-     aControl.Top:= TControl(aControls[aControls.Count-1]).Top;
+     aControl.Top:= l_PrevTop;
      aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
      if aSize = csAutoSize then
       aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
@@ -131,7 +204,6 @@ begin
      end;
     end;
   end;
- end
  else
  // первый контрол на форме
  begin
@@ -139,12 +211,14 @@ begin
   aControl.Left:= cIndent;
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
+ *)
+ (*
  if (aSize = csAutoSize) and (aLabelPosition = cpNewLine) then
  begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
   aControl.Anchors:= aControl.Anchors + [akRight];
  end;
-
+ *)
  aParent.InsertControl(aControl);
  if aParent.GetInterface(ISizeableControl, l_IC) then
   l_Ic.SizeChanged;
