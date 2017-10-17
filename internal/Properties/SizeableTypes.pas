@@ -2,7 +2,7 @@ unit SizeableTypes;
 
 interface
 type
- TControlPosition = (cpNewLine, cpInline);
+ TControlPosition = (cpNone, cpNewLine, cpInline);
  TControlSize     = (csAutoSize, csFixed);
 
 

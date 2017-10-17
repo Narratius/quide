@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  SimpleGraph {$IFDEF COMPILER7_UP}, XPMan {$ENDIF}, Dialogs, ExtDlgs,
+  SimpleGraph, Dialogs, ExtDlgs,
   Menus, ActnList, ImgList, StdCtrls, ComCtrls, ToolWin, JPEG, Buttons,
   System.Actions, quideScenarios, System.ImageList, PngImageList;
 
@@ -346,7 +346,8 @@ uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
   AboutDelphiArea, AlignDlg, SizeDlg,
   PropertyUtils,
-  quideLocations, quideLocationDlg, quideSteps;
+  quideLocations, quideLocationDlg, quideSteps
+  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 resourcestring
   SAppTitle      = 'Quest IDE 2014';
@@ -552,6 +553,9 @@ begin
    SaveDialog.FileName:= SUntitled;
   end;
  MakeScript;
+ {$IFDEF Debug}
+ Msg2Log('Start session');
+ {$ENDIF}
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -819,6 +823,7 @@ procedure TMainForm.EditPropertiesExecute(Sender: TObject);
 var
   LinkCount: Integer;
 begin
+  (*
   if ScenarioGraph.SelectedObjects.Count = 0 then
     TDesignerProperties.Execute(ScenarioGraph)
   else
@@ -831,6 +836,7 @@ begin
     else
       TObjectProperties.Execute(ScenarioGraph.SelectedObjects);
   end;
+  *)
 end;
 
 procedure TMainForm.ClipboardNativeUpdate(Sender: TObject);
@@ -1074,7 +1080,7 @@ end;
 
 procedure TMainForm.HelpUsageExecute(Sender: TObject);
 begin
-  THelpOnActions.Execute;
+  //THelpOnActions.Execute;
 end;
 
 procedure TMainForm.OptionsConfirmHookLinkExecute(Sender: TObject);

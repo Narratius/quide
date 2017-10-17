@@ -89,7 +89,8 @@ const
 implementation
 
 uses
- Math;
+ Math
+ {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 procedure AddInnerControl(aParent: TWinControl; aControls: TList;
     aMyControlResized: TNotifyEvent; aControl: TControl; aSize: TControlSize;
@@ -99,10 +100,16 @@ var
   l_Delta: Integer;
   l_PrevControl: TControl;
   l_Top, l_Left, l_PrevTop, l_PrevLeft: Integer;
+  l_PrevisLabel: Boolean;
 begin
+ {$IFDEF Debug}
+ with aParent do
+   Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
+ {$ENDIF}
  if aControls.Count > 0 then
  begin
   l_PrevControl:= TControl(aControls[aControls.Count-1]);
+  l_PrevIsLabel:= l_PrevControl is TLabel;
   l_Top:= cIndent + l_PrevControl.Top + l_PrevControl.Height;
   l_Left:= cIndent;
   l_PrevTop:= l_PrevControl.Top;
@@ -114,63 +121,85 @@ begin
   l_Left:= cIndent;
  end;
   // CtrlPosition  - расположение контролов относительно друг друга
+ if aCtrlPosition = cpNewLine then
+ begin
   // LabelPosition - метки относительно контрола
-  if (aCtrlPosition = cpNewLine) and (aLabelPosition = cpNewLine) then
-  begin
-    aControl.Top:= l_Top;
-    aControl.Left:= l_Left;
-    aParent.Height:= aParent.Height + aControl.Height + cIndent;
-  end
-  else
-  if (aCtrlPosition = cpNewLine) and (aLabelPosition = cpInline) then
-  begin
-    Нужно обрабатывать случай, когда нет метки
-    if aControl is TLabel then
-    begin
-     aControl.Top:= l_Top;
-     aControl.Left:= l_Left;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end
-    else
-    begin
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= l_PrevLeft;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end;
-  end
-  else
-  if (aCtrlPosition = cpInline) and (aLabelPosition = cpNewLine) then
-  begin
-    if aControl is TLabel then
-    begin
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= l_PrevLeft;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end
-    else
-    begin
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= l_PrevLeft;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end;
-  end
-  else
-  if (aCtrlPosition = cpInline) and (aLabelPosition = cpInLine) then
-  begin
-    if aControl is TLabel then
-    begin
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= l_PrevLeft;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end
-    else
-    begin
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= l_PrevLeft;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end;
-  end;
+  case aLabelPosition of
+    cpNone:
+      begin
+        aControl.Top:= l_Top;
+        aControl.Left:= l_Left;
+        aParent.Height:= aParent.Height + aControl.Height + cIndent;
+      end; // cpNone
+    cpNewLine:
+      begin
+        aControl.Top:= l_Top;
+        aControl.Left:= l_Left;
+        aParent.Height:= aParent.Height + aControl.Height + cIndent;
+      end; // cpNewLine
+    cpInline:
+      begin
+        if (aControl is TLabel) or not l_PrevIsLabel then
+        begin
+         aControl.Top:= l_Top;
+         aControl.Left:= l_Left;
+         aParent.Height:= aParent.Height + aControl.Height + cIndent;
+        end
+        else
+        begin
+         aControl.Top:= l_PrevTop;
+         aControl.Left:= l_PrevLeft;
+//         aParent.Height:= aParent.Height + aControl.Height + cIndent;
 
+         if aSize = csAutoSize then
+          aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
+         l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
+         if l_Delta > 0 then
+          aParent.Height:= aParent.Height + l_Delta + cIndent;
+         aControl.Anchors:= aControl.Anchors + [akRight];
+        end;
+      end; // cpInline
+  end; // case aLabelPosition
+ end
+ else
+ if aCtrlPosition = cpInline then
+ begin
+  case aLabelPosition of
+    cpNone:
+      begin
+      end;
+    cpNewLine:
+      begin
+        if aControl is TLabel then
+        begin
+         aControl.Top:= l_PrevTop;
+         aControl.Left:= l_PrevLeft;
+         aParent.Height:= aParent.Height + aControl.Height + cIndent;
+        end
+        else
+        begin
+         aControl.Top:= l_PrevTop;
+         aControl.Left:= l_PrevLeft;
+         aParent.Height:= aParent.Height + aControl.Height + cIndent;
+        end;
+      end; // cpNewLine
+    cpInline:
+      begin
+        if aControl is TLabel then
+        begin
+         aControl.Top:= l_PrevTop;
+         aControl.Left:= l_PrevLeft;
+         aParent.Height:= aParent.Height + aControl.Height + cIndent;
+        end
+        else
+        begin
+         aControl.Top:= l_PrevTop;
+         aControl.Left:= l_PrevLeft;
+         aParent.Height:= aParent.Height + aControl.Height + cIndent;
+        end;
+      end; // cpInline
+  end;
+ end;
   (*
   case aCtrlPosition of
     cpNewLine:
@@ -212,19 +241,24 @@ begin
   aParent.Height:= aControl.Height + 2*cIndent;
  end;
  *)
- (*
- if (aSize = csAutoSize) and (aLabelPosition = cpNewLine) then
+ (* *)
+ if (aSize = csAutoSize) and (aLabelPosition in [cpNone, cpNewLine]) then
  begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
   aControl.Anchors:= aControl.Anchors + [akRight];
  end;
- *)
+ (* *)
  aParent.InsertControl(aControl);
  if aParent.GetInterface(ISizeableControl, l_IC) then
   l_Ic.SizeChanged;
  if aControl.GetInterface(ISizeableControl, l_IC) then
   l_IC.OnSizeChanged:= aMyControlResized;
  aControls.Add(aControl);
+ {$IFDEF Debug}
+ with aControl do
+   Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
+ Msg2Log('Parent.Height After: %d', [aParent.Height]);
+ {$ENDIF}
 end;
 
 procedure InnerControlResized(aParent: TWinControl; aControl: TControl; aControlsList: TList);

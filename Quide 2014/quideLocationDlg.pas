@@ -53,7 +53,8 @@ implementation
 {$R *.dfm}
 
 Uses
-  quideButtonEditDlg;
+  quideButtonEditDlg
+  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 { TForm1 }
 
@@ -116,12 +117,21 @@ begin
   l_Top:= 0;
  // Добавляем панель и контролы
  l_Actions:= TPropertiesPanel.Create(Self);
- l_Actions.Align:= alNone;
- l_Actions.Parent:= f_Actions;
- l_Actions.Width:= f_Actions.ClientWidth;
- l_Actions.Properties:= aAction;
- l_Actions.Top:= l_Top;
- l_Actions.Tag:= aAction.Index;
+ with l_Actions do
+ begin
+  Align:= alNone;
+  Parent:= f_Actions;
+  Width:= f_Actions.ClientWidth;
+  Anchors:= Anchors + [akRight];
+  Top:= l_Top;
+  Tag:= aAction.Index;
+  Height:= 16;
+  Properties:= aAction;
+ end;
+ {$IFDEF Debug}
+ with l_Actions do
+   Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [ClassName, Left, Top, Width, Height]);
+ {$ENDIF}
 end;
 
 procedure TquideLocationDialog.ClearControls;

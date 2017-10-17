@@ -74,7 +74,8 @@ implementation
 
 uses
  Variants, Vcl.ComCtrls, SySutils,
- SizeableTypes, PropertiesListControl;
+ SizeableTypes, PropertiesListControl
+ {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 {
 ******************************* TPropertiesPanel *******************************
@@ -91,6 +92,11 @@ var
  l_Ctrl: TControl;
  l_Width: Integer;
 begin
+ { TODO : Тут все ломается }
+ exit;
+ {$IFDEF Debug}
+ Msg2Log('AdjustControls');
+ {$ENDIF}
  // Выравнивание контролов относительно меток
  // Следующий контрол может располагаться на этой же строке
  i:= 0;
@@ -143,6 +149,10 @@ begin
     end;
   end;
   *)
+  {$IFDEF Debug}
+   with ControlByTag(f_Controls[i].Tag) do
+    Msg2Log('Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
+  {$ENDIF}
   Inc(i);
  end; //while i
 end;
@@ -270,6 +280,7 @@ begin
  begin
   Caption:= aProperty.Caption;
   Size:= csAutoSize;
+  LabelPosition:= cpNone;
  end;
 end;
 
@@ -336,7 +347,10 @@ begin
  { TGroupBox, в который встроены TListBox и три TButton  }
   MakeCustomControl(TPropertiesListControl, aProperty.NewLine);
   with f_Controls[Length(f_Controls)-1] do
+  begin
     Caption:= aProperty.Caption;
+    LabelPosition:= cpNone;
+  end;
 end;
 
 procedure TPropertiesPanel.MakePasswordControl(aProperty: TddProperty);
@@ -376,8 +390,6 @@ begin
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
-  { TODO : Установить CtrlPosition и LabelPosition }
-
    f_Controls[i].ReadOnly:= aProperty.ReadOnly;
    f_Controls[i].Tag:= aProperty.ID;
    f_Controls[i].Event:= aProperty.Event;
@@ -431,15 +443,19 @@ procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
  MakeControls;
- //AdjustControls;   <- Вернуть, иначе нет выравнивание по левой границе
+ AdjustControls;   //<- Вернуть, иначе нет выравнивание по левой границе
 end;
 
 procedure TPropertiesPanel.SetActionValue(aProperty: TddProperty; aControl: TControl);
+var
+ l_S: String;
 begin
  // Кнопка - значение отсутствует
   if (aControl is TButton)  then
   begin
-    TButton(aControl).Caption := VarToStr(aProperty.Value)
+    l_S:= VarToStr(aProperty.Value);
+    if l_S <> '' then
+      TButton(aControl).Caption := l_S;
   end;
 end;
 

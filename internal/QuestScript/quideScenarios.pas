@@ -75,7 +75,7 @@ begin
   inherited;
   f_Chapters.Clear;
   f_Inventory.Clear;
-  f_Variables.Clear;
+  //f_Variables.Clear;
   f_Chapters.Clear;
   f_LocationsNames.Clear;
   f_VariablesNames.Clear;

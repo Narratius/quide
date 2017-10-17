@@ -51,7 +51,8 @@ const
 implementation
 
 uses
- SysUtils, StdCtrls, Math;
+ SysUtils, StdCtrls, Math
+ {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 {
 ******************************** TControlPanel *********************************
@@ -133,6 +134,9 @@ begin
  finally
   Unlock;
  end;
+ {$IFDEF Debug}
+ Msg2Log('Controls Created: %d (Left: %d, Top: %d, Width: %d, Height: %d)', [Length(aControls), Left, Top, Width, Height]);
+ {$ENDIF}
 end;
 
 procedure TControlPanel.TuneupControl(aControl: TControl);

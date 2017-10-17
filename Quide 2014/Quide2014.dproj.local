@@ -1,8 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.209,C:\#My Work\quide\Quide 2014\Unit1.pas=C:\#My Work\quide\Quide 2014\quideButtonEditDlg.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.411,=C:\#My Work\quide\Quide 2014\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.209,C:\#My Work\quide\Quide 2014\Unit1.dfm=C:\#My Work\quide\Quide 2014\quideButtonEditDlg.dfm</Transaction>
-  </Transactions>
-</BorlandProject>
+<BorlandProject/>
