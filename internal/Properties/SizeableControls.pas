@@ -149,10 +149,10 @@ begin
         begin
          aControl.Top:= l_PrevTop;
          aControl.Left:= l_PrevLeft;
-//         aParent.Height:= aParent.Height + aControl.Height + cIndent;
-
+         (* *)
          if aSize = csAutoSize then
           aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
+         (* *)
          l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
          if l_Delta > 0 then
           aParent.Height:= aParent.Height + l_Delta + cIndent;
@@ -200,48 +200,7 @@ begin
       end; // cpInline
   end;
  end;
-  (*
-  case aCtrlPosition of
-    cpNewLine:
-      begin
-        aControl.Top:= l_Top;
-        aControl.Left:= l_Left;
-      end;
-    cpInline:
-      begin
-      end;
-  end;
-
-  case aLabelPosition of
-   cpNewLine:
-    begin
-     aControl.Top:= cIndent + TControl(aControls[aControls.Count-1]).Top + TControl(aControls[aControls.Count-1]).Height;
-     aControl.Left:= cIndent;
-     aParent.Height:= aParent.Height + aControl.Height + cIndent;
-    end;
-   cpInline:
-    begin
-     { TODO -oДД -cУлучшение на будущее : Тут может быть больше одного элемента }
-     aControl.Top:= l_PrevTop;
-     aControl.Left:= cIndent + TControl(aControls[aControls.Count-1]).Left + TControl(aControls[aControls.Count-1]).Width;
-     if aSize = csAutoSize then
-      aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;
-     l_Delta:= (aControl.Top + aControl.Height) - (aParent.Height - cIndent);
-     if l_Delta > 0 then
-     begin
-      aParent.Height:= aParent.Height + l_Delta + cIndent;
-     end;
-    end;
-  end;
- else
- // первый контрол на форме
- begin
-  aControl.Top:= 2*cIndent;
-  aControl.Left:= cIndent;
-  aParent.Height:= aControl.Height + 2*cIndent;
- end;
- *)
- (* *)
+ (* Подгонка под размер родителя  *)
  if (aSize = csAutoSize) and (aLabelPosition in [cpNone, cpNewLine]) then
  begin
   aControl.Width:= aParent.ClientWidth - 2*cIndent;
@@ -356,11 +315,19 @@ end;
 constructor TSizeablePanel.Create(aOwner: TComponent);
 begin
   inherited ;
+  {$IFDEF Debug}
+  BevelOuter:= bvRaised;
+  BevelInner:= bvLowered;
+  BevelKind:= bkNone;
+  {$ELSE}
   BevelOuter:= bvNone;
+  {$ENDIF}
   Caption:= '';
-  Height:= 18;
-  //Font.Size:= 14;
+  Height:= 2*cIndent;
+  {$IFDEF Debug}
+  //Font.Size:= 12;
   //Font.Name:= 'Book Antiqua';
+  {$ENDIF}
   f_InnerControls := TList.Create();
   f_Locked:= 0;
 end;

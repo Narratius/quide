@@ -127,6 +127,7 @@ begin
      aControls[i].Event(l_C);
    end;
    AddControl(l_C, aControls[i].Size, aControls[i].CtrlPosition, aControls[i].LabelPosition);
+   { TODO : Подгонкой высоты нужно заниматься после того, как все контролы вставлены }
    f_LeftIndent:= Max(f_LeftIndent, l_C.Left);
    // Тут можно запомнить Макс. левую позицию контрола
    TuneupControl(l_C)

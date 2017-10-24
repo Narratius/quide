@@ -55,7 +55,8 @@ type
     function SetOneValue(aProperty: TddProperty): Boolean;
     function GetOneValue(aProperty: TddProperty): Boolean;
     function ControlByTag(aTag: Integer): TControl;
-
+    function LabelByTag(aTag: Integer): TControl;
+    procedure PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);
   public
     constructor Create(aOwner: TComponent); override;
     procedure CorrectControl(aControlRec: TControlRec); virtual;
@@ -88,73 +89,98 @@ end;
 
 procedure TPropertiesPanel.AdjustControls;
 var
- i, l_Cur, j, l_Count: Integer;
- l_Ctrl: TControl;
- l_Width: Integer;
+ l_CurCtrlIdx, l_Cur, j, l_Count: Integer;
+ l_CtrlRec: TControlRec;
+ l_CurCtrl, l_FirstCtrl: TControl;
+ l_Width, l_LblWidth: Integer;
+ l_Left, l_Top: Integer;
 begin
  { TODO : “ут все ломаетс€ }
- exit;
+ //exit;
  {$IFDEF Debug}
  Msg2Log('AdjustControls');
  {$ENDIF}
- // ¬ыравнивание контролов относительно меток
- // —ледующий контрол может располагатьс€ на этой же строке
- i:= 0;
- while I < ControlCount do
+ { ¬ыравнивание контролов относительно меток
+  —ледующий контрол может располагатьс€ на этой же строке
+  Ќужно подсчитать, сколько контролов после текущего расположено на одной строке
+  ѕодсчитать ширины и выровн€ть пропорционально, если AutoSize или друг за другом, если нет
+ }
+ l_FirstCtrl:= nil;
+ l_CurCtrlIdx:= 0;
+ l_LblWidth:= 0;
+ l_Count:= 0;
+ {$IFDEF Debug}
+ Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
+ {$ENDIF}
+ l_CurCtrlIdx:= 0;
+ while l_CurCtrlIdx < ControlCount do // цикл по свойствам
  begin
-  if (f_Controls[i].LabelPosition = cpInline) then
+  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
   begin
-   l_Ctrl:= ControlByTag(f_Controls[i].Tag);
-   //—двигать только тех, у кого Inline
-   if (l_Ctrl.Left <> LeftIndent) then
-   begin
-    if (f_Controls[i].Size = csAutoSize) then
-    begin
-     l_Ctrl.Width:= l_Ctrl.Width - (LeftIndent - l_Ctrl.Left);
-     l_Ctrl.Anchors := l_Ctrl.Anchors + [akRight];
-    end;
-    l_Ctrl.Left:= LeftIndent;
-   end;
-  end;
-  (*
+   l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
+   //l_Count:= 1;
+   if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
+     l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
+  end
   else
+  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline) then
   begin
-    l_Cur:= i; // отсюда начнем подгонку
-    Inc(i);
-    l_Count:= 0;
-    while i < ControlCount do
-    begin
-      if f_Controls[i].Position = cpInline then
+   if l_FirstCtrl = nil then
+   begin
+     l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
+     //l_Count:= 1;
+     if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
+       l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
+   end
+   else // l_FirstCtrl <> nil
+   begin
+     l_Cur:= l_CurCtrlIdx;
+     // ѕоиск контролов
+     while l_CurCtrlIdx < ControlCount do
+     begin
+      if f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline then
       begin
-       Inc(i);
+       if (f_Controls[l_CurCtrlIdx].LabelPosition = cpInline) then
+        Inc(l_LblWidth, LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width);
+       Inc(l_CurCtrlIdx);
        Inc(l_Count);
       end
       else
        break
-    end; // while
-    if l_Count > 0 then
-    begin
-      l_Width:= l_Ctrl.Width div Succ(l_Count);
-      for j := l_Cur to i do
+     end; // while
+     // ¬ыравнивание
+     if l_Count > 0 then
+     begin
+      l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+1)) div l_Count;
+      l_FirstCtrl.Width:= l_Width;
+      l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left+cIndent;
+      for j := l_Cur to l_Count do
       begin
-         l_Ctrl:= ControlByTag(f_Controls[j].Tag);
-         //—двигать только тех, у кого Inline
-         if (l_Ctrl.Left <> LeftIndent) then
-         begin
-          l_Ctrl.Width:= l_Width - (LeftIndent - l_Ctrl.Left);
-          //l_Ctrl.Anchors := l_Ctrl.Anchors + [akRight];
-          l_Ctrl.Left:= LeftIndent;
-         end;
-      end;
-    end;
-  end;
-  *)
+       if f_Controls[j].LabelPosition = cpInline then
+       begin
+        with LabelByTag(f_Controls[j].Tag) do
+        begin
+         Left:= l_Left{ + cIndent};
+         Inc(l_Left, Width);
+        end;
+       end; // f_Controls[j].LabelPosition = cpInline
+       with ControlByTag(f_Controls[j].Tag) do
+       begin
+        Width:= l_Width; // - (LeftIndent - l_CurCtrl.Left);
+        Left:= l_Left + cIndent; //LeftIndent;
+        Inc(l_Left, Width);
+       end; // l_CurCtrl.Left <> LeftIndent
+      end; // for j
+     end; // l_Count > 0
+   end; // l_FirstCtrl <> nil
+  end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
   {$IFDEF Debug}
-   with ControlByTag(f_Controls[i].Tag) do
-    Msg2Log('Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
+  // with ControlByTag(f_Controls[l_CurCtrlIdx].Tag) do
+  //  Msg2Log('Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
   {$ENDIF}
-  Inc(i);
+  Inc(l_CurCtrlIdx);
  end; //while i
+ Height:= ControlByTag(f_Controls[Pred(ControlCount)].Tag).Top + ControlByTag(f_Controls[Pred(ControlCount)].Tag).Height + cIndent;
 end;
 
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
@@ -271,6 +297,19 @@ end;
 procedure TPropertiesPanel.GetValues;
 begin
  f_Properties.IterateAll(GetOneValue);
+end;
+
+function TPropertiesPanel.LabelByTag(aTag: Integer): TControl;
+var
+ i: Integer;
+begin
+ Result:= nil;
+ for i:= 0 to Pred(ControlCount) do
+  if (Controls[i].Tag = aTag) and (Controls[i] is TLabel) then
+  begin
+   Result:= Controls[i];
+   break;
+  end;
 end;
 
 procedure TPropertiesPanel.MakeActionControl(aProperty: TddProperty);
@@ -434,9 +473,16 @@ begin
  //MakeCustomControl(TSizeableMemo);
  MakeCustomControl(TRichEdit, aProperty.NewLine);
 // !!!
- if not LabelTop then
-  with f_Controls[Length(f_Controls)-1] do
-   LabelPosition:= cpInline;
+ if Caption <> '' then
+ begin
+   if not LabelTop then
+    with f_Controls[Length(f_Controls)-1] do
+     LabelPosition:= cpInline;
+ end
+ else
+   with f_Controls[Length(f_Controls)-1] do
+     LabelPosition:= cpNone;
+
 end;
 
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
@@ -444,6 +490,11 @@ begin
  f_Properties := Value;
  MakeControls;
  AdjustControls;   //<- ¬ернуть, иначе нет выравнивание по левой границе
+end;
+
+procedure TPropertiesPanel.PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);
+begin
+  aCtrlRec:= f_Controls[aTag-propBase];
 end;
 
 procedure TPropertiesPanel.SetActionValue(aProperty: TddProperty; aControl: TControl);
