@@ -85,10 +85,6 @@ constructor TquideScenario.Create;
 begin
   inherited Create;
   Define('Author', 'Автор', ptString);
-  f_VariablesNames := TStringList.Create;
-  f_LocationsNames := TStringList.Create;
-  f_Chapters := TObjectList<TquideChapter>.Create();
-  //f_Variables := TObjectList<TquideVariable>.Create();
   DefineList('Variables', 'Переменные', True,
     NewProperty('Caption', 'Название', ptString,
     NewChoiceProperty('VarType', 'Тип',  // vtNumeric, vtText, vtBoolean, vtEnum
@@ -100,6 +96,9 @@ begin
     NewProperty('Value', 'Значение', ptString,
     nil))));
   f_Inventory := TObjectList<TquideInventoryItem>.Create();
+  f_VariablesNames := TStringList.Create;
+  f_LocationsNames := TStringList.Create;
+  f_Chapters := TObjectList<TquideChapter>.Create();
   Changed:= False;
 end;
 
@@ -107,7 +106,6 @@ destructor TquideScenario.Destroy;
 begin
   FreeAndNil(f_Chapters);
   FreeAndNil(f_Inventory);
-  FreeAndNil(f_Variables);
   FreeAndNil(f_Chapters);
   FreeAndNil(f_LocationsNames);
   FreeAndNil(f_VariablesNames);

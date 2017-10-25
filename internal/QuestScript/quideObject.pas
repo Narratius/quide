@@ -19,9 +19,8 @@ type
     procedure pm_SetHint(const Value: string);
   protected
   public
-    constructor Create; virtual;
+    constructor Create; override;
     constructor Make(const aCaption, aHint: string);
-    destructor Destroy; override;
     //1 Сбрасывает в начальное состояние
     procedure Clear; virtual;
     //1 Проверяет соответствует ли переданное название собственному
@@ -53,7 +52,7 @@ var
 }
 constructor TquideObject.Create;
 begin
- inherited Create;
+  inherited Create;
   Define('ID', 'Идентификатор', ptInteger, False);
   Define('Caption', 'Название', ptString);
   Define('Hint', 'Описание', ptString);
@@ -64,10 +63,6 @@ begin
   Create;
   Caption:= aCaption;
   Hint:= aHint;
-end;
-
-destructor TquideObject.Destroy;
-begin
 end;
 
 

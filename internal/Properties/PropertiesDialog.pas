@@ -42,7 +42,8 @@ begin
  if IsPositiveResult(ShowModal) then
  begin
    Result:= True;
-   aProp:= Properties;
+   Тут все падает
+   aProp.Assign(Properties);
  end;
 end;
 

@@ -60,6 +60,8 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure SetItem(aItem: TddPropertyLink);
     procedure SetChoice(aChoiceDef: TddChoiceLink);
+    procedure GetChoiceItems(aItems: TStrings);
+    procedure SetChoiceItems(aItems: TStrings);
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
     property ID: Integer read f_ID write f_ID;
@@ -112,6 +114,7 @@ type
   private
     f_Changed: Boolean;
     f_Items: TObjectList<TddProperty>;
+    f_ChoiceItems: TStrings;
     FOnChange: TNotifyEvent;
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
@@ -133,8 +136,11 @@ type
     function Decrypt(const aText: String): String;
     function GetNewLines(Alias: String): Boolean;
     procedure SetNewLines(Alias: String; Value: Boolean);
+    function pm_GetChoiceItems(Alias: String): TStrings;
+    procedure pm_SetChoiceItems(Alias: String; const Value: TStrings);
   public
     constructor Create; virtual;
+    destructor Destroy; override;
     function Add(aProp: TddProperty): TddProperty;
     procedure Assign(Source: TProperties);
     function Clone: Pointer;
@@ -156,9 +162,11 @@ type
     procedure IterateAll(aFunc: TddPropertyFunc);
     procedure LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
     procedure SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
+  public
     property AliasItems[Alias: String]: TddProperty read pm_GetAliasItems write
         pm_SetAliasItems; default;
     property Changed: Boolean read f_Changed write pm_SetChanged;
+    property ChoiceItems[Alias: String]: TStrings read pm_GetChoiceItems write pm_SetChoiceItems;
     property Count: Integer read pm_GetCount;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Hints[Alias: String]: String read GetHints write SetHints;
@@ -379,7 +387,9 @@ end;
 }
 constructor TProperties.Create;
 begin
+ inherited;
  F_Items := TObjectList<TddProperty>.Create(True);
+ f_ChoiceItems:= TStringList.Create;
 end;
 
 function TProperties.Add(aProp: TddProperty): TddProperty;
@@ -478,6 +488,13 @@ begin
   Define(aAlias, aCaption, ptText, True);
 end;
 
+destructor TProperties.Destroy;
+begin
+  FreeAndNil(f_ChoiceItems);
+  FreeAndNil(f_Items);
+  inherited;
+end;
+
 function TProperties.Encrypt(const aText: String): String;
 begin
   Result:= EncryptText(aText);
@@ -495,13 +512,15 @@ function TProperties.FindProperty(aAlias: String): TddProperty;
 var
   i: Integer;
 begin
-   Result:= nil;
-   for i:= 0 to Pred(Count) do
-    if AnsiSameText(Items[i].Alias, aAlias) then
-    begin
-     Result:= Items[i];
-     break
-    end;
+ Result:= nil;
+ for i:= 0 to Pred(Count) do
+   if AnsiSameText(Items[i].Alias, aAlias) then
+   begin
+    Result:= Items[i];
+    break
+   end;
+ if Result = nil then
+  raise Exception.CreateFmt('Отсутствует указанное свойство %s', [aAlias]);
 end;
 
 function TProperties.GetHints(Alias: String): String;
@@ -667,6 +686,13 @@ begin
   Result:= FindProperty(Alias);
 end;
 
+function TProperties.pm_GetChoiceItems(Alias: String): TStrings;
+begin
+  f_ChoiceItems.Clear;
+  FindProperty(Alias).GetChoiceItems(f_ChoiceItems);
+  Result:= f_ChoiceItems;
+end;
+
 function TProperties.pm_GetCount: Integer;
 begin
  Result:= f_Items.Count;
@@ -692,14 +718,17 @@ var
   l_Prop: TddProperty;
 begin
   l_Prop:= FindProperty(Alias);
-  if l_Prop = nil then
-   raise Exception.CreateFmt('Отсутствует указанное свойство %s', [Alias]);
   l_Prop.Assign(aValue);
 end;
 
 procedure TProperties.pm_SetChanged(const Value: Boolean);
 begin
  f_Changed := Value;
+end;
+
+procedure TProperties.pm_SetChoiceItems(Alias: String; const Value: TStrings);
+begin
+  FindProperty(Alias).SetChoiceItems(Value);
 end;
 
 procedure TProperties.pm_SetValues(Alias: String; const Value: Variant);
@@ -824,6 +853,15 @@ begin
  inherited;
 end;
 
+procedure TddProperty.GetChoiceItems(aItems: TStrings);
+var
+  i: Integer;
+begin
+  aItems.Clear;
+  for I := 0 to Pred(ListItemsCount) do
+   aItems.Add(ListItems[i].Values['Caption'])
+end;
+
 function TddProperty.pm_GetItems(Index: Integer): TProperties;
 begin
  Result:= nil;
@@ -881,6 +919,24 @@ begin
   l_Cur:= l_Next;
   l_Next:= l_Cur.Next;
   FreeAndNil(l_Cur);
+ end;
+end;
+
+procedure TddProperty.SetChoiceItems(aItems: TStrings);
+var
+ i: Integer;
+ l_Index: Integer;
+begin
+ FreeAndNil(f_ListItem);
+ f_ListItem:= TProperties.Create;
+ f_ListItem.Define('id', 'id', ptInteger, False);
+ f_ListItem.Define('caption', 'caption', ptString, False);
+ f_ListItems.Clear;
+ for I := 0 to Pred(aItems.Count) do
+ begin
+  l_Index:= AddItem;
+  ListItems[l_Index].Values['id']:= i;
+  ListItems[l_Index].Values['caption']:= aItems[i];
  end;
 end;
 

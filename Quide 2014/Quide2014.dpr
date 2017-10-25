@@ -1,6 +1,7 @@
 program Quide2014;
 
 uses
+  FastMM4,
   Forms,
   Main in 'Main.pas' {MainForm},
   DesignProp in 'DesignProp.pas' {DesignerProperties},
