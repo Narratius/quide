@@ -33,6 +33,9 @@ var
 
 implementation
 
+Uses
+ Math;
+
 {$R *.dfm}
 
 function TPropDialog.Execute(var aProp: TProperties): Boolean;
@@ -42,8 +45,8 @@ begin
  if IsPositiveResult(ShowModal) then
  begin
    Result:= True;
-   Тут все падает
-   aProp.Assign(Properties);
+   //Тут все падает
+   aProp:= Properties;
  end;
 end;
 
@@ -79,6 +82,7 @@ procedure TPropDialog.ResizePanel;
 begin
  // Подогнать панель и диалог под контролы
  { TODO : Нужно реализовать, иначе фигня, а не диалог }
+   Height:= Max(f_WorkPanel.Height, Height);
 end;
 
 procedure TPropDialog.SetProperties(const Value: TProperties);

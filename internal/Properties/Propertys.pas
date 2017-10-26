@@ -294,13 +294,13 @@ end;
 }
 function TddProperty.AddItem: Integer;
 var
- l_ListItem: TProperties;
+ l_Item: TProperties;
 begin
  Result:= -1;
  if PropertyType in [ptList, ptChoice] then
  begin
-   l_ListItem:= f_ListItem.Clone;
-   Result:= f_ListItems.Add(l_ListItem);
+   l_Item:= f_ListItem.Clone;
+   Result:= f_ListItems.Add(l_Item);
  end;
 end;
 
@@ -329,10 +329,12 @@ begin
    f_ReadOnly:= TddProperty(Source).ReadOnly;
    if PropertyType in [ptList, ptChoice] then
    begin
-    ListItem:= TddProperty(Source).ListItem;
+    if f_ListItem <> nil then
+      FreeAndNil(f_ListItem);
+    f_ListItem:= TddProperty(Source).ListItem.Clone;
     // SubItems
     for i := 0 to TddProperty(Source).f_ListItems.Count-1 do
-     f_ListItems.Add(TddProperty(Source).f_ListItems[i]);
+     f_ListItems.Add(TddProperty(Source).f_ListItems[i].Clone);
    end;
   end
   else
@@ -1005,6 +1007,8 @@ begin
  if f_ListItems = nil then
  begin
    f_ListItems.Create;
+   if f_ListItem <> nil then
+     FreeAndNil(f_ListItem);
    f_ListItem:= TProperties.Create;
    f_ListItem.Define('Caption', 'Название', ptString);
  end; // f_ListItems
