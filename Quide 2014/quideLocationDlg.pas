@@ -1,4 +1,4 @@
-unit quideLocationDlg;
+Unit quideLocationDlg;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   quideLocations, System.Actions, Vcl.ActnList,
   Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.ToolWin, Vcl.ActnCtrls,
-  Vcl.ActnMenus, Vcl.ExtCtrls, PropertiesControls, Vcl.StdCtrls, quideActions,
+  Vcl.ActnMenus, Vcl.ExtCtrls, PropertiesControls, Vcl.StdCtrls, quideActions, quideScenarios,
   Vcl.Menus;
 
 type
@@ -31,6 +31,7 @@ type
     procedure actEditButtonExecute(Sender: TObject);
     procedure actVariableExecute(Sender: TObject);
   private
+    f_Scenario: TquideScenario;
     FLocation: TquideLocation;
     f_Header : TPropertiesPanel;
     f_Actions: TPanel;
@@ -43,7 +44,7 @@ type
     procedure GetActionsValues;
   public
     { Public declarations }
-   function Execute(aLocation: TquideLocation): Boolean;
+   function Execute(aLocation: TquideLocation; theScenario: TquideScenario): Boolean;
    property Location: TquideLocation read FLocation write SetLocation;
   end;
 
@@ -66,16 +67,14 @@ begin
  // Добавляем кнопку
  l_Loc:= ''; l_Cap:= '';
  { TODO : Подтянуть список существующих локаций или создать новую }
- if ButtonEditDlg(l_Cap, l_Loc, nil) then
-
- //if InputQuery('Выбор локации', 'Выберите локацию', l_Loc) then
- begin
-  l_Act:= fLocation.AddAction(atButton);
-  TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
-  TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
-  TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
-  AddAction(l_Act);
- end;
+  if ButtonEditDlg(l_Cap, l_Loc, f_Scenario.LocationsNames) then
+  begin
+   l_Act:= fLocation.AddAction(atButton);
+   TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
+   TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
+   TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
+   AddAction(l_Act);
+  end;
 end;
 
 procedure TquideLocationDialog.actEditButtonExecute(Sender: TObject);
@@ -116,6 +115,9 @@ begin
  else
   l_Top:= 0;
  // Добавляем панель и контролы
+ if aAction.ActionType = atVariable  then
+  //aAction.ChoiceItems['VarList']:= f_Scenario.VariablesNames;
+  aAction.AliasItems['VarList'].SetChoice(f_Scenario.AliasItems['Variables']);
  l_Actions:= TPropertiesPanel.Create(Self);
  with l_Actions do
  begin
@@ -164,9 +166,10 @@ begin
  f_Actions.Caption:= '';
 end;
 
-function TquideLocationDialog.Execute(aLocation: TquideLocation): Boolean;
+function TquideLocationDialog.Execute(aLocation: TquideLocation; theScenario: TquideScenario): Boolean;
 begin
  Result:= False;
+ f_Scenario:= theScenario;
  Location:= aLocation;
  if IsPositiveResult(ShowModal) then
  begin

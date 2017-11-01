@@ -183,7 +183,7 @@ begin
   inherited Create;
   f_Variable := TquideVariable.Create();
   ActionType:= atVariable;
-  DefineChoice('Variables', '');
+  DefineChoice('VarList', '');
   DefineString('VarValue', '=');
   NewLines['VarValue']:= False;
 end;

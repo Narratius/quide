@@ -75,7 +75,7 @@ begin
   inherited;
   f_Chapters.Clear;
   f_Inventory.Clear;
-  //f_Variables.Clear;
+  // переменные теперь в свойствах...
   f_Chapters.Clear;
   f_LocationsNames.Clear;
   f_VariablesNames.Clear;
@@ -84,7 +84,12 @@ end;
 constructor TquideScenario.Create;
 begin
   inherited Create;
+  f_Inventory := TObjectList<TquideInventoryItem>.Create();
+  f_VariablesNames := TStringList.Create;
+  f_LocationsNames := TStringList.Create;
+  f_Chapters := TObjectList<TquideChapter>.Create();
   Define('Author', 'Автор', ptString);
+  DefineChoice('Start', 'Начальная локация');
   DefineList('Variables', 'Переменные', True,
     NewProperty('Caption', 'Название', ptString,
     NewChoiceProperty('VarType', 'Тип',  // vtNumeric, vtText, vtBoolean, vtEnum
@@ -95,10 +100,6 @@ begin
       nil)))),
     NewProperty('Value', 'Значение', ptString,
     nil))));
-  f_Inventory := TObjectList<TquideInventoryItem>.Create();
-  f_VariablesNames := TStringList.Create;
-  f_LocationsNames := TStringList.Create;
-  f_Chapters := TObjectList<TquideChapter>.Create();
   Changed:= False;
 end;
 
@@ -232,7 +233,17 @@ begin
 end;
 
 function TquideScenario.pm_GetLocationsNames: TStrings;
+var
+ i, j: Integer;
+ l_Chap: TquideChapter;
 begin
+  f_LocationsNames.Clear;
+  for I := 0 to ChaptersCount-1 do
+  begin
+   l_Chap:= Chapters[i];
+   for j := 0 to l_Chap.LocationsCount-1 do
+    f_LocationsNames.Add(l_Chap.Locations[j].Caption);
+  end;
   Result := f_LocationsNames;
 end;
 
@@ -248,7 +259,7 @@ end;
 
 function TquideScenario.pm_GetVariablesNames: TStrings;
 begin
-  Result := f_VariablesNames;
+  Result := ChoiceItems['Variables']
 end;
 
 procedure TquideScenario.SaveToFile(const aFileName: String);
@@ -271,11 +282,6 @@ begin
  for I := 0 to ChaptersCount-1 do
   Chapters[i].SaveToXML(l_Node.AddChild('Chapter'));
  // Переменные
- (*
- l_Node:= l_Scenario.AddChild('Variables');
- for I := 0 to VariablesCount-1 do
-  Variables[i].SaveToXML(l_Node.AddChild('Variable'), False);
- *)
  l_Doc.SaveToFile(aFileName);
 end;
 

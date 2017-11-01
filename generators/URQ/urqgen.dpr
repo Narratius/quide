@@ -68,7 +68,7 @@ var
  l_MDoc: IXmlDocument;
  l_Root: IXmlNode;
  l_Node, l_Attr: IXmlNode;
- l_Locations, l_Chapters, l_Actions: IXmlNode;
+ l_Locations, l_Chapters, l_Actions, l_Variables: IXmlNode;
  l_List: IXmlNodeList;
  I, j : Integer;
 
@@ -118,6 +118,11 @@ var
   QWriteLn('btn '+LocName(l_Target)+', '+l_Text);
  end;
 
+ procedure WriteVariable(aVar: IXmlNode);
+ begin
+
+ end;
+
  procedure WriteLocation(aLocation: IXmlNode);
  var
   l_List: IXmlNodeList;
@@ -129,6 +134,9 @@ var
   begin
    if AnsiSameText(l_List[i].GetAttr('Type'), 'Button') then
     WriteButton(l_List[i])
+   else
+   if AnsiSameText(l_List[i].GetAttr('Type'), 'Variable') then
+    WriteVariable(l_List[i])
    else
     WriteAction(l_List[I]);
   end;
@@ -187,12 +195,15 @@ begin
     else
      QWriteLn('goto '+l_Start);
 
+    l_Variables:= l_Root.SelectSingleNode('Chapters');
+
     for I := 0 to Pred(l_Chapters.ChildNodes.Count) do
     begin
       l_Locations:= l_Chapters.ChildNodes[i].SelectSingleNode('Locations');
       l_List := l_Locations.ChildNodes;
       for j := 0 to Pred(l_List.Count) do
        WriteLocation(l_List.Item[j]);
+
     end; // for i
    finally
     l_FS.Free;

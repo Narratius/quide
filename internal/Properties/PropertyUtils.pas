@@ -22,7 +22,10 @@ function NewChoice(aID: Integer; aCaption: String; aNext: TddChoiceLink = nil): 
 function LinkToProperties(aLink: TddPropertyLink): TProperties;
 
 function ShowPropDialog(const aCaption: String; aProperties: TProperties;
-    aLabelTop: Boolean = False): Boolean;
+    aLabelTop: Boolean = False): Boolean; overload;
+
+function ShowPropDialog(const aCaption: String; aProperty: TddProperty;
+    aLabelTop: Boolean = False): Boolean; overload;
 
 procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
 
@@ -114,6 +117,30 @@ begin
   Free;
  end;
 end;
+
+
+function ShowPropDialog(const aCaption: String; aProperty: TddProperty; aLabelTop: Boolean = False): Boolean;
+var
+ l_Prop: TProperties;
+ l_P: TddProperty;
+begin
+ { TODO : Нужно клонировать aProperty }
+ l_Prop:= TProperties.Create;
+ try
+  l_Prop.Add(aProperty);
+  with TPropDialog.Create(Application) do
+  try
+   LabelTop:= aLabelTop;
+   Caption:= aCaption;
+   Result:= Execute(l_Prop);
+  finally
+   Free;
+  end;
+ finally
+  FreeAndNil(l_Prop);
+ end;
+end;
+
 
 
 procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);

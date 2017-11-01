@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  SimpleGraph, Dialogs, ExtDlgs,
+  SimpleGraph, Dialogs, ExtDlgs, quideConfig,
   Menus, ActnList, ImgList, StdCtrls, ComCtrls, ToolWin, JPEG, Buttons,
   System.Actions, quideScenarios, System.ImageList, PngImageList;
 
@@ -167,25 +167,17 @@ type
     MakeAllSelectable1: TMenuItem;
     OptionsConfirmDeletion: TAction;
     N19: TMenuItem;
-    Prefernces1: TMenuItem;
-    ConfirmDeletion1: TMenuItem;
-    ConfirmHookingLinking1: TMenuItem;
     ViewWholeGraph: TAction;
     FullGraph1: TMenuItem;
     ExportBitmap: TAction;
     Export1: TMenuItem;
     AsMetafile1: TMenuItem;
     AsBitmap1: TMenuItem;
-    FileMerge: TAction;
     Merge1: TMenuItem;
     ViewPan: TAction;
     N20: TMenuItem;
     PanMode1: TMenuItem;
     ClipboardNative: TAction;
-    ClipboardFormats1: TMenuItem;
-    Native1: TMenuItem;
-    Bitmap1: TMenuItem;
-    Metafile1: TMenuItem;
     EditAlign: TAction;
     ViewFixScrolls: TAction;
     FixScrollBars1: TMenuItem;
@@ -206,6 +198,10 @@ type
     N21: TMenuItem;
     N22: TMenuItem;
     N23: TMenuItem;
+    FileGenerate: TAction;
+    N24: TMenuItem;
+    FileOptions: TAction;
+    N25: TMenuItem;
     procedure FileNewExecute(Sender: TObject);
     procedure FileOpenExecute(Sender: TObject);
     procedure FileSaveExecute(Sender: TObject);
@@ -295,7 +291,6 @@ type
     procedure EditPasteUpdate(Sender: TObject);
     procedure EditSelectAllUpdate(Sender: TObject);
     procedure EditSendToBackUpdate(Sender: TObject);
-    procedure FileMergeUpdate(Sender: TObject);
     procedure FilePrintUpdate(Sender: TObject);
     procedure FileSaveAsUpdate(Sender: TObject);
     procedure FileSaveUpdate(Sender: TObject);
@@ -319,10 +314,12 @@ type
     procedure ScenarioGraphObjectDblClick(Graph: TSimpleGraph;
       GraphObject: TGraphObject);
     procedure FilePropertiesExecute(Sender: TObject);
+    procedure FileGenerateExecute(Sender: TObject);
+    procedure FileOptionsExecute(Sender: TObject);
   private
     TargetPt: TPoint;
     IsReadonly: Boolean;
-
+    f_AppConfig: TquideConfig;
     f_Scenario: TquideScenario;
     function IsGraphSaved: Boolean;
     procedure ShowHint(Sender: TObject);
@@ -332,6 +329,8 @@ type
     procedure DestroyScript;
     procedure CheckConnections(const OldCaption, NewCaption: String);
     procedure FindFreePlace(var aPlace: TRect);
+    procedure CreateConfig;
+    procedure DestroyConfig;
     // Quide
   end;
 
@@ -344,7 +343,7 @@ implementation
 
 uses
   Clipbrd, Printers, DesignProp, ObjectProp, NodeProp, LinkProp, UsageHelp,
-  AboutDelphiArea, AlignDlg, SizeDlg,
+  AboutDelphiArea, AlignDlg, SizeDlg, ShellAPI,
   PropertyUtils,
   quideLocations, quideLocationDlg, quideSteps
   {$IFDEF Debug}, ddLogFile{$ENDIF};
@@ -516,7 +515,7 @@ begin
      with TquideLocationDialog.Create(Self) do
      try
        l_OldCaption:= l_Loc.Caption;
-       if Execute(l_Loc) then
+       if Execute(l_Loc, f_Scenario) then
        begin
         ScenarioGraph.Modified:= True;
         GraphObject.Text:= l_Loc.Caption;
@@ -552,6 +551,7 @@ begin
    Caption:= Application.Title;
    SaveDialog.FileName:= SUntitled;
   end;
+ CreateConfig;
  MakeScript;
  {$IFDEF Debug}
  Msg2Log('Start session');
@@ -560,6 +560,7 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+ DestroyConfig;
  DestroyScript;
 end;
 
@@ -598,9 +599,9 @@ begin
   end;
 end;
 
-procedure TMainForm.FileMergeUpdate(Sender: TObject);
+procedure TMainForm.FileOptionsExecute(Sender: TObject);
 begin
-  FileMerge.Enabled := not IsReadonly and (ScenarioGraph.Objects.Count > 0);
+  ShowPropDialog('Настройки приложения', f_AppConfig);
 end;
 
 procedure TMainForm.FileMergeExecute(Sender: TObject);
@@ -678,6 +679,7 @@ end;
 
 procedure TMainForm.FilePropertiesExecute(Sender: TObject);
 begin
+  f_Scenario.ChoiceItems['Start']:= f_Scenario.LocationsNames;
   f_Scenario.Changed:= ShowPropDialog('Свойства игры', f_Scenario);
 end;
 
@@ -702,6 +704,19 @@ end;
 procedure TMainForm.FileExitExecute(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TMainForm.FileGenerateExecute(Sender: TObject);
+var
+ l_File, l_Param: String;
+begin
+  { Выбрать один из установленных генераторов, сохранить сценарий и выполнить генерацию}
+  if f_AppConfig.AliasItems['Generators'].ListItemsCount > 0 then
+  begin
+   l_File:= f_AppConfig.AliasItems['Generators'].ListItems[0].Values['Path'];
+   l_Param:= ChangeFileExt(SaveDialog.FileName, '.xml');
+   ShellExecute(Handle, 'open', PChar(l_File), PChar(l_Param), nil, SW_SHOWNORMAL);
+  end;
 end;
 
 procedure TMainForm.EditCutUpdate(Sender: TObject);
@@ -844,6 +859,18 @@ begin
   ClipboardNative.Checked := cfNative in ScenarioGraph.ClipboardFormats;
 end;
 
+procedure TMainForm.CreateConfig;
+begin
+  f_AppConfig:= TquideConfig.Create;
+  f_AppConfig.LoadFromFile;
+end;
+
+procedure TMainForm.DestroyConfig;
+begin
+  f_AppConfig.SaveToFile;
+  FreeAndNil(f_AppConfig);
+end;
+
 procedure TMainForm.DestroyScript;
 begin
  FreeAndNil(f_Scenario);
@@ -926,6 +953,7 @@ end;
 procedure TMainForm.actScenarioPropertiesExecute(Sender: TObject);
 begin
  // Редактирование свойств сценария
+  f_Scenario.ChoiceItems['Start']:= f_Scenario.LocationsNames;
   ShowPropDialog('Свойства сценария', f_Scenario);
 end;
 
@@ -956,7 +984,7 @@ begin
 
  with TquideLocationDialog.Create(Self) do
  try
-   if Execute(l_Loc) then
+   if Execute(l_Loc, f_Scenario) then
    begin
     FindFreePlace(B);
     l_N1:= ScenarioGraph.InsertNode(B, TRoundRectangularNode);
@@ -1225,7 +1253,7 @@ begin
       if L_loc <> nil then
        with TquideLocationDialog.Create(Self) do
        try
-         if Execute(l_Loc) then
+         if Execute(l_Loc, f_Scenario) then
          begin
           N1.Text:= l_Loc.Caption;
           l_Loc.Values['GraphObject']:= N1.ID;

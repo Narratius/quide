@@ -31,6 +31,8 @@ type
     procedure MakeStringControl(aProperty: TddProperty); virtual;
     procedure MakePasswordControl(aProperty: TddProperty); virtual;
     procedure MakeTextControl(aProperty: TddProperty); virtual;
+    procedure MakeStaticText(aProperty: TddProperty); virtual;
+    procedure MakeDivider(aProperty: TddProperty); virtual;
     // ”становка значений в контролы
     procedure SetActionValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetBooleanValue(aProperty: TddProperty; aControl: TControl); virtual;
@@ -74,7 +76,7 @@ const
 implementation
 
 uses
- Variants, Vcl.ComCtrls, SySutils,
+ Variants, Vcl.ComCtrls, SySutils, Math,
  SizeableTypes, PropertiesListControl
  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
@@ -93,7 +95,7 @@ var
  l_CtrlRec: TControlRec;
  l_CurCtrl, l_FirstCtrl: TControl;
  l_Width, l_LblWidth: Integer;
- l_Left, l_Top: Integer;
+ l_Left, l_Top, l_LeftIndent: Integer;
 begin
  { TODO : “ут все ломаетс€ }
  //exit;
@@ -105,10 +107,7 @@ begin
   Ќужно подсчитать, сколько контролов после текущего расположено на одной строке
   ѕодсчитать ширины и выровн€ть пропорционально, если AutoSize или друг за другом, если нет
  }
- l_FirstCtrl:= nil;
- l_CurCtrlIdx:= 0;
- l_LblWidth:= 0;
- l_Count:= 0;
+ l_LeftIndent:= 0;
  {$IFDEF Debug}
  Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
  {$ENDIF}
@@ -117,10 +116,30 @@ begin
  begin
   if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
   begin
-   l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
-   //l_Count:= 1;
    if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
+   begin
      l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
+     l_LeftIndent:= Max(l_LeftIndent, l_LblWidth);
+   end;
+  end;
+  Inc(l_CurCtrlIdx);
+ end; // while l_CurCtrlIdx < ControlCount
+ l_FirstCtrl:= nil;
+ l_LblWidth:= 0;
+ l_Count:= 0;
+ l_CurCtrlIdx:= 0;
+ while l_CurCtrlIdx < ControlCount do // цикл по свойствам
+ begin
+  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
+  begin
+   l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
+   if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
+   begin
+    l_LblWidth:= Max(LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width, l_LeftIndent);
+    if (f_Controls[l_CurCtrlIdx].Size = csAutoSize) and (l_FirstCtrl.Left < l_LeftIndent) then
+     l_FirstCtrl.Width:= l_FirstCtrl.Width - (l_LeftIndent - l_FirstCtrl.Left) - 2*cIndent;
+    l_FirstCtrl.Left:= l_LeftIndent + 2*cIndent;
+   end;
   end
   else
   if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline) then
@@ -154,7 +173,7 @@ begin
       l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+1)) div l_Count;
       l_FirstCtrl.Width:= l_Width;
       l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left+cIndent;
-      for j := l_Cur to l_Count do
+      for j := l_Cur to l_Cur + l_Count-2 do
       begin
        if f_Controls[j].LabelPosition = cpInline then
        begin
@@ -174,10 +193,6 @@ begin
      end; // l_Count > 0
    end; // l_FirstCtrl <> nil
   end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
-  {$IFDEF Debug}
-  // with ControlByTag(f_Controls[l_CurCtrlIdx].Tag) do
-  //  Msg2Log('Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
-  {$ENDIF}
   Inc(l_CurCtrlIdx);
  end; //while i
  Height:= ControlByTag(f_Controls[Pred(ControlCount)].Tag).Top + ControlByTag(f_Controls[Pred(ControlCount)].Tag).Height + cIndent;
@@ -370,6 +385,11 @@ begin
  end; // with
 end;
 
+procedure TPropertiesPanel.MakeDivider(aProperty: TddProperty);
+begin
+
+end;
+
 procedure TPropertiesPanel.MakeIntegerControl(aProperty: TddProperty);
 begin
  MakeCustomControl(TLabel, aProperty.NewLine);
@@ -425,7 +445,9 @@ begin
     ptAction: MakeActionControl(aProperty);
     ptList: MakeListControl(aProperty);
     ptProperties: MakePropertiesControl(aProperty);
-    ptPassword: MakePAsswordControl(aProperty);
+    ptPassword: MakePasswordControl(aProperty);
+    ptStaticText: MakeStaticText(aProperty);
+    ptDivider: MakeDivider(aProperty);
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
@@ -454,6 +476,16 @@ begin
  end;
 end;
 
+
+procedure TPropertiesPanel.MakeStaticText(aProperty: TddProperty);
+begin
+ MakeCustomControl(TStaticText, aProperty.NewLine);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  Caption:= aProperty.Caption;
+  LabelPosition:= cpNone;
+ end;
+end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TddProperty);
 begin

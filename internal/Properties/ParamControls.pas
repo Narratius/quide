@@ -121,7 +121,10 @@ begin
     begin
      TCheckBox(l_C).Caption:= aControls[i].Caption;
      TCheckBox(l_C).OnClick:= aControls[i].OnChange;
-    end;
+    end
+    else
+    if l_C is TStaticText then
+     TStaticText(l_C).Caption := aControls[i].Caption;
     // Это зачем?
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);

@@ -17,7 +17,9 @@ type
                     ptAction,     // TButton
                     ptList,       // TListBox
                     ptProperties, // TScrollBox (Вложенные свойства)
-                    ptPassword    // TEdit с PasswordChar
+                    ptPassword,   // TEdit с PasswordChar
+                    ptStaticText, // TStaticText
+                    ptDivider     // TPanel Height := 1
                     );
 
   TddChoiceLink = class;
@@ -38,11 +40,13 @@ type
     f_Hint: String;
     f_OnChange: TNotifyEvent;
     f_ReadOnly: Boolean;  // Элементы списка
+    f_ChoiceProp: TddProperty;
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
     function pm_GetItems(Index: Integer): TProperties;
     procedure pm_SetItem(const Value: TProperties);
+    procedure MakeChoiceItem;
   public
     constructor Create(const aAlias, aCaption: String; aType: TddPropertyType;
         aVisible: Boolean = True); reintroduce;
@@ -56,10 +60,12 @@ type
     destructor Destroy; override;
     function AddItem: Integer; overload;
     function AddItem(aItem: TProperties): Integer; overload;
-    procedure DeleteItem(Index: Integer);
     procedure Assign(Source: TPersistent); override;
+    procedure DeleteItem(Index: Integer);
+    procedure Clear;
     procedure SetItem(aItem: TddPropertyLink);
-    procedure SetChoice(aChoiceDef: TddChoiceLink);
+    procedure SetChoice(aChoiceDef: TddChoiceLink); overload;
+    procedure SetChoice(aProp: TddProperty); overload;
     procedure GetChoiceItems(aItems: TStrings);
     procedure SetChoiceItems(aItems: TStrings);
     property Alias: string read f_Alias write f_Alias;
@@ -154,10 +160,10 @@ type
     procedure DefineInteger(const aAlias, aCaption: String);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure DefinePassword(const aAlias, aCaption: String);
-    //procedure DefineProperties(const aAlias, aCaption: String);
+    procedure DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
     procedure DefineString(const aAlias, aCaption: String);
     procedure DefineText(const aAlias, aCaption: String);
-
+    procedure DefineStaticText(aCaption: String);
 
     procedure IterateAll(aFunc: TddPropertyFunc);
     procedure LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);
@@ -219,7 +225,8 @@ Uses
 const
  PropertyTypeNames: Array[TddPropertyType] of String = (
   'Nothing', 'Char', 'String', 'Integer', 'Text',
-  'Boolean', 'Choice', 'Action', 'List', 'Properties', 'Password');
+  'Boolean', 'Choice', 'Action', 'List', 'Properties', 'Password',
+  'StaticText', 'Divider');
 
 function PropertyType2String(aType: TddPropertyType): String;
 begin
@@ -341,11 +348,16 @@ begin
    inherited;
 end;
 
+procedure TddProperty.Clear;
+begin
+ f_ListItems.Clear;
+end;
+
 constructor TddProperty.Create;
 begin
   inherited Create;
-  if (aAlias = '') or (aAlias[1] in ['0'..'9']) then
-   raise Exception.Create('Alias не должен быть пустым или начинаться с цифры');
+  if (aAlias = '') or CharInSet(aAlias[1], ['0'..'9']) then
+   raise Exception.Create('Alias не может быть пустым или начинаться с цифры');
   Alias:= aAlias;
   Caption:= aCaption;
   PropertyType:= aType;
@@ -480,6 +492,16 @@ begin
   Define(aAlias, aCaption, ptPassword, True);
 end;
 
+procedure TProperties.DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
+begin
+  Define(aAlias, aCaption, ptProperties);
+end;
+
+procedure TProperties.DefineStaticText(aCaption: String);
+begin
+  Define(Format('StaticText%d', [Succ(f_Items.Count)]), aCaption, ptStaticText, True);
+end;
+
 procedure TProperties.DefineString(const aAlias, aCaption: String);
 begin
   Define(aAlias, aCaption, ptString, True);
@@ -572,8 +594,7 @@ var
   i, j, k: Integer;
   l_E: IXMLNode;
   l_Strings: TStrings;
-  l_Item, l_Value: IXMLNode;
-  l_Prop: TddProperty;
+  l_Item: IXMLNode;
   l_SubItem: TProperties;
   l_Type: TddPropertyType;
   l_Alias, l_Caption: String;
@@ -901,17 +922,22 @@ begin
   f_PropertyType := Value;
 end;
 
-procedure TddProperty.SetChoice(aChoiceDef: TddChoiceLink);
-var
- l_Cur, l_Next: TddChoiceLink;
- l_Index: Integer;
+procedure TddProperty.MakeChoiceItem;
 begin
- // Раскручиваем цепочку и формируем список. Можно использовать внутренний список
  FreeAndNil(f_ListItem);
  f_ListItem:= TProperties.Create;
  f_ListItem.Define('id', 'id', ptInteger, False);
  f_ListItem.Define('caption', 'caption', ptString, False);
  f_ListItems.Clear;
+end;
+
+procedure TddProperty.SetChoice(aChoiceDef: TddChoiceLink);
+var
+ l_Cur, l_Next: TddChoiceLink;
+ l_Index: Integer;
+begin
+ MakeChoiceItem;
+ // Раскручиваем цепочку и формируем список. Можно использовать внутренний список
  l_Next:= aChoiceDef;
  while l_Next <> nil do
  begin
@@ -924,16 +950,27 @@ begin
  end;
 end;
 
+procedure TddProperty.SetChoice(aProp: TddProperty);
+var
+  I: Integer;
+  l_Index: Integer;
+begin
+ f_ChoiceProp:= aProp;
+ MakeChoiceItem;
+ for I := 0 to f_ChoiceProp.ListItemsCount-1 do
+ begin
+  l_Index:= AddItem;
+  ListItems[l_Index].Values['id']:= i;
+  ListItems[l_Index].Values['caption']:= f_ChoiceProp.ListItems[i].Values['Caption'];
+ end;
+end;
+
 procedure TddProperty.SetChoiceItems(aItems: TStrings);
 var
  i: Integer;
  l_Index: Integer;
 begin
- FreeAndNil(f_ListItem);
- f_ListItem:= TProperties.Create;
- f_ListItem.Define('id', 'id', ptInteger, False);
- f_ListItem.Define('caption', 'caption', ptString, False);
- f_ListItems.Clear;
+ MakeChoiceItem;
  for I := 0 to Pred(aItems.Count) do
  begin
   l_Index:= AddItem;
@@ -943,23 +980,9 @@ begin
 end;
 
 procedure TddProperty.SetItem(aItem: TddPropertyLink);
-//var
-// l_Item: TddPropertyLink;
-// l_Next: TddPropertyLink;
 begin
  FreeAndNil(f_ListItem);
  f_ListItem:= LinkToProperties(aItem);
-(*
- f_ListItem:= TProperties.Create;
- l_Next:= aItem;
- while l_Next <> nil do
- begin
-   f_ListItem.Add(l_Next.Item);
-   l_Item:= l_Next;
-   l_Next:= l_Item.Next;
-   FreeAndNil(l_Item);
- end;
-*)
 end;
 
 

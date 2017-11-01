@@ -16,7 +16,8 @@ uses
   quideGUILink in 'quideGUILink.pas',
   quideLocationDlg in 'quideLocationDlg.pas' {quideLocationDialog},
   quideActionControls in 'quideActionControls.pas',
-  quideButtonEditDlg in 'quideButtonEditDlg.pas' {ButtonEditDialog};
+  quideButtonEditDlg in 'quideButtonEditDlg.pas' {ButtonEditDialog},
+  quideConfig in 'quideConfig.pas';
 
 {$R *.res}
 

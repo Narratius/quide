@@ -2,8 +2,8 @@ object quideLocationDialog: TquideLocationDialog
   Left = 0
   Top = 0
   Caption = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1077' '#1083#1086#1082#1072#1094#1080#1080
-  ClientHeight = 249
-  ClientWidth = 527
+  ClientHeight = 499
+  ClientWidth = 848
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object quideLocationDialog: TquideLocationDialog
   object ActionMainMenuBar1: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 527
+    Width = 848
     Height = 25
     UseSystemFont = False
     ActionManager = ActionManager
@@ -37,17 +37,17 @@ object quideLocationDialog: TquideLocationDialog
   object WorkPanel: TPanel
     Left = 0
     Top = 25
-    Width = 440
-    Height = 224
+    Width = 761
+    Height = 474
     Align = alClient
     PopupMenu = PopupMenu1
     TabOrder = 1
   end
   object Panel1: TPanel
-    Left = 440
+    Left = 761
     Top = 25
     Width = 87
-    Height = 224
+    Height = 474
     Align = alRight
     TabOrder = 2
     object Button1: TButton
@@ -95,8 +95,8 @@ object quideLocationDialog: TquideLocationDialog
           end>
         ActionBar = ActionMainMenuBar1
       end>
-    Left = 32
-    Top = 168
+    Left = 784
+    Top = 152
     StyleName = 'Platform Default'
     object actNewText: TAction
       Category = #1044#1077#1081#1089#1090#1074#1080#1103
@@ -122,8 +122,8 @@ object quideLocationDialog: TquideLocationDialog
     end
   end
   object PopupMenu1: TPopupMenu
-    Left = 328
-    Top = 161
+    Left = 784
+    Top = 97
     object MenuText: TMenuItem
       Action = actNewText
     end
