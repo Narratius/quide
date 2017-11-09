@@ -156,7 +156,8 @@ type
     procedure DefineBoolean(const aAlias, aCaption: String);
     procedure DefineButton(const aAlias, aCaption: String; aEvent: TNotifyEvent);
     procedure DefineChar(const aAlias, aCaption: String);
-    procedure DefineChoice(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddChoiceLink = nil);
+    procedure DefineChoice(const aAlias, aCaption: String; aItem: TddChoiceLink = nil); overload;
+    procedure DefineChoice(const aAlias, aCaption: String; aProp: TddProperty); overload;
     procedure DefineInteger(const aAlias, aCaption: String);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure DefinePassword(const aAlias, aCaption: String);
@@ -462,12 +463,20 @@ begin
   Define(aAlias, aCaption, ptChar, True);
 end;
 
-procedure TProperties.DefineChoice(const aAlias, aCaption: String;
-  aVisible: Boolean; aItem: TddChoiceLink);
+procedure TProperties.DefineChoice(const aAlias, aCaption: String; aProp: TddProperty);
 var
  l_P: TddProperty;
 begin
- Define(aAlias, aCaption, ptChoice, aVisible);
+ Define(aAlias, aCaption, ptChoice, True);
+ l_P:= AliasItems[aAlias];
+ l_P.SetChoice(aProp);
+end;
+
+procedure TProperties.DefineChoice(const aAlias, aCaption: String; aItem: TddChoiceLink);
+var
+ l_P: TddProperty;
+begin
+ Define(aAlias, aCaption, ptChoice, True);
  l_P:= AliasItems[aAlias];
  l_P.SetChoice(aItem);
 end;
@@ -664,8 +673,9 @@ begin
       else
       if l_Type = ptChoice then
       begin
+       { TODO : тут может быть линк на другое свойство, а не список }
        if LoadStruct then
-        DefineChoice(l_Alias, l_Caption, l_Visible);
+        DefineChoice(l_Alias, l_Caption);
        l_E:= l_Item.ChildNodes.FindNode('Value');
        for j := 0 to l_E.ChildNodes.Count-1 do
        begin

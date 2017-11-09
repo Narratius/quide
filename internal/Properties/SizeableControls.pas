@@ -113,7 +113,7 @@ begin
   l_Top:= cIndent + l_PrevControl.Top + l_PrevControl.Height;
   l_Left:= cIndent;
   l_PrevTop:= l_PrevControl.Top;
-  l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width  + cIndent;
+  l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width{  + cIndent};
  end
  else // первый контрол на форме
  begin
@@ -164,6 +164,8 @@ begin
  else
  if aCtrlPosition = cpInline then
  begin
+  aControl.Top:= l_PrevTop;
+  aControl.Left:= l_PrevLeft;
   case aLabelPosition of
     cpNone:
       begin
@@ -172,14 +174,10 @@ begin
       begin
         if aControl is TLabel then
         begin
-         aControl.Top:= l_PrevTop;
-         aControl.Left:= l_PrevLeft;
          aParent.Height:= aParent.Height + aControl.Height + cIndent;
         end
         else
         begin
-         aControl.Top:= l_PrevTop;
-         aControl.Left:= l_PrevLeft;
          aParent.Height:= aParent.Height + aControl.Height + cIndent;
         end;
       end; // cpNewLine
@@ -187,14 +185,10 @@ begin
       begin
         if aControl is TLabel then
         begin
-         aControl.Top:= l_PrevTop;
-         aControl.Left:= l_PrevLeft;
          aParent.Height:= aParent.Height + aControl.Height + cIndent;
         end
         else
         begin
-         aControl.Top:= l_PrevTop;
-         aControl.Left:= l_PrevLeft;
          aParent.Height:= aParent.Height + aControl.Height + cIndent;
         end;
       end; // cpInline

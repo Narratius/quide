@@ -26,10 +26,15 @@ type
     actEditButton: TAction;
     menuVariable: TMenuItem;
     actVariable: TAction;
+    actInventory: TAction;
+    menuInventary: TMenuItem;
+    actLogical: TAction;
+    N1: TMenuItem;
     procedure actNewTextExecute(Sender: TObject);
     procedure actButtonExecute(Sender: TObject);
     procedure actEditButtonExecute(Sender: TObject);
     procedure actVariableExecute(Sender: TObject);
+    procedure actLogicalExecute(Sender: TObject);
   private
     f_Scenario: TquideScenario;
     FLocation: TquideLocation;
@@ -94,6 +99,11 @@ begin
  end;
 end;
 
+procedure TquideLocationDialog.actLogicalExecute(Sender: TObject);
+begin
+ AddAction(fLocation.AddAction(atLogic));
+end;
+
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);
 begin
  // Добавляем текст
@@ -116,8 +126,10 @@ begin
   l_Top:= 0;
  // Добавляем панель и контролы
  if aAction.ActionType = atVariable  then
-  //aAction.ChoiceItems['VarList']:= f_Scenario.VariablesNames;
-  aAction.AliasItems['VarList'].SetChoice(f_Scenario.AliasItems['Variables']);
+  aAction.AliasItems['VarList'].SetChoice(f_Scenario.AliasItems['Variables'])
+ else
+ if aAction.ActionType = atInventory  then
+  aAction.AliasItems['InvList'].SetChoice(f_Scenario.AliasItems['Inventory']);
  l_Actions:= TPropertiesPanel.Create(Self);
  with l_Actions do
  begin

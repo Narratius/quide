@@ -709,13 +709,15 @@ end;
 procedure TMainForm.FileGenerateExecute(Sender: TObject);
 var
  l_File, l_Param: String;
+ l_Result: Cardinal;
 begin
   { ¬ыбрать один из установленных генераторов, сохранить сценарий и выполнить генерацию}
   if f_AppConfig.AliasItems['Generators'].ListItemsCount > 0 then
   begin
    l_File:= f_AppConfig.AliasItems['Generators'].ListItems[0].Values['Path'];
    l_Param:= ChangeFileExt(SaveDialog.FileName, '.xml');
-   ShellExecute(Handle, 'open', PChar(l_File), PChar(l_Param), nil, SW_SHOWNORMAL);
+   l_Result:= ShellExecute(Handle, 'open', PChar(l_File), PChar(l_Param), nil, SW_SHOWNORMAL);
+   ShowMessageFmt('%d', [l_Result]);
   end;
 end;
 
@@ -1235,7 +1237,7 @@ end;
 procedure TMainForm.SimpleGraphObjectDblClick(Graph: TSimpleGraph;
   GraphObject: TGraphObject);
 var
- N1: TGraphNode;
+ l_N: TGraphNode;
  LinkCount: Integer;
  l_Loc: TquideLocation;
 begin
@@ -1248,15 +1250,15 @@ begin
     LinkCount := ScenarioGraph.SelectedObjectsCount(TGraphLink);
     if LinkCount = 0 then
     begin
-      N1:= TGraphNode(ScenarioGraph.SelectedObjects[0]);
-      l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(N1.ID);
+      l_N:= TGraphNode(ScenarioGraph.SelectedObjects[0]);
+      l_Loc:= f_Scenario.Chapters[f_Scenario.ChaptersCount-1].FindLocationByGraph(l_N.ID);
       if L_loc <> nil then
        with TquideLocationDialog.Create(Self) do
        try
          if Execute(l_Loc, f_Scenario) then
          begin
-          N1.Text:= l_Loc.Caption;
-          l_Loc.Values['GraphObject']:= N1.ID;
+          l_N.Text:= l_Loc.Caption;
+          l_Loc.Values['GraphObject']:= l_N.ID;
          end;
        finally
          Free;

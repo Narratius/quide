@@ -74,7 +74,7 @@ begin
  case aActType of
    atNone: Result:= nil;
    atGoto: Result:= TquideJumpAction.Create;
-   atInventory: Result:= nil;
+   atInventory: Result:= TquideInventoryAction.Create;
    atLogic: Result:= TquideLogicalAction.Create;
    atText: Result:= TquideTextAction.Create;
    atVariable: Result:= TquideVariableAction.Create;

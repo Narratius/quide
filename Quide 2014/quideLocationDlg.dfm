@@ -120,6 +120,15 @@ object quideLocationDialog: TquideLocationDialog
       Caption = #1055#1077#1088#1077#1084#1077#1085#1085#1072#1103
       OnExecute = actVariableExecute
     end
+    object actInventory: TAction
+      Category = #1044#1077#1081#1089#1090#1074#1080#1103
+      Caption = #1048#1085#1074#1077#1085#1090#1072#1088#1100
+    end
+    object actLogical: TAction
+      Category = #1044#1077#1081#1089#1090#1074#1080#1103
+      Caption = #1057#1088#1072#1074#1085#1077#1085#1080#1077
+      OnExecute = actLogicalExecute
+    end
   end
   object PopupMenu1: TPopupMenu
     Left = 784
@@ -132,6 +141,12 @@ object quideLocationDialog: TquideLocationDialog
     end
     object menuVariable: TMenuItem
       Action = actVariable
+    end
+    object menuInventary: TMenuItem
+      Action = actInventory
+    end
+    object N1: TMenuItem
+      Action = actLogical
     end
   end
 end

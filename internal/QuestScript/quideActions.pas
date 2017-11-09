@@ -81,12 +81,16 @@ type
     property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
   end;
 
+  TquideInventoryAction = class(TquideAction)
+    constructor Create; override;
+  end;
+
 
 implementation
 
 Uses
  SysUtils,
- Propertys;
+ Propertys, PropertyUtils;
 
 
 
@@ -247,6 +251,21 @@ constructor TquideLogicalAction.Create;
 begin
   inherited;
   ActionType:= atLogic;
+  DefineChoice('What', 'Если');
+  DefineChoice('Condition', '',
+    NewChoice(0, 'равно',
+    NewChoice(1, 'не равно',
+    NewChoice(2, 'больше',
+    NewChoice(3, 'меньше',
+    NewChoice(4, 'больше или равно',
+    NewChoice(5, 'меньше или равно',
+    nil)))))));
+  DefineString('Value', '');
+  NewLines['Condition']:= False;
+  NewLines['Value']:= False;
+  DefineProperties('True', '');
+  DefineStaticText('Иначе');
+  DefineProperties('False', ''); (* *)
 end;
 
 { TquideButtonAction }
@@ -276,6 +295,19 @@ begin
   Define('Target', 'Локация для перехода', ptString, False); // Название локации для перехода
   ActionType:= atGoto;
 end;
+
+
+{ TquideInventoryAction }
+
+constructor TquideInventoryAction.Create;
+begin
+  inherited;
+  ActionType:= atInventory;
+  DefineChoice('InvList', '');
+  DefineString('InvValue', '=');
+  NewLines['InvValue']:= False;
+end;
+
 
 
 end.

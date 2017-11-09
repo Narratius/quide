@@ -99,7 +99,13 @@ begin
       NewChoice(3, 'Перечисление',
       nil)))),
     NewProperty('Value', 'Значение', ptString,
-    nil))));
+    nil)))
+  );
+  DefineList('Inventory', 'Инвентарь', True,
+    NewProperty('Caption', 'Название', ptString,
+    NewProperty('Count', 'Количество', ptString,
+    nil))
+  );
   Changed:= False;
 end;
 
