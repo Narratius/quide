@@ -22,6 +22,8 @@ type
                     ptDivider     // TPanel Height := 1
                     );
 
+  TddChoiceStyle = (csReadonlyList, csEditableList);
+
   TddChoiceLink = class;
   TddPropertyLink = class;
   TProperties = class;
@@ -41,6 +43,7 @@ type
     f_OnChange: TNotifyEvent;
     f_ReadOnly: Boolean;  // Элементы списка
     f_ChoiceProp: TddProperty;
+    f_ChoiceStyle: TddChoiceStyle;
     function pm_GetItemsCount: Integer;
     procedure pm_SetPropertyType(const Value: TddPropertyType);
     function pm_GetOrdinalType: Boolean;
@@ -70,6 +73,7 @@ type
     procedure SetChoiceItems(aItems: TStrings);
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
+    property ChoiceStyle: TddChoiceStyle read f_ChoiceStyle write f_ChoiceStyle;
     property ID: Integer read f_ID write f_ID;
     property Hint: String read f_Hint write f_Hint;
     property OrdinalType: Boolean read pm_GetOrdinalType;
@@ -116,6 +120,7 @@ type
   end;
 
   TddPropertyFunc = function (aItem: TddProperty): Boolean of object;
+
   TProperties = class(TInterfacedObject, IpropertyStore)
   private
     f_Changed: Boolean;
@@ -144,6 +149,8 @@ type
     procedure SetNewLines(Alias: String; Value: Boolean);
     function pm_GetChoiceItems(Alias: String): TStrings;
     procedure pm_SetChoiceItems(Alias: String; const Value: TStrings);
+    function pm_GetChoiceStyles(Alias: String): TddChoiceStyle;
+    procedure pm_SetChoiceStyles(Alias: String; const Value: TddChoiceStyle);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -174,6 +181,7 @@ type
         pm_SetAliasItems; default;
     property Changed: Boolean read f_Changed write pm_SetChanged;
     property ChoiceItems[Alias: String]: TStrings read pm_GetChoiceItems write pm_SetChoiceItems;
+    property ChoiceStyles[Alias: String]: TddChoiceStyle read pm_GetChoiceStyles write pm_SetChoiceStyles;
     property Count: Integer read pm_GetCount;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Hints[Alias: String]: String read GetHints write SetHints;
@@ -364,6 +372,7 @@ begin
   PropertyType:= aType;
   Visible:= aVisible;
   Value:= Unassigned;
+  f_ChoiceStyle:= csreadOnlyList;
   f_ListItems:= TObjectList<TProperties>.Create;
   fNewLine:= True;
 end;
@@ -442,7 +451,6 @@ end;
 procedure TProperties.Define(const aAlias, aCaption: String; aType:
     TddPropertyType; aVisible: Boolean = True);
 begin
- // Проверить валидность Alias - не должна начинаться с цифры
  Add(TddProperty.Create(aAlias, aCaption, aType, aVisible));
 end;
 
@@ -726,6 +734,11 @@ begin
   Result:= f_ChoiceItems;
 end;
 
+function TProperties.pm_GetChoiceStyles(Alias: String): TddChoiceStyle;
+begin
+ Result:= FindProperty(Alias).ChoiceStyle;
+end;
+
 function TProperties.pm_GetCount: Integer;
 begin
  Result:= f_Items.Count;
@@ -762,6 +775,12 @@ end;
 procedure TProperties.pm_SetChoiceItems(Alias: String; const Value: TStrings);
 begin
   FindProperty(Alias).SetChoiceItems(Value);
+end;
+
+procedure TProperties.pm_SetChoiceStyles(Alias: String;
+  const Value: TddChoiceStyle);
+begin
+ FindProperty(Alias).ChoiceStyle:= Value;
 end;
 
 procedure TProperties.pm_SetValues(Alias: String; const Value: Variant);

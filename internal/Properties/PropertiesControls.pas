@@ -94,11 +94,51 @@ end;
 
 procedure TPropertiesPanel.AdjustControls;
 var
- l_CurCtrlIdx, l_Cur, j, l_Count, l_LblCount: Integer;
+ l_CurCtrlIdx, l_Cur, i, j, l_Count, l_LblCount: Integer;
  l_CtrlRec: TControlRec;
  l_CurCtrl, l_FirstCtrl: TControl;
  l_Width, l_LblWidth: Integer;
  l_Left, l_Top, l_LeftIndent: Integer;
+
+ function lf_CtrlByTag(aTag: Integer): Integer;
+ var
+  i: Integer;
+ begin
+  Result:= -1;
+   for I := 0 to Pred(Length(f_Controls)) do
+    if f_Controls[i].Tag = aTag then
+    begin
+     Result:= i;
+     break
+    end;
+ end;
+
+
+ procedure lp_SetMaxLeftIndent;
+ begin
+  l_CurCtrlIdx:= 0;
+  // ћаксимальна€ длина метки дл€ выравнивани€
+  while l_CurCtrlIdx < CtrlCount do // цикл по контролам
+  begin
+   if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
+   begin
+    if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
+    begin
+      l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
+      l_LeftIndent:= Max(l_LeftIndent, l_LblWidth);
+    end;
+   end;
+   Inc(l_CurCtrlIdx);
+  end; // while l_CurCtrlIdx < ControlCount
+ end;
+
+ procedure lp_SetFirstCtrl;
+ begin
+   l_FirstCtrl:= ControlByTag(f_Properties.Items[l_CurCtrlIdx].ID);
+   if f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline then
+     l_LblWidth:= LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width;
+ end;
+
 begin
  { TODO : “ут все ломаетс€ }
  //exit;
@@ -114,77 +154,58 @@ begin
  {$IFDEF Debug}
  Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
  {$ENDIF}
- l_CurCtrlIdx:= 0;
- while l_CurCtrlIdx < CtrlCount do // цикл по свойствам
- begin
-  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
-  begin
-   if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
-   begin
-     l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
-     l_LeftIndent:= Max(l_LeftIndent, l_LblWidth);
-   end;
-  end;
-  Inc(l_CurCtrlIdx);
- end; // while l_CurCtrlIdx < ControlCount
+
+ lp_SetMaxLeftIndent;
+
+ // ћасштабирование и выравнивание контролов в строке
  l_FirstCtrl:= nil;
  l_LblWidth:= 0;
  l_Count:= 0;
  l_CurCtrlIdx:= 0;
  l_LblCount:= 0;
- while l_CurCtrlIdx < CtrlCount do // цикл по свойствам
+ while l_CurCtrlIdx < f_Properties.Count do // цикл по свойствам
  begin
-  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpNewLine) then
-  begin
-   l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
-   if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
-   begin
-    l_LblWidth:= Max(LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width, l_LeftIndent);
-    if (f_Controls[l_CurCtrlIdx].Size = csAutoSize) and (l_FirstCtrl.Left < l_LeftIndent) then
-     l_FirstCtrl.Width:= l_FirstCtrl.Width - (l_LeftIndent - l_FirstCtrl.Left) - 2*cIndent;
-    l_FirstCtrl.Left:= l_LeftIndent + 2*cIndent;
-   end;
-  end
+  // каждый контрол с новой строки считаетс€ первым в строке
+  if (f_Properties.Items[l_CurCtrlIdx].NewLine) then
+   lp_SetFirstCtrl
   else
-  if (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline) then
+  if not f_Properties.Items[l_CurCtrlIdx].NewLine then
   begin
+   // —читаем количество контролов в одной строке и ширину их меток
    if l_FirstCtrl = nil then
-   begin
-     l_FirstCtrl:= ControlByTag(f_Controls[l_CurCtrlIdx].Tag);
-     //l_Count:= 1;
-     if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
-       l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
-   end
+     lp_SetFirstCtrl
    else // l_FirstCtrl <> nil
    begin
      l_Cur:= l_CurCtrlIdx;
      // ѕоиск контролов
-     while l_CurCtrlIdx < CtrlCount do
+     while l_CurCtrlIdx < f_Properties.Count do
      begin
-      if f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline then
+      if not f_Properties.Items[l_CurCtrlIdx].NewLine then
       begin
-       if (f_Controls[l_CurCtrlIdx].LabelPosition = cpInline) then
+       if (f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline) then
        begin
-        Inc(l_LblWidth, LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width);
-        Inc(l_CurCtrlIdx);
+        Inc(l_LblWidth, LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width+cIndent);
         Inc(l_LblCount);
        end;
        Inc(l_CurCtrlIdx);
-
        Inc(l_Count);
       end
       else
        break
      end; // while
-     //Dec(l_Count, l_LblCount);
      // ¬ыравнивание
      if l_Count > 0 then
      begin
-      l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+l_lblCount+1)) div l_Count;
+      if l_LblCount > 0 then
+       Inc(l_LblWidth, cIndent);
+      { TODO : Ўирина не учитывает один отступ }
+      l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+l_lblCount+1{метка первого контрола}+2{последний отступ})) div (l_Count+1);
       l_FirstCtrl.Width:= l_Width;
+      l_FirstCtrl.Anchors:= [akLeft, akTop];
       l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left;
-      for j := l_Cur to l_Cur + l_Count-2 do
+      for i := l_Cur to l_Cur + l_Count-1 do
       begin
+       j:= lf_CtrlByTag(f_Properties.Items[i].ID);
        if f_Controls[j].LabelPosition = cpInline then
        begin
         with LabelByTag(f_Controls[j].Tag) do
@@ -195,6 +216,7 @@ begin
        end; // f_Controls[j].LabelPosition = cpInline
        with ControlByTag(f_Controls[j].Tag) do
        begin
+        Anchors:= [akLeft, akTop];
         Width:= l_Width; // - (LeftIndent - l_CurCtrl.Left);
         Left:= l_Left + cIndent; //LeftIndent;
         Inc(l_Left, Width+cIndent);
@@ -262,7 +284,10 @@ procedure TPropertiesPanel.GetChoiceValue(aProperty: TddProperty;
   aControl: TControl);
 begin
  if aControl is TComboBox then
+ begin
   aProperty.Value:= TComboBox(aControl).ItemIndex;
+  { TODO : “ут может быть пополн€емый список. Ќужно вернуть текст нового элемента, если ItemIndex = -1 }
+ end;
 end;
 
 procedure TPropertiesPanel.GetIntegerValue(aProperty: TddProperty;
@@ -379,6 +404,7 @@ begin
    else
      if not LabelTop then
        LabelPosition:= cpInline;
+   ChoiceStyle:= aProperty.ChoiceStyle;
  end; // with
 end;
 
@@ -511,22 +537,34 @@ end;
 
 procedure TPropertiesPanel.MakeStringControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel, aProperty.NewLine);
- with f_Controls[Length(f_Controls)-1] do
+ if aProperty.Caption <> '' then
  begin
-  Caption:= aProperty.Caption;
+  MakeCustomControl(TLabel, aProperty.NewLine);
+  with f_Controls[Length(f_Controls)-1] do
+   Caption:= aProperty.Caption;
  end;
  MakeCustomControl(TEdit, aProperty.NewLine);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+   if aProperty.Caption = '' then
+     LabelPosition:= cpNone
+   else
+     if not LabelTop then
+       LabelPosition:= cpInline;
+ end; // with
 end;
 
 procedure TPropertiesPanel.MakeTextControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel, aProperty.NewLine);
- with f_Controls[Length(f_Controls)-1] do
-  Caption:= aProperty.Caption;
+ if aProperty.Caption <> '' then
+ begin
+   MakeCustomControl(TLabel, aProperty.NewLine);
+   with f_Controls[Length(f_Controls)-1] do
+    Caption:= aProperty.Caption;
+ end;
  //MakeCustomControl(TSizeableMemo);
+ { TODO : Ќужно бы помен€ть обратно... }
  MakeCustomControl(TRichEdit, aProperty.NewLine);
-// !!!
  if Caption <> '' then
  begin
    if not LabelTop then
@@ -548,7 +586,7 @@ procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
  MakeControls;
- AdjustControls;   //<- ¬ернуть, иначе нет выравнивание по левой границе
+ AdjustControls;
 end;
 
 procedure TPropertiesPanel.PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);

@@ -3,11 +3,13 @@ unit ParamControls;
 interface
 
 uses
- SizeableControls, SizeableTypes, Controls, Classes;
+ SizeableControls, SizeableTypes, Propertys,
+ Controls, Classes;
 
 type
-  TControlRec = record
+  TControlRec = record      { TODO : ƒобавить выбор стил€ выпадающего списка }
     Caption: string;
+    ChoiceStyle: TddChoiceStyle;
     ControlClass: TControlClass;
     CtrlPosition: TControlPosition;
     LabelPosition: TControlPosition;
@@ -36,6 +38,7 @@ type
 
 const
  cDefControlRec : TControlRec = (Caption: '';
+                                 ChoiceStyle: csReadOnlyList;
                                  ControlClass: TSizeableMemo;
                                  CtrlPosition: cpNewLine;
                                  LabelPosition: cpNewLine;
@@ -106,7 +109,13 @@ begin
     else
     if (l_C is TComboBox) then
     begin
-     TComboBox(l_C).Style:= csDropDownList;
+     if aControls[i].ChoiceStyle = csReadOnlyList then
+      TComboBox(l_C).Style:= csDropDownList
+     else
+     begin
+      TComboBox(l_C).Style:= csDropDown;
+      TComboBox(l_C).Text:= '';
+     end;
      TComboBox(l_C).OnChange:= aControls[i].OnChange;
     end
     else

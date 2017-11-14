@@ -148,7 +148,7 @@ begin
         else
         begin
          aControl.Top:= l_PrevTop;
-         aControl.Left:= l_PrevLeft;
+         aControl.Left:= l_PrevLeft+cIndent;
          (* *)
          if aSize = csAutoSize then
           aControl.Width:= aParent.ClientWidth - cIndent - aControl.Left;

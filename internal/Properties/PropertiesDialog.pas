@@ -9,8 +9,9 @@ uses
 
 type
   TPropDialog = class(TForm)
-    Button1: TButton;
+    ButtontsPanel: TPanel;
     Button2: TButton;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
   private
     f_WorkPanel: TPropertiesPanel;
@@ -59,7 +60,7 @@ begin
   f_WorkPanel.Left:= 0;
   f_WorkPanel.Top:= 0;
   //f_WorkPanel.Height:= ClientHeight;
-  f_WorkPanel.Width:= Button1.Left - 10;
+  f_WorkPanel.Align:= alClient;
 end;
 
 function TPropDialog.GetProperties: TProperties;

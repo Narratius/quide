@@ -14,24 +14,36 @@ object PropDialog: TPropDialog
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Button1: TButton
-    Left = 448
-    Top = 8
-    Width = 75
-    Height = 25
-    Caption = #1054#1050
-    Default = True
-    ModalResult = 1
+  object ButtontsPanel: TPanel
+    Left = 445
+    Top = 0
+    Width = 89
+    Height = 242
+    Align = alRight
+    BevelOuter = bvNone
     TabOrder = 0
-  end
-  object Button2: TButton
-    Left = 448
-    Top = 40
-    Width = 75
-    Height = 25
-    Cancel = True
-    Caption = #1054#1090#1084#1077#1085#1072
-    ModalResult = 2
-    TabOrder = 1
+    ExplicitLeft = 437
+    ExplicitTop = 8
+    ExplicitHeight = 121
+    object Button2: TButton
+      Left = 6
+      Top = 40
+      Width = 75
+      Height = 25
+      Cancel = True
+      Caption = #1054#1090#1084#1077#1085#1072
+      ModalResult = 2
+      TabOrder = 0
+    end
+    object Button1: TButton
+      Left = 6
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = #1054#1050
+      Default = True
+      ModalResult = 1
+      TabOrder = 1
+    end
   end
 end
