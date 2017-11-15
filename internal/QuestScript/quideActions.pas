@@ -188,6 +188,7 @@ begin
   f_Variable := TquideVariable.Create();
   ActionType:= atVariable;
   DefineChoice('VarList', '');
+  ChoiceStyles['VarList']:= csEditableList;
   DefineString('VarValue', '=');
   NewLines['VarValue']:= False;
 end;

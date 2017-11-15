@@ -66,11 +66,13 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure DeleteItem(Index: Integer);
     procedure Clear;
+    procedure CheckItem(aCaption: String);
     procedure SetItem(aItem: TddPropertyLink);
     procedure SetChoice(aChoiceDef: TddChoiceLink); overload;
     procedure SetChoice(aProp: TddProperty); overload;
     procedure GetChoiceItems(aItems: TStrings);
     procedure SetChoiceItems(aItems: TStrings);
+  public
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
     property ChoiceStyle: TddChoiceStyle read f_ChoiceStyle write f_ChoiceStyle;
@@ -355,6 +357,34 @@ begin
   end
   else
    inherited;
+end;
+
+procedure TddProperty.CheckItem(aCaption: String);
+var
+ i, l_Index: Integer;
+begin
+  // Проверить наличие элемента в исходном списке и установить Value
+  l_Index:= -1;
+  for I := 0 to Pred(f_ListItems.Count) do
+   if SameText(f_ListItems[i].Values['Caption'], aCaption) then
+   begin
+    l_Index:= i;
+    break
+   end;
+  if l_Index = -1 then
+  begin
+   if f_ChoiceProp = nil then
+   begin
+     l_Index:= AddItem;
+     ListItems[l_Index].Values['Caption']:= aCaption;
+   end
+   else
+   begin
+     l_Index:= f_ChoiceProp.AddItem;
+     f_ChoiceProp.ListItems[l_Index].Values['Caption']:= aCaption;
+   end;
+  end;
+  Value:= l_Index;
 end;
 
 procedure TddProperty.Clear;

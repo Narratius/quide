@@ -125,7 +125,7 @@ var
     if f_Controls[l_CurCtrlIdx].LabelPosition = cpInline then
     begin
       l_LblWidth:= LabelByTag(f_Controls[l_CurCtrlIdx].Tag).Width;
-      l_LeftIndent:= Max(l_LeftIndent, l_LblWidth);
+      l_LeftIndent:= Max(l_LeftIndent, l_LblWidth+cIndent);
     end;
    end;
    Inc(l_CurCtrlIdx);
@@ -136,7 +136,12 @@ var
  begin
    l_FirstCtrl:= ControlByTag(f_Properties.Items[l_CurCtrlIdx].ID);
    if f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline then
+   begin
      l_LblWidth:= LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width;
+     l_FirstCtrl.Left:= l_LeftIndent + cIndent;
+     if f_Controls[lf_CtrlByTag(l_FirstCtrl.Tag)].Size = csAutoSize then
+      l_FirstCtrl.Width:= ClientWidth - l_FirstCtrl.Left - cIndent;
+   end;
  end;
 
 begin
@@ -285,8 +290,10 @@ procedure TPropertiesPanel.GetChoiceValue(aProperty: TddProperty;
 begin
  if aControl is TComboBox then
  begin
-  aProperty.Value:= TComboBox(aControl).ItemIndex;
-  { TODO : Тут может быть пополняемый список. Нужно вернуть текст нового элемента, если ItemIndex = -1 }
+  if aProperty.ChoiceStyle = csEditableList then
+   aProperty.CheckItem(TComboBox(aControl).Text)
+  else
+   aProperty.Value:= TComboBox(aControl).ItemIndex;
  end;
 end;
 

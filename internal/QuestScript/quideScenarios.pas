@@ -92,14 +92,16 @@ begin
   DefineChoice('Start', 'Начальная локация');
   DefineList('Variables', 'Переменные', True,
     NewProperty('Caption', 'Название', ptString,
+    {$IFDEF VarType}
     NewChoiceProperty('VarType', 'Тип',  // vtNumeric, vtText, vtBoolean, vtEnum
       NewChoice(0, 'Число',
       NewChoice(1, 'Строка',
       NewChoice(2, 'Булеан',
       NewChoice(3, 'Перечисление',
       nil)))),
+    {$ENDIF}
     NewProperty('Value', 'Значение', ptString,
-    nil)))
+    nil){$IFDEF VarType}){$ENDIF})
   );
   DefineList('Inventory', 'Инвентарь', True,
     NewProperty('Caption', 'Название', ptString,

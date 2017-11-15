@@ -7,7 +7,7 @@ uses
  Controls, Classes;
 
 type
-  TControlRec = record      { TODO : ƒобавить выбор стил€ выпадающего списка }
+  TControlRec = record
     Caption: string;
     ChoiceStyle: TddChoiceStyle;
     ControlClass: TControlClass;
