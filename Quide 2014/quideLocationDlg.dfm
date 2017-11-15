@@ -123,11 +123,16 @@ object quideLocationDialog: TquideLocationDialog
     object actInventory: TAction
       Category = #1044#1077#1081#1089#1090#1074#1080#1103
       Caption = #1048#1085#1074#1077#1085#1090#1072#1088#1100
+      OnExecute = actInventoryExecute
     end
     object actLogical: TAction
       Category = #1044#1077#1081#1089#1090#1074#1080#1103
       Caption = #1057#1088#1072#1074#1085#1077#1085#1080#1077
       OnExecute = actLogicalExecute
+    end
+    object actDelete: TAction
+      Category = #1044#1077#1081#1089#1090#1074#1080#1103
+      Caption = #1059#1076#1072#1083#1080#1090#1100
     end
   end
   object PopupMenu1: TPopupMenu

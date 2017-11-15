@@ -2,7 +2,9 @@ unit PropertiesControls;
 
 interface
 
-uses classes, ExtCtrls, StdCtrls, Controls, Propertys, SizeableControls, ParamControls;
+uses
+  Classes, ExtCtrls, StdCtrls, Controls, Types,
+  Propertys, SizeableControls, ParamControls;
 
 type
   //1 Панель для редактирования одного объекта
@@ -60,6 +62,7 @@ type
     function ControlByTag(aTag: Integer): TControl;
     function LabelByTag(aTag: Integer): TControl;
     procedure PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);
+    procedure ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
   protected
     property CtrlCount: Integer read pm_GetCtrlCount;
   public
@@ -79,7 +82,7 @@ const
 implementation
 
 uses
- Variants, Vcl.ComCtrls, SySutils, Math,
+ Variants, Vcl.ComCtrls, SySutils, Math, Dialogs,
  SizeableTypes, PropertiesListControl
  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
@@ -137,16 +140,15 @@ var
    l_FirstCtrl:= ControlByTag(f_Properties.Items[l_CurCtrlIdx].ID);
    if f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline then
    begin
-     l_LblWidth:= LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width;
+     // Подгонка отступа и ширины по левому краю
      l_FirstCtrl.Left:= l_LeftIndent + cIndent;
      if f_Controls[lf_CtrlByTag(l_FirstCtrl.Tag)].Size = csAutoSize then
       l_FirstCtrl.Width:= ClientWidth - l_FirstCtrl.Left - cIndent;
+     l_LblWidth:= l_FirstCtrl.Left-2*cIndent;//LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width;
    end;
  end;
 
 begin
- { TODO : Тут все ломается }
- //exit;
  {$IFDEF Debug}
  Msg2Log('AdjustControls');
  {$ENDIF}
@@ -240,6 +242,13 @@ begin
  {$ENDIF}
 end;
 
+procedure TPropertiesPanel.ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
+  ShowMessageFmt('%p', [Addr(Self)]);
+end;
+
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
 var
  i: Integer;
@@ -262,6 +271,9 @@ begin
   inherited;
   fLabelTop:= False;
   ShowHint:= True;
+  {$IFDEF Debug}
+  OnContextPopup:= ContextPopup;
+  {$ENDIF}
 end;
 
 function TPropertiesPanel.FillControls: TControlsArray;
@@ -475,10 +487,15 @@ end;
 
 procedure TPropertiesPanel.MakePropertiesControl(aProperty: TddProperty);
 begin
- MakeCustomControl(TLabel, aProperty.NewLine);
- with f_Controls[Length(f_Controls)-1] do
-  Caption:= aProperty.Caption;
+ if aProperty.Caption <> '' then
+ begin
+  MakeCustomControl(TLabel, aProperty.NewLine);
+  with f_Controls[Length(f_Controls)-1] do
+   Caption:= aProperty.Caption;
+ end;
  MakeCustomControl(TSizeableScrollBox, aProperty.NewLine);
+ if aProperty.Caption = '' then
+  f_Controls[Length(f_Controls)-1].LabelPosition:= cpNone;
 end;
 
 function TPropertiesPanel.MakePropertyControl(aProperty: TddProperty): Boolean;

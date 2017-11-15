@@ -185,8 +185,8 @@ type
     property ChoiceItems[Alias: String]: TStrings read pm_GetChoiceItems write pm_SetChoiceItems;
     property ChoiceStyles[Alias: String]: TddChoiceStyle read pm_GetChoiceStyles write pm_SetChoiceStyles;
     property Count: Integer read pm_GetCount;
-    property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Hints[Alias: String]: String read GetHints write SetHints;
+    property Items[Index: Integer]: TddProperty read pm_GetItems;
     property NewLines[Alias: String]: Boolean read GetNewLines write setNewLines;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
     property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;

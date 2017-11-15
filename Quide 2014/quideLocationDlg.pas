@@ -30,11 +30,13 @@ type
     menuInventary: TMenuItem;
     actLogical: TAction;
     N1: TMenuItem;
+    actDelete: TAction;
     procedure actNewTextExecute(Sender: TObject);
     procedure actButtonExecute(Sender: TObject);
     procedure actEditButtonExecute(Sender: TObject);
     procedure actVariableExecute(Sender: TObject);
     procedure actLogicalExecute(Sender: TObject);
+    procedure actInventoryExecute(Sender: TObject);
   private
     f_Scenario: TquideScenario;
     FLocation: TquideLocation;
@@ -97,6 +99,11 @@ begin
   TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
   TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
  end;
+end;
+
+procedure TquideLocationDialog.actInventoryExecute(Sender: TObject);
+begin
+ AddAction(fLocation.AddAction(atInventory));
 end;
 
 procedure TquideLocationDialog.actLogicalExecute(Sender: TObject);

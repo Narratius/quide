@@ -147,12 +147,9 @@ end;
 class function TquideAction.Make(aElement: IXMLNode): TquideAction;
 begin
  Result:= nil;
- // Все не так :(
- (* *)
   case String2ActionType(aElement.Attributes['Type']) of
-  //case TquideActionType(StrToIntDef(aElement.Attributes['Type'], 0)) of
     //atGoto: Result:= TquideJump.Create;
-    //atInventory: Result:= TquideInventoryAction.Create;
+    atInventory: Result:= TquideInventoryAction.Create;
     atLogic: Result:= TquideLogicalAction.Create;
     atText: Result:= TquideTextAction.Create;
     atVariable: Result:= TquideVariableAction.Create;
@@ -160,7 +157,6 @@ begin
   end;
   if Result <> nil then
    Result.LoadFromXML(aElement);
-  (* *)
 end;
 
 function TquideAction.pm_GetActionType: TquideActionType;
@@ -305,6 +301,7 @@ begin
   inherited;
   ActionType:= atInventory;
   DefineChoice('InvList', '');
+  ChoiceStyles['InvList']:= csEditableList;
   DefineString('InvValue', '=');
   NewLines['InvValue']:= False;
 end;
