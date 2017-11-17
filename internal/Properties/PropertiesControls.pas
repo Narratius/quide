@@ -22,6 +22,7 @@ type
     procedure AdjustControls;
     function FillControls: TControlsArray; virtual;
     procedure GetLastControl(var aRec: TControlRec);
+    procedure PropChanged(Sender: TObject);
     // Создание контролов
     procedure MakeActionControl(aProperty: TddProperty); virtual;
     procedure MakeBooleanControl(aProperty: TddProperty); virtual;
@@ -62,7 +63,6 @@ type
     function ControlByTag(aTag: Integer): TControl;
     function LabelByTag(aTag: Integer): TControl;
     procedure PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);
-    procedure ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
   protected
     property CtrlCount: Integer read pm_GetCtrlCount;
   public
@@ -242,12 +242,6 @@ begin
  {$ENDIF}
 end;
 
-procedure TPropertiesPanel.ContextPopup(Sender: TObject; MousePos: TPoint;
-  var Handled: Boolean);
-begin
-
-  ShowMessageFmt('%p', [Addr(Self)]);
-end;
 
 function TPropertiesPanel.ControlByTag(aTag: Integer): TControl;
 var
@@ -271,9 +265,6 @@ begin
   inherited;
   fLabelTop:= False;
   ShowHint:= True;
-  {$IFDEF Debug}
-  OnContextPopup:= ContextPopup;
-  {$ENDIF}
 end;
 
 function TPropertiesPanel.FillControls: TControlsArray;
@@ -493,9 +484,17 @@ begin
   with f_Controls[Length(f_Controls)-1] do
    Caption:= aProperty.Caption;
  end;
- MakeCustomControl(TSizeableScrollBox, aProperty.NewLine);
- if aProperty.Caption = '' then
-  f_Controls[Length(f_Controls)-1].LabelPosition:= cpNone;
+ MakeCustomControl(TPropertiesPanel, aProperty.NewLine);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  if aProperty.ListItem <> nil then
+  begin
+   Menu:= aProperty.ListItem.Menu;
+   SubItem:= aProperty.ListItem;
+  end;
+  if aProperty.Caption = '' then
+   LabelPosition:= cpNone;
+ end;
 end;
 
 function TPropertiesPanel.MakePropertyControl(aProperty: TddProperty): Boolean;
@@ -609,6 +608,13 @@ end;
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
+ f_Properties.OnChange:= PropChanged;
+ MakeControls;
+ AdjustControls;
+end;
+
+procedure TPropertiesPanel.PropChanged(Sender: TObject);
+begin
  MakeControls;
  AdjustControls;
 end;

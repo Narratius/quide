@@ -3,7 +3,7 @@ unit Propertys;
 interface
 
 uses
-  SysUtils, Windows, Messages, Classes, Xml.XMLIntf, Generics.Collections,
+  SysUtils, Windows, Messages, Classes, Xml.XMLIntf, Generics.Collections, Menus,
   PropertyIntf;
 
 type
@@ -129,6 +129,8 @@ type
     f_Items: TObjectList<TddProperty>;
     f_ChoiceItems: TStrings;
     FOnChange: TNotifyEvent;
+  private
+    f_Menu: TPopupMenu;
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
@@ -153,6 +155,7 @@ type
     procedure pm_SetChoiceItems(Alias: String; const Value: TStrings);
     function pm_GetChoiceStyles(Alias: String): TddChoiceStyle;
     procedure pm_SetChoiceStyles(Alias: String; const Value: TddChoiceStyle);
+    procedure DoChange;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -170,7 +173,8 @@ type
     procedure DefineInteger(const aAlias, aCaption: String);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure DefinePassword(const aAlias, aCaption: String);
-    procedure DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
+    procedure DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil); overload;
+    procedure DefineProperties(const aAlias, aCaption: String; Items: TProperties); overload;
     procedure DefineString(const aAlias, aCaption: String);
     procedure DefineText(const aAlias, aCaption: String);
     procedure DefineStaticText(aCaption: String);
@@ -187,6 +191,7 @@ type
     property Count: Integer read pm_GetCount;
     property Hints[Alias: String]: String read GetHints write SetHints;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
+    property Menu: TPopupMenu read f_Menu;
     property NewLines[Alias: String]: Boolean read GetNewLines write setNewLines;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
     property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;
@@ -444,6 +449,7 @@ begin
  inherited;
  F_Items := TObjectList<TddProperty>.Create(True);
  f_ChoiceItems:= TStringList.Create;
+ f_Menu:= TPopupMenu.Create(nil);
 end;
 
 function TProperties.Add(aProp: TddProperty): TddProperty;
@@ -457,14 +463,23 @@ procedure TProperties.Assign(Source: TProperties);
 var
   I: Integer;
   l_Prop: TddProperty;
+  l_I: TMenuItem;
 begin
   f_Items.Clear; //
-
+  f_Menu.Items.Clear;
+  for I := 0 to Source.Menu.Items.Count-1 do
+   begin
+    l_I:= TMenuItem.Create(nil);
+    l_I.Caption:= Source.Menu.Items[i].Caption;
+    l_I.OnClick:= Source.Menu.Items[i].OnClick;
+    f_Menu.Items.Add(l_I);
+   end;
   for I := 0 to TProperties(Source).Count - 1 do
   begin
    l_Prop:= TddProperty.MakeClone(TProperties(Source).Items[I]);
    Add(l_Prop);
   end;
+  fOnChange:= Source.OnChange;
 end;
 
 function TProperties.Clone;
@@ -539,9 +554,18 @@ begin
   Define(aAlias, aCaption, ptPassword, True);
 end;
 
+procedure TProperties.DefineProperties(const aAlias, aCaption: String;
+  Items: TProperties);
+begin
+ Define(aAlias, aCaption, ptProperties);
+ FindProperty(aAlias).ListItem:= Items;
+end;
+
 procedure TProperties.DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
 begin
   Define(aAlias, aCaption, ptProperties);
+  { TODO : Развернуть список свойств }
+  FindProperty(aAlias).SetItem(Items);
 end;
 
 procedure TProperties.DefineStaticText(aCaption: String);
@@ -561,9 +585,16 @@ end;
 
 destructor TProperties.Destroy;
 begin
+  FreeAndNil(f_Menu);
   FreeAndNil(f_ChoiceItems);
   FreeAndNil(f_Items);
   inherited;
+end;
+
+procedure TProperties.DoChange;
+begin
+ if Assigned(fOnChange) then
+  fOnChange(Self);
 end;
 
 function TProperties.Encrypt(const aText: String): String;
@@ -607,8 +638,7 @@ end;
 procedure TProperties.InnerOnChange(Sender: TObject);
 begin
  f_Changed:= True;
- if Assigned(fOnChange) then
-  fOnChange(Self);
+ DoChange;
 end;
 
 procedure TProperties.IterateAll(aFunc: TddPropertyFunc);
@@ -800,6 +830,7 @@ end;
 procedure TProperties.pm_SetChanged(const Value: Boolean);
 begin
  f_Changed := Value;
+ DoChange;
 end;
 
 procedure TProperties.pm_SetChoiceItems(Alias: String; const Value: TStrings);
@@ -966,7 +997,7 @@ end;
 
 procedure TddProperty.pm_SetItem(const Value: TProperties);
 begin
- if (PropertyType in [ptList, ptChoice]) then
+ if (PropertyType in [ptList, ptChoice, ptProperties]) then
  begin
   if f_ListItem = nil then
    f_ListItem:= TProperties.Create;

@@ -216,13 +216,28 @@ begin
 end;
 
 procedure TquideLocationDialog.SetLocation(const Value: TquideLocation);
+var
+ l_A: TquideActions;
 begin
   FLocation := Value;
   Caption:= fLocation.Caption;
   // очистить текущее содержимое
   ClearControls;
   CreateHeader;
-  CreateActions;
+ (*
+ with TPropertiesPanel.Create(Self) do
+ begin
+  Align:= alNone;
+  Parent:= f_Actions;
+  Width:= f_Actions.ClientWidth;
+  Anchors:= Anchors + [akRight];
+  Height:= 16;
+  l_A:= TquideActions.Create;
+  Properties:= l_A;
+  PopupMenu:= l_A.Menu;
+ end;
+ *)
+ CreateActions;
 end;
 
 end.

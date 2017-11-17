@@ -102,9 +102,17 @@ begin
 end;
 
 constructor TquideLocation.Create;
+var
+ l_A: TquideActions;
 begin
   inherited Create;
   Define('GraphObject', 'Визуальный элемент', ptInteger, False);
+  l_A:= TquideActions.Create;
+  try
+   DefineProperties('Actions', '', l_A);
+  finally
+   FreeAndNil(l_A);
+  end;
   f_Actions := TObjectList<TquideAction>.Create();
 end;
 

@@ -4,9 +4,10 @@ interface
 
 uses
  SizeableControls, SizeableTypes, Propertys,
- Controls, Classes;
+ Controls, Classes, Menus;
 
 type
+  { TODO : Почему бы не хранить здесь само свойство? Или хотя бы описание вложенного }
   TControlRec = record
     Caption: string;
     ChoiceStyle: TddChoiceStyle;
@@ -19,8 +20,10 @@ type
     Hint: String;
     Tag: Integer;
     ReadOnly: Boolean;
+    Menu: TPopupmenu;
     Event: TNotifyEvent;
     OnChange: TNotifyEvent;
+    SubItem: TProperties;
   end;
 
   TControlsArray = array of TControlRec;
@@ -48,13 +51,16 @@ const
                                  Hint: '';
                                  Tag: 0;
                                  ReadOnly: False;
+                                 Menu: nil;
                                  Event: nil;
-                                 OnChange: nil);
+                                 OnChange: nil;
+                                 SubItem: nil
+                                 );
 
 implementation
 
 uses
- SysUtils, StdCtrls, Math
+ SysUtils, StdCtrls, Math, PropertiesControls
  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 {
@@ -133,12 +139,23 @@ begin
     end
     else
     if l_C is TStaticText then
-     TStaticText(l_C).Caption := aControls[i].Caption;
+     TStaticText(l_C).Caption := aControls[i].Caption
+    else
+    if l_C is TPropertiesPanel then
+    begin
+     TPropertiesPanel(l_C).Caption:= '';
+     TPropertiesPanel(l_C).PopupMenu:= aControls[i].Menu;
+    end;
     // Это зачем?
     if Assigned(aControls[i].Event) then
      aControls[i].Event(l_C);
    end;
    AddControl(l_C, aControls[i].Size, aControls[i].CtrlPosition, aControls[i].LabelPosition);
+   if l_C is TPropertiesPanel then
+   begin
+     // Где взять вложенные свойства?
+     TPropertiesPanel(l_C).Properties:= aControls[i].SubItem;
+   end;
    { TODO : Подгонкой высоты нужно заниматься после того, как все контролы вставлены }
    f_LeftIndent:= Max(f_LeftIndent, l_C.Left);
    // Тут можно запомнить Макс. левую позицию контрола
