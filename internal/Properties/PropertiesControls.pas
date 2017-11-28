@@ -489,7 +489,7 @@ begin
  begin
   if aProperty.ListItem <> nil then
   begin
-   Menu:= aProperty.ListItem.Menu;
+   //Menu:= aProperty.ListItem.Menu;
    SubItem:= aProperty.ListItem;
   end;
   if aProperty.Caption = '' then
@@ -608,9 +608,10 @@ end;
 procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
 begin
  f_Properties := Value;
- f_Properties.OnChange:= PropChanged;
+ PopUpMenu:= f_Properties.Menu;
  MakeControls;
  AdjustControls;
+ f_Properties.OnPanelStructureChange:= PropChanged;
 end;
 
 procedure TPropertiesPanel.PropChanged(Sender: TObject);

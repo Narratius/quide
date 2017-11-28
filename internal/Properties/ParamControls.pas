@@ -32,7 +32,7 @@ type
   private
     f_LeftIndent: Integer;
   protected
-    procedure ClearControls;
+    procedure ClearControls; override;
     procedure TuneupControl(aControl: TControl); virtual;
   public
     procedure CreateControls(aControls: TControlsArray);
@@ -68,8 +68,10 @@ uses
 }
 procedure TControlPanel.ClearControls;
 begin
+ inherited;
  // Удалить все контролы
  f_LeftIndent:= -1;
+ DestroyComponents
 end;
 
 procedure TControlPanel.CreateControls(aControls: TControlsArray);
@@ -144,7 +146,7 @@ begin
     if l_C is TPropertiesPanel then
     begin
      TPropertiesPanel(l_C).Caption:= '';
-     TPropertiesPanel(l_C).PopupMenu:= aControls[i].Menu;
+     TPropertiesPanel(l_C).PopupMenu:= aControls[i].SubItem.Menu;
     end;
     // Это зачем?
     if Assigned(aControls[i].Event) then

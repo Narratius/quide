@@ -53,7 +53,6 @@ type
   public
     constructor Create(const aAlias, aCaption: String; aType: TddPropertyType;
         aVisible: Boolean = True); reintroduce;
-    constructor MakeClone(aSource: TddProperty);
     constructor MakeList(const aAlias, aCaption: String; aListDef: TddPropertyLink;
         aVisible: Boolean = True);
     constructor MakeButton(const aAlias, aCaption: String; aEvent: TNotifyEvent;
@@ -67,6 +66,7 @@ type
     procedure DeleteItem(Index: Integer);
     procedure Clear;
     procedure CheckItem(aCaption: String);
+    function Clone: TddProperty;
     procedure SetItem(aItem: TddPropertyLink);
     procedure SetChoice(aChoiceDef: TddChoiceLink); overload;
     procedure SetChoice(aProp: TddProperty); overload;
@@ -129,8 +129,11 @@ type
     f_Items: TObjectList<TddProperty>;
     f_ChoiceItems: TStrings;
     FOnChange: TNotifyEvent;
-  private
     f_Menu: TPopupMenu;
+    f_OwnerStructChange: TNotifyEvent;
+    f_PanelStructChange: TNotifyEvent;
+    f_StructChanged: Boolean;
+  private
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
@@ -147,6 +150,7 @@ type
     procedure SetHints(Alias: String; const Value: String);
     procedure SetOnChange(const Value: TNotifyEvent);
     procedure InnerOnChange(Sender: TObject);
+    procedure InnerStructChange(Sender: TObject);
     function Encrypt(const aText: String): String;
     function Decrypt(const aText: String): String;
     function GetNewLines(Alias: String): Boolean;
@@ -156,6 +160,10 @@ type
     function pm_GetChoiceStyles(Alias: String): TddChoiceStyle;
     procedure pm_SetChoiceStyles(Alias: String; const Value: TddChoiceStyle);
     procedure DoChange;
+    procedure DoStructChange;
+    procedure pm_SetStructChanged(const Value: Boolean);
+    procedure ItemsChanged(Sender: TObject; const Item: TddProperty; Action: TCollectionNotification);
+    procedure pm_SetOnStructChange(const Value: TNotifyEvent);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -193,23 +201,15 @@ type
     property Items[Index: Integer]: TddProperty read pm_GetItems;
     property Menu: TPopupMenu read f_Menu;
     property NewLines[Alias: String]: Boolean read GetNewLines write setNewLines;
+    property StructureChanged: Boolean read f_StructChanged write pm_SetStructChanged;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
     property Visible[Alias: String]: Boolean read pm_GetVisible write pm_SetVisible;
     property OnChange: TNotifyEvent read FOnChange write SetOnChange;
+    property OnOwnerStructureChange: TNotifyEvent read f_OwnerStructChange write pm_SetOnStructChange;
+    property OnPanelStructureChange: TNotifyEvent read f_PanelStructChange write f_PanelStructChange;
   end;
 
 type
-(*
-  TddPropertyList = class helper for TddProperty
-  private
-    function GetValues(Index: Integer; Alias: String): Variant;
-    function pm_GetCount: Integer;
-    procedure SetValues(Index: Integer; Alias: String; const Value: Variant);
-  public
-    property Count: Integer read pm_GetCount;
-    property Values[Index: Integer; Alias: String]: Variant read GetValues write SetValues;
-  end;
-*)
   TComboBoxProperty = class helper for TddProperty
   private
    procedure CheckList;
@@ -236,13 +236,18 @@ implementation
 
 Uses
  Variants,
- PropertyUtils;
+ PropertyUtils
+ {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 const
  PropertyTypeNames: Array[TddPropertyType] of String = (
   'Nothing', 'Char', 'String', 'Integer', 'Text',
   'Boolean', 'Choice', 'Action', 'List', 'Properties', 'Password',
   'StaticText', 'Divider');
+
+type
+ TddPropertyClass = class of TddProperty;
+ TPropertiesClass = class of TProperties;
 
 function PropertyType2String(aType: TddPropertyType): String;
 begin
@@ -397,6 +402,12 @@ begin
  f_ListItems.Clear;
 end;
 
+function TddProperty.Clone: TddProperty;
+begin
+ Result:= TddPropertyClass(ClassType).Create(Alias, Caption, PropertyType, Visible);
+ Result.Assign(Self);
+end;
+
 constructor TddProperty.Create;
 begin
   inherited Create;
@@ -427,13 +438,6 @@ begin
  SetChoice(aChoiceDef);
 end;
 
-constructor TddProperty.MakeClone(aSource: TddProperty);
-begin
- Create(aSource.Alias, aSource.Caption, aSource.PropertyType, aSource.Visible);
- Assign(aSource);
-end;
-
-
 constructor TddProperty.MakeList(const aAlias, aCaption: String;
   aListDef: TddPropertyLink; aVisible: Boolean);
 begin
@@ -448,6 +452,7 @@ constructor TProperties.Create;
 begin
  inherited;
  F_Items := TObjectList<TddProperty>.Create(True);
+ //f_Items.OnNotify:= ItemsChanged;
  f_ChoiceItems:= TStringList.Create;
  f_Menu:= TPopupMenu.Create(nil);
 end;
@@ -462,10 +467,11 @@ end;
 procedure TProperties.Assign(Source: TProperties);
 var
   I: Integer;
-  l_Prop: TddProperty;
   l_I: TMenuItem;
 begin
   f_Items.Clear; //
+
+  (*  Присваивать нужно если это чужое меню. Или все равно не нужно?
   f_Menu.Items.Clear;
   for I := 0 to Source.Menu.Items.Count-1 do
    begin
@@ -474,17 +480,17 @@ begin
     l_I.OnClick:= Source.Menu.Items[i].OnClick;
     f_Menu.Items.Add(l_I);
    end;
+  *)
   for I := 0 to TProperties(Source).Count - 1 do
-  begin
-   l_Prop:= TddProperty.MakeClone(TProperties(Source).Items[I]);
-   Add(l_Prop);
-  end;
+   Add(TProperties(Source).Items[I].Clone);
   fOnChange:= Source.OnChange;
+  f_OwnerStructChange:= TProperties(Source).OnOwnerStructureChange;
+  f_PanelStructChange:= TProperties(Source).OnPanelStructureChange;
 end;
 
 function TProperties.Clone;
 begin
- Result:= TProperties.Create;
+ Result:= TPropertiesClass(ClassType).Create; //  Неправильный клон?
  TProperties(Result).Assign(Self);
 end;
 
@@ -558,14 +564,23 @@ procedure TProperties.DefineProperties(const aAlias, aCaption: String;
   Items: TProperties);
 begin
  Define(aAlias, aCaption, ptProperties);
- FindProperty(aAlias).ListItem:= Items;
+ with FindProperty(aAlias) do
+ begin
+  ListItem:= Items;
+  ListItem.OnOwnerStructureChange:= InnerStructChange;
+  OnOwnerStructureChange:= InnerStructChange;
+ end;
 end;
 
 procedure TProperties.DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
 begin
   Define(aAlias, aCaption, ptProperties);
   { TODO : Развернуть список свойств }
-  FindProperty(aAlias).SetItem(Items);
+  with FindProperty(aAlias) do
+  begin
+   SetItem(Items);
+   OnOwnerStructureChange:= InnerStructChange;
+  end;
 end;
 
 procedure TProperties.DefineStaticText(aCaption: String);
@@ -595,6 +610,12 @@ procedure TProperties.DoChange;
 begin
  if Assigned(fOnChange) then
   fOnChange(Self);
+end;
+
+procedure TProperties.DoStructChange;
+begin
+ if Assigned(f_PanelStructChange) then
+  f_PanelStructChange(Self);
 end;
 
 function TProperties.Encrypt(const aText: String): String;
@@ -639,6 +660,24 @@ procedure TProperties.InnerOnChange(Sender: TObject);
 begin
  f_Changed:= True;
  DoChange;
+end;
+
+procedure TProperties.InnerStructChange(Sender: TObject);
+begin
+ DoStructChange;
+end;
+
+procedure TProperties.ItemsChanged(Sender: TObject; const Item: TddProperty;
+  Action: TCollectionNotification);
+begin
+  {$IFDEF Debug}
+  case Action of
+   cnAdded: Msg2Log('Добавлено свойство %s', [Item.Caption]);
+   cnRemoved: Msg2Log('Удалено свойство %s', [Item.Caption]);
+   cnExtracted: Msg2Log('Извлечено свойство %s', [Item.Caption]);
+  end;
+  {$ENDIF}
+  DoStructChange;
 end;
 
 procedure TProperties.IterateAll(aFunc: TddPropertyFunc);
@@ -844,6 +883,17 @@ begin
  FindProperty(Alias).ChoiceStyle:= Value;
 end;
 
+procedure TProperties.pm_SetOnStructChange(const Value: TNotifyEvent);
+begin
+end;
+
+procedure TProperties.pm_SetStructChanged(const Value: Boolean);
+begin
+  f_StructChanged := Value;
+  if f_StructChanged then
+   DoStructChange;
+end;
+
 procedure TProperties.pm_SetValues(Alias: String; const Value: Variant);
 begin
  AliasItems[Alias].Value:= Value;
@@ -999,9 +1049,11 @@ procedure TddProperty.pm_SetItem(const Value: TProperties);
 begin
  if (PropertyType in [ptList, ptChoice, ptProperties]) then
  begin
-  if f_ListItem = nil then
-   f_ListItem:= TProperties.Create;
-  f_ListItem.Assign(Value);
+  if f_ListItem <> nil then
+   FreeAndNil(f_ListItem);
+  f_ListItem:= Value.Clone;
+ //  f_ListItem:= TProperties.Create;
+ // f_ListItem.Assign(Value);
  end
  else
   raise Exception.Create('Свойство не ptList'); // Добавить ошибку

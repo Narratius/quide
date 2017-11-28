@@ -39,6 +39,7 @@ type
     function Locked: Boolean; stdcall;
     procedure MyControlResized(Sender: TObject);
     procedure Unlock; stdcall;
+    procedure ClearControls; virtual;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -306,6 +307,11 @@ end;
 {
 ******************************** TSizeablePanel ********************************
 }
+procedure TSizeablePanel.ClearControls;
+begin
+ f_InnerControls.Clear;
+end;
+
 constructor TSizeablePanel.Create(aOwner: TComponent);
 begin
   inherited ;
