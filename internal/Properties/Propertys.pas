@@ -164,6 +164,8 @@ type
     procedure pm_SetStructChanged(const Value: Boolean);
     procedure ItemsChanged(Sender: TObject; const Item: TddProperty; Action: TCollectionNotification);
     procedure pm_SetOnStructChange(const Value: TNotifyEvent);
+  protected
+    procedure MakeMenuItems; virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -355,7 +357,13 @@ begin
    f_Visible:= TddProperty(Source).Visible;
    f_ID:= TddProperty(Source).ID; // ?
    f_ReadOnly:= TddProperty(Source).ReadOnly;
-   if PropertyType in [ptList, ptChoice] then
+   f_ChoiceStyle:=  TddProperty(Source).ChoiceStyle;
+   f_Hint:= TddProperty(Source).Hint;
+   // property Event: TNotifyEvent read f_Event write f_Event;
+   fNewLine:= TddProperty(Source).NewLine;
+   // property OnChange: TNotifyEvent read f_OnChange write f_OnChange;
+
+   if PropertyType in [ptList, ptChoice, ptProperties] then
    begin
     if f_ListItem <> nil then
       FreeAndNil(f_ListItem);
@@ -455,6 +463,7 @@ begin
  //f_Items.OnNotify:= ItemsChanged;
  f_ChoiceItems:= TStringList.Create;
  f_Menu:= TPopupMenu.Create(nil);
+ MakeMenuItems;
 end;
 
 function TProperties.Add(aProp: TddProperty): TddProperty;
@@ -816,9 +825,17 @@ begin
           AliasItems[l_Alias].ListItems[k].LoadValues(l_E.ChildNodes.Get(j), LoadStruct);
          end;
        end; // for j
-      end; // ptList
+      end // ptList
+      else
+      if l_type = ptProperties then
+
     end; // Property
   end; // for i
+end;
+
+procedure TProperties.MakeMenuItems;
+begin
+
 end;
 
 function TProperties.pm_GetAliasItems(Alias: String): TddProperty;
@@ -969,7 +986,8 @@ begin
         for j := 0 to ListItemsCount-1 do
          ListItems[j].SaveToXML(l_Value.AddChild('Item'), False);
        end; // ptList
-      ptProperties: ; // TScrollBox (Вложенные свойства)
+      ptProperties:  // TPropertiesPanel (Вложенные свойства)
+        ListItem.SaveToXML(l_Item.AddChild('Properties'), True);
       ptPassword: l_Value.Text:= Encrypt(VarToStrDef(Value, ''));
      end; // case
    end; // with Items[i]

@@ -103,10 +103,6 @@ var
   l_Top, l_Left, l_PrevTop, l_PrevLeft: Integer;
   l_PrevisLabel: Boolean;
 begin
- {$IFDEF Debug}
- with aParent do
-   Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
- {$ENDIF}
  if aControls.Count > 0 then
  begin
   l_PrevControl:= TControl(aControls[aControls.Count-1]);
@@ -208,11 +204,6 @@ begin
  if aControl.GetInterface(ISizeableControl, l_IC) then
   l_IC.OnSizeChanged:= aMyControlResized;
  aControls.Add(aControl);
- {$IFDEF Debug}
- with aControl do
-   Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
- Msg2Log('Parent.Height After: %d', [aParent.Height]);
- {$ENDIF}
 end;
 
 procedure InnerControlResized(aParent: TWinControl; aControl: TControl; aControlsList: TList);

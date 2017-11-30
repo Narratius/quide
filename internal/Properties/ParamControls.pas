@@ -79,6 +79,9 @@ var
   l_C: TControl;
   i: Integer;
 begin
+ {$IFDEF Debug}
+ Msg2Log('CreateControls');
+ {$ENDIF}
  Lock;
  try
   for i:= 0 to Length(aControls)-1 do

@@ -109,6 +109,7 @@ begin
   Define('GraphObject', 'Визуальный элемент', ptInteger, False);
   l_A:= TquideActions.Create;
   try
+   //l_A.Scenario:=
    DefineProperties('Actions', '', l_A);
   finally
    FreeAndNil(l_A);

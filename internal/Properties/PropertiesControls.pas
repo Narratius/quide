@@ -151,6 +151,7 @@ var
 begin
  {$IFDEF Debug}
  Msg2Log('AdjustControls');
+ Msg2Log('>>>>>');
  {$ENDIF}
  { ¬ыравнивание контролов относительно меток
   —ледующий контрол может располагатьс€ на этой же строке
@@ -160,6 +161,10 @@ begin
  l_LeftIndent:= 0;
  {$IFDEF Debug}
  Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
+ Msg2Log('Before:');
+ for j := 0 to ControlCount-1 do
+  with Controls[j] do
+   Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
  {$ENDIF}
 
  lp_SetMaxLeftIndent;
@@ -234,11 +239,16 @@ begin
   end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
   Inc(l_CurCtrlIdx);
  end; //while i
- Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent;
+ if CtrlCount > 0 then
+  Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent
+ else
+  Height:= 2*cIndent;
  {$IFDEF Debug}
+ Msg2Log('After:');
  for j := 0 to ControlCount-1 do
   with Controls[j] do
    Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
+ Msg2Log('<<<<<<');
  {$ENDIF}
 end;
 
@@ -555,6 +565,7 @@ begin
  begin
   Caption:= aProperty.Caption;
   LabelPosition:= cpNone;
+  Size:= csFixed;
  end;
 end;
 
