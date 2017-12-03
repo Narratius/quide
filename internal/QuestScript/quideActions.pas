@@ -282,9 +282,9 @@ begin
   DefineString('Value', '');
   NewLines['Condition']:= False;
   NewLines['Value']:= False;
-  DefineProperties('True', '');
+  DefineProps('True', '');
   DefineStaticText('Иначе');
-  DefineProperties('False', ''); (* *)
+  DefineProps('False', ''); (* *)
 end;
 
 { TquideButtonAction }

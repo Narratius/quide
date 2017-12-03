@@ -27,14 +27,19 @@ function ShowPropDialog(const aCaption: String; aProperties: TProperties;
 function ShowPropDialog(const aCaption: String; aProperty: TddProperty;
     aLabelTop: Boolean = False): Boolean; overload;
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
+procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean); overload;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean);
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean); overload;
+
+procedure SaveToFile(const aFileName: String; aProperties: TProperties); overload;
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties); overload;
+
 
 implementation
 
 Uses
- Forms, UITypes, SysUtils,
+ Forms, UITypes, SysUtils, Classes,
  XMLDoc, XMLIntf,
  PropertiesDialog;
 
@@ -173,6 +178,46 @@ begin
    aProperties.LoadFromXML(l_XML.ChildNodes.FindNode('Properties'), aLoadStruct);
   finally
     l_XML:= nil;
+  end;
+end;
+
+
+procedure SaveToFile(const aFileName: String; aProperties: TProperties);
+var
+  FileStream: TFileStream;
+  MemStream: TMemoryStream;
+  l_StrStream: TStringStream;
+begin
+  FileStream := TFileStream.Create(aFileName, fmCreate);
+  try
+    MemStream := TMemoryStream.Create;
+    try
+      l_StrStream:= TStringStream.Create;
+      MemStream.WriteComponent(aProperties);
+      MemStream.Position := 0;
+      ObjectBinaryToText(MemStream, FileStream);
+    finally
+      MemStream.Free;
+    end;
+  finally
+    FileStream.Free;
+  end;
+end;
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties);
+var
+  FileStream: TFileStream;
+  MemStream: TMemoryStream;
+begin
+  FileStream := TFileStream.Create(aFileName, 0);
+  MemStream := TMemoryStream.Create;
+  try
+    ObjectTextToBinary(FileStream, MemStream);
+    MemStream.Position := 0;
+    MemStream.ReadComponent(aProperties);
+  finally
+    MemStream.Free;
+    FileStream.Free;
   end;
 end;
 

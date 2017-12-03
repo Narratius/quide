@@ -109,7 +109,7 @@ begin
   Define('GraphObject', 'Визуальный элемент', ptInteger, False);
   l_A:= TquideActions.Create;
   try
-   DefineProperties('Actions', '', l_A);
+   DefineProps('Actions', '', l_A);
   finally
    FreeAndNil(l_A);
   end;

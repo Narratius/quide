@@ -234,6 +234,8 @@ begin
   end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
   Inc(l_CurCtrlIdx);
  end; //while i
+ if CtrlCount > 0 then
+ 
  Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent;
  {$IFDEF Debug}
  for j := 0 to ControlCount-1 do
