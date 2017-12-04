@@ -290,6 +290,7 @@ begin
   DefineString('Value', '');
   NewLines['Condition']:= False;
   NewLines['Value']:= False;
+<<<<<<< HEAD
   l_P:= TquideActions.Create;
   try
    DefineProperties('True', '', l_P);
@@ -303,6 +304,11 @@ begin
   finally
    l_P.Free;
   end;
+=======
+  DefineProps('True', '');
+  DefineStaticText('Иначе');
+  DefineProps('False', ''); (* *)
+>>>>>>> ac0925feb1c76a9e0b4781d8ab66a4d4ec276492
 end;
 
 { TquideButtonAction }

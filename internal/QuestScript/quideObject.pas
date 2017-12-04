@@ -11,7 +11,6 @@ type
   //1 Базовый объект
   TquideObject = class(TProperties)
   private
-    f_Changed: Boolean;
     //f_GraphID: DWord;
     function pm_GetCaption: string;
     function pm_GetHint: string;
@@ -29,7 +28,6 @@ type
     procedure Save(aStream: TStream); virtual;
     //1 Название
     property Caption: string read pm_GetCaption write pm_SetCaption;
-    property Changed: Boolean read f_Changed write f_Changed;
     //property GraphID: DWord read f_GraphID write f_GraphID;
     //1 Краткое описание
     property Hint: string read pm_GetHint write pm_SetHint;

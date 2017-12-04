@@ -27,7 +27,7 @@ type
   TddChoiceLink = class;
   TddPropertyLink = class;
   TProperties = class;
-  TddProperty = class(TPersistent)
+  TddProperty = class(TCollectionItem)
   private
     FNewLine: Boolean;
     f_Alias: string;
@@ -36,7 +36,7 @@ type
     f_PropertyType: TddPropertyType;
     f_Value: Variant;
     f_Visible: Boolean;
-    f_ID: Integer;
+    f_UID: Integer;
     f_ListItem: TProperties;      // Эталонный элемент списка
     f_ListItems: TObjectList<TProperties>;
     f_Hint: String;
@@ -50,9 +50,34 @@ type
     function pm_GetItems(Index: Integer): TProperties;
     procedure pm_SetItem(const Value: TProperties);
     procedure MakeChoiceItem;
+    procedure ReadAlias(Reader: TReader);
+    procedure WriteAlias(Writer: TWriter);
+    procedure ReadCaption(Reader: TReader);
+    procedure WriteCaption(Writer: TWriter);
+    procedure ReadPropertyType(Reader: TReader);
+    procedure WritePropertyType(Writer: TWriter);
+    procedure ReadValue(Reader: TReader);
+    procedure WriteValue(Writer: TWriter);
+    procedure ReadVisible(Reader: TReader);
+    procedure WriteVisible(Writer: TWriter);
+    procedure ReadID(Reader: TReader);
+    procedure WriteID(Writer: TWriter);
+    procedure ReadListItem(Reader: TReader);
+    procedure WriteListItem(Writer: TWriter);
+    procedure ReadListItems(Reader: TReader);
+    procedure WriteListItems(Writer: TWriter);
+    procedure ReadHint(Reader: TReader);
+    procedure WriteHint(Writer: TWriter);
+    procedure ReadReadOnly(Reader: TReader);
+    procedure WriteReadOnly(Writer: TWriter);
+    procedure ReadChoiceProp(Reader: TReader);
+    procedure WriteChoiceProp(Writer: TWriter);
+    procedure ReadChoiceStyle(Reader: TReader);
+    procedure WriteShoiceStyle(Writer: TWriter);
+  protected
+   procedure DefineProperties(Filer: TFiler); override;
   public
-    constructor Create(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True); reintroduce;
+    constructor Create(aCollection: TCollection); overload;
     constructor MakeList(const aAlias, aCaption: String; aListDef: TddPropertyLink;
         aVisible: Boolean = True);
     constructor MakeButton(const aAlias, aCaption: String; aEvent: TNotifyEvent;
@@ -63,6 +88,7 @@ type
     function AddItem: Integer; overload;
     function AddItem(aItem: TProperties): Integer; overload;
     procedure Assign(Source: TPersistent); override;
+    procedure Define(const aAlias, aCaption: String; aType: TddPropertyType; aVisible: Boolean);
     procedure DeleteItem(Index: Integer);
     procedure Clear;
     procedure CheckItem(aCaption: String);
@@ -76,7 +102,7 @@ type
     property Alias: string read f_Alias write f_Alias;
     property Caption: String read f_Caption write f_Caption;
     property ChoiceStyle: TddChoiceStyle read f_ChoiceStyle write f_ChoiceStyle;
-    property ID: Integer read f_ID write f_ID;
+    property UID: Integer read f_UID write f_UID;
     property Hint: String read f_Hint write f_Hint;
     property OrdinalType: Boolean read pm_GetOrdinalType;
     property PropertyType: TddPropertyType read f_PropertyType write
@@ -91,6 +117,18 @@ type
     property NewLine: Boolean read FNewLine write FNewLine default True;
     property OnChange: TNotifyEvent read f_OnChange write f_OnChange;
   end;
+
+  TddPropertyCollection = class(TCollection)
+  private
+    function pm_GetItem(Index: Integer): TddProperty;
+    procedure pm_SetItem(Index: Integer; Value: TddProperty);
+  public
+    function Add: TddProperty;
+    function AddItem(Item: TddProperty; Index: Integer): TddProperty;
+    function Insert(Index: Integer): TddProperty;
+    property Items[Index: Integer]: TddProperty read pm_GetItem write pm_SetItem; default;
+  end;
+
 
 
   TddPropertyLink = class
@@ -123,10 +161,10 @@ type
 
   TddPropertyFunc = function (aItem: TddProperty): Boolean of object;
 
-  TProperties = class(TInterfacedObject, IpropertyStore)
+  TProperties = class(TComponent{, IpropertyStore})
   private
     f_Changed: Boolean;
-    f_Items: TObjectList<TddProperty>;
+    f_Items: TddPropertyCollection;
     f_ChoiceItems: TStrings;
     FOnChange: TNotifyEvent;
     f_Menu: TPopupMenu;
@@ -134,6 +172,10 @@ type
     f_PanelStructChange: TNotifyEvent;
     f_StructChanged: Boolean;
   private
+    procedure ReadItems(Reader: TReader);
+    procedure WriteItems(Writer: TWriter);
+    procedure ReadChoiceItems(Reader: TReader);
+    procedure WriteChoiceItems(Writer: TWriter);
     function FindProperty(aAlias: String): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
@@ -166,10 +208,13 @@ type
     procedure pm_SetOnStructChange(const Value: TNotifyEvent);
   protected
     procedure MakeMenuItems; virtual;
+    procedure DefineProperties(Filer: TFiler); override;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    function Add(aProp: TddProperty): TddProperty;
+    function AddProp(aProp: TddProperty): TddProperty;
+    function Add(const aAlias, aCaption: String; aType: TddPropertyType;
+        aVisible: Boolean = True): TddProperty;
     procedure Assign(Source: TProperties);
     function Clone: Pointer;
     procedure Define(const aAlias, aCaption: String; aType: TddPropertyType;
@@ -183,8 +228,8 @@ type
     procedure DefineInteger(const aAlias, aCaption: String);
     procedure DefineList(const aAlias, aCaption: String;  aVisible: Boolean = True; aItem: TddPropertyLink = nil);
     procedure DefinePassword(const aAlias, aCaption: String);
-    procedure DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil); overload;
-    procedure DefineProperties(const aAlias, aCaption: String; Items: TProperties); overload;
+    procedure DefineProps(const aAlias, aCaption: String; Items: TddPropertyLink = nil); overload;
+    procedure DefineProps(const aAlias, aCaption: String; Items: TProperties); overload;
     procedure DefineString(const aAlias, aCaption: String);
     procedure DefineText(const aAlias, aCaption: String);
     procedure DefineStaticText(aCaption: String);
@@ -237,7 +282,7 @@ function String2PropertyType(const aText: String): TddPropertyType;
 implementation
 
 Uses
- Variants,
+ Variants, TypInfo,
  PropertyUtils
  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
@@ -339,6 +384,35 @@ begin
  Result:= f_ListItems.Add(aItem);
 end;
 
+procedure TddProperty.Define(const aAlias, aCaption: String;
+  aType: TddPropertyType; aVisible: Boolean);
+begin
+  if (aAlias = '') or CharInSet(aAlias[1], ['0'..'9']) then
+   raise Exception.Create('Alias не может быть пустым или начинаться с цифры');
+  Alias:= aAlias;
+  Caption:= aCaption;
+  PropertyType:= aType;
+  Visible:= aVisible;
+end;
+
+procedure TddProperty.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('Alias', ReadAlias, WriteAlias, True);
+  Filer.DefineProperty('Caption', ReadCaption, WriteCaption, True);
+  Filer.DefineProperty('PropertyType', ReadPropertyType, WritePropertyType, True);
+  Filer.DefineProperty('Value', ReadValue, WriteValue, True);
+
+  Filer.DefineProperty('Visible', ReadVisible, WriteVisible, True);
+  Filer.DefineProperty('UID', ReadID, WriteID, True);
+  Filer.DefineProperty('ListItem', ReadListItem, WriteListItem, True);
+  //Filer.DefineProperty('ListItems', ReadListItems, WriteListItems, True);
+  Filer.DefineProperty('Hint', ReadHint, WriteHint, True);
+  Filer.DefineProperty('ReadOnly', ReadReadOnly, WriteReadOnly, True);
+  //Filer.DefineProperty('ChoiceProp', ReadChoiceProp, WriteChoiceProp, True);
+  Filer.DefineProperty('ChoiceStyle', ReadChoiceStyle, WriteShoiceStyle, True);
+end;
+
 procedure TddProperty.DeleteItem(Index: Integer);
 begin
  f_ListItems.Delete(Index);
@@ -355,7 +429,7 @@ begin
    f_PropertyType:= TddProperty(Source).PropertyType;
    f_Value:= TddProperty(Source).Value;
    f_Visible:= TddProperty(Source).Visible;
-   f_ID:= TddProperty(Source).ID; // ?
+   f_UID:= TddProperty(Source).UID; // ?
    f_ReadOnly:= TddProperty(Source).ReadOnly;
    f_ChoiceStyle:=  TddProperty(Source).ChoiceStyle;
    f_Hint:= TddProperty(Source).Hint;
@@ -412,21 +486,17 @@ end;
 
 function TddProperty.Clone: TddProperty;
 begin
- Result:= TddPropertyClass(ClassType).Create(Alias, Caption, PropertyType, Visible);
+ Result:= TddPropertyClass(ClassType).Create(Collection);
  Result.Assign(Self);
 end;
 
-constructor TddProperty.Create;
+
+constructor TddProperty.Create(aCollection: TCollection);
 begin
-  inherited Create;
-  if (aAlias = '') or CharInSet(aAlias[1], ['0'..'9']) then
-   raise Exception.Create('Alias не может быть пустым или начинаться с цифры');
-  Alias:= aAlias;
-  Caption:= aCaption;
-  PropertyType:= aType;
-  Visible:= aVisible;
+  inherited;
+  f_UID:= ID;
   Value:= Unassigned;
-  f_ChoiceStyle:= csreadOnlyList;
+  f_ChoiceStyle:= csReadOnlyList;
   f_ListItems:= TObjectList<TProperties>.Create;
   fNewLine:= True;
 end;
@@ -435,21 +505,24 @@ end;
 constructor TddProperty.MakeButton(const aAlias, aCaption: String;
   aEvent: TNotifyEvent; aVisible: Boolean);
 begin
- Create(aAlias, aCaption, ptAction, aVisible);
+ Create(nil);
+ Define(aAlias, aCaption, ptAction, aVisible);
  Event:= aEvent;
 end;
 
 constructor TddProperty.MakeChoice(const aAlias, aCaption: String;
   aChoiceDef: TddChoiceLink; aVisible: Boolean);
 begin
- Create(aAlias, aCaption, ptChoice, aVisible);
+ Create(nil);
+ Define(aAlias, aCaption, ptChoice, aVisible);
  SetChoice(aChoiceDef);
 end;
 
 constructor TddProperty.MakeList(const aAlias, aCaption: String;
   aListDef: TddPropertyLink; aVisible: Boolean);
 begin
- Create(aAlias, aCaption, ptList, aVisible);
+ Create(nil);
+ Define(aAlias, aCaption, ptList, aVisible);
  SetItem(aListDef);
 end;
 
@@ -458,25 +531,38 @@ end;
 }
 constructor TProperties.Create;
 begin
- inherited;
- F_Items := TObjectList<TddProperty>.Create(True);
+ inherited Create(nil);
+ F_Items := TddPropertyCollection.Create(TddProperty);
  //f_Items.OnNotify:= ItemsChanged;
  f_ChoiceItems:= TStringList.Create;
  f_Menu:= TPopupMenu.Create(nil);
  MakeMenuItems;
 end;
 
-function TProperties.Add(aProp: TddProperty): TddProperty;
+function TProperties.AddProp(aProp: TddProperty): TddProperty;
 begin
+  Assert(False, 'Не нужно вызывать AddProp');
+ (*
  Result:= aProp;
- Result.ID:= f_Items.Add(aProp) + propBase;
+ Result.ID:= f_Items.(aProp) + propBase;
  Result.OnChange:= InnerOnChange;
+ *)
+end;
+
+function TProperties.Add(const aAlias, aCaption: String; aType: TddPropertyType;
+        aVisible: Boolean = True): TddProperty;
+begin
+ Result:= f_Items.Add;
+ Result.UID:= Result.Index + propBase;
+ Result.OnChange:= InnerOnChange;
+ Result.Define(aAlias, aCaption, aType, aVisible);
 end;
 
 procedure TProperties.Assign(Source: TProperties);
 var
   I: Integer;
   l_I: TMenuItem;
+  l_P: TddProperty;
 begin
   f_Items.Clear; //
 
@@ -491,7 +577,10 @@ begin
    end;
   *)
   for I := 0 to TProperties(Source).Count - 1 do
-   Add(TProperties(Source).Items[I].Clone);
+  begin
+   l_P:= f_Items.Add;
+   l_P.Assign(TProperties(Source).Items[I]);
+  end;
   fOnChange:= Source.OnChange;
   f_OwnerStructChange:= TProperties(Source).OnOwnerStructureChange;
   f_PanelStructChange:= TProperties(Source).OnPanelStructureChange;
@@ -511,7 +600,7 @@ end;
 procedure TProperties.Define(const aAlias, aCaption: String; aType:
     TddPropertyType; aVisible: Boolean = True);
 begin
- Add(TddProperty.Create(aAlias, aCaption, aType, aVisible));
+ Add(aAlias, aCaption, aType, aVisible);
 end;
 
 procedure TProperties.DefineBoolean(const aAlias, aCaption: String);
@@ -569,7 +658,13 @@ begin
   Define(aAlias, aCaption, ptPassword, True);
 end;
 
-procedure TProperties.DefineProperties(const aAlias, aCaption: String;
+procedure TProperties.DefineProperties(Filer: TFiler);
+begin
+ inherited;
+ Filer.DefineProperty('Items', readItems, WriteItems, True);
+end;
+
+procedure TProperties.DefineProps(const aAlias, aCaption: String;
   Items: TProperties);
 begin
  Define(aAlias, aCaption, ptProperties);
@@ -581,7 +676,7 @@ begin
  end;
 end;
 
-procedure TProperties.DefineProperties(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
+procedure TProperties.DefineProps(const aAlias, aCaption: String; Items: TddPropertyLink = nil);
 begin
   Define(aAlias, aCaption, ptProperties);
   { TODO : Развернуть список свойств }
@@ -923,6 +1018,16 @@ begin
  Changed:= True;
 end;
 
+procedure TProperties.ReadChoiceItems(Reader: TReader);
+begin
+
+end;
+
+procedure TProperties.ReadItems(Reader: TReader);
+begin
+  Reader.ReadCollection(f_Items);
+end;
+
 procedure TProperties.SaveToXML(Element: IXMLNode; SaveStruct: Boolean);
 begin
  SaveValues(Element, SaveStruct);
@@ -1009,6 +1114,16 @@ begin
   FOnChange := Value;
 end;
 
+procedure TProperties.WriteChoiceItems(Writer: TWriter);
+begin
+
+end;
+
+procedure TProperties.WriteItems(Writer: TWriter);
+begin
+  Writer.WriteCollection(f_Items);
+end;
+
 { TddPropertyLink }
 
 constructor TddPropertyLink.Create(aItem: TddProperty; aNext: TddPropertyLink);
@@ -1082,6 +1197,73 @@ begin
   f_PropertyType := Value;
 end;
 
+procedure TddProperty.ReadAlias(Reader: TReader);
+begin
+ f_Alias:= Reader.ReadString
+end;
+
+procedure TddProperty.ReadCaption(Reader: TReader);
+begin
+ f_Caption:= Reader.ReadString;
+end;
+
+procedure TddProperty.ReadChoiceProp(Reader: TReader);
+begin
+ { TODO : Потом реализовать }
+end;
+
+procedure TddProperty.ReadChoiceStyle(Reader: TReader);
+begin
+  f_ChoiceStyle := TddChoiceStyle(GetEnumValue(TypeInfo(TddChoiceStyle), Reader.ReadIdent));
+end;
+
+procedure TddProperty.ReadHint(Reader: TReader);
+begin
+ f_Hint:= Reader.ReadString;
+end;
+
+procedure TddProperty.ReadID(Reader: TReader);
+begin
+ f_UID:= Reader.ReadInteger;
+end;
+
+procedure TddProperty.ReadListItem(Reader: TReader);
+var
+ l_Read: Boolean;
+begin
+ l_Read:= Reader.ReadBoolean;
+ if l_read then
+ begin
+  f_ListItem:= TProperties.Create;
+  Reader.ReadComponent(f_ListItem);
+ end;
+end;
+
+procedure TddProperty.ReadListItems(Reader: TReader);
+begin
+ { TODO : Потом реализовать }
+end;
+
+procedure TddProperty.ReadPropertyType(Reader: TReader);
+begin
+ f_PropertyType:= TddPropertyType(GetEnumValue(TypeInfo(TddPropertyType), Reader.ReadIdent));
+end;
+
+procedure TddProperty.ReadReadOnly(Reader: TReader);
+begin
+ f_ReadOnly:= Reader.ReadBoolean;
+end;
+
+procedure TddProperty.ReadValue(Reader: TReader);
+begin
+ f_Value:= Reader.ReadVariant;
+end;
+
+procedure TddProperty.ReadVisible(Reader: TReader);
+begin
+ f_Visible:= Reader.ReadBoolean;
+end;
+
 procedure TddProperty.MakeChoiceItem;
 begin
  FreeAndNil(f_ListItem);
@@ -1145,6 +1327,68 @@ begin
  f_ListItem:= LinkToProperties(aItem);
 end;
 
+
+procedure TddProperty.WriteAlias(Writer: TWriter);
+begin
+ Writer.WriteString(f_Alias);
+end;
+
+procedure TddProperty.WriteCaption(Writer: TWriter);
+begin
+ Writer.WriteString(f_Caption);
+end;
+
+procedure TddProperty.WriteChoiceProp(Writer: TWriter);
+begin
+
+end;
+
+procedure TddProperty.WriteHint(Writer: TWriter);
+begin
+ Writer.WriteString(f_Hint);
+end;
+
+procedure TddProperty.WriteID(Writer: TWriter);
+begin
+ Writer.WriteInteger(f_UID);
+end;
+
+procedure TddProperty.WriteListItem(Writer: TWriter);
+begin
+ Writer.WriteBoolean(f_ListItem <> nil);
+ if f_ListItem <> nil then
+  Writer.WriteComponent(f_ListItem);
+end;
+
+procedure TddProperty.WriteListItems(Writer: TWriter);
+begin
+
+end;
+
+procedure TddProperty.WritePropertyType(Writer: TWriter);
+begin
+ Writer.WriteIdent(GetEnumName(TypeInfo(TddPropertyType), Integer(f_PropertyType)))
+end;
+
+procedure TddProperty.WriteReadOnly(Writer: TWriter);
+begin
+ Writer.WriteBoolean(f_ReadOnly);
+end;
+
+procedure TddProperty.WriteShoiceStyle(Writer: TWriter);
+begin
+ Writer.WriteIdent(GetEnumName(TypeInfo(TddChoiceStyle), Integer(f_ChoiceStyle)))
+end;
+
+procedure TddProperty.WriteValue(Writer: TWriter);
+begin
+ Writer.WriteVariant(f_Value);
+end;
+
+procedure TddProperty.WriteVisible(Writer: TWriter);
+begin
+ Writer.WriteBoolean(f_Visible);
+end;
 
 { TddPropertyList }
 (*
@@ -1223,4 +1467,35 @@ begin
   FText := Value;
 end;
 
+{ TddPropertyCollection }
+
+function TddPropertyCollection.Add: TddProperty;
+begin
+  Result:= TddProperty(inherited Add);
+end;
+
+function TddPropertyCollection.AddItem(Item: TddProperty;
+  Index: Integer): TddProperty;
+begin
+
+end;
+
+
+function TddPropertyCollection.Insert(Index: Integer): TddProperty;
+begin
+   Result := AddItem(nil, Index);
+end;
+
+function TddPropertyCollection.pm_GetItem(Index: Integer): TddProperty;
+begin
+  Result:= TddProperty(inherited GetItem(Index));
+end;
+
+procedure TddPropertyCollection.pm_SetItem(Index: Integer; Value: TddProperty);
+begin
+ inherited SetItem(Index, Value);
+end;
+
+initialization
+  RegisterClasses([TddProperty, TProperties, TddPropertyCollection]);
 end.

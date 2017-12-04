@@ -27,14 +27,19 @@ function ShowPropDialog(const aCaption: String; aProperties: TProperties;
 function ShowPropDialog(const aCaption: String; aProperty: TddProperty;
     aLabelTop: Boolean = False): Boolean; overload;
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
+procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean); overload;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean);
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean); overload;
+
+procedure SaveToFile(const aFileName: String; aProperties: TProperties); overload;
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties); overload;
+
 
 implementation
 
 Uses
- Forms, UITypes, SysUtils,
+ Forms, UITypes, SysUtils, Classes,
  XMLDoc, XMLIntf,
  PropertiesDialog;
 
@@ -42,7 +47,8 @@ function NewProperty(const aAlias, aCaption: String; aPropertyType: TddPropertyT
 var
  l_I: TddProperty;
 begin
- l_I:= TddProperty.Create(aAlias, aCaption, aPropertyType);
+ l_I:= TddProperty.Create(nil);
+ l_I.Define(aAlias, aCaption, aPropertyType, True);
  Result:= TddPropertyLink.Create(l_I, aNext);
 end;
 
@@ -95,7 +101,7 @@ begin
  l_Next:= aLink;
  while l_Next <> nil do
  begin
-   Result.Add(l_Next.Item);
+   Result.AddProp(l_Next.Item);
    l_Item:= l_Next;
    l_Next:= l_Item.Next;
    FreeAndNil(l_Item);
@@ -127,7 +133,7 @@ begin
  { TODO : Нужно клонировать aProperty }
  l_Prop:= TProperties.Create;
  try
-  l_Prop.Add(aProperty);
+  l_Prop.AddProp(aProperty);
   with TPropDialog.Create(Application) do
   try
    LabelTop:= aLabelTop;
@@ -173,6 +179,44 @@ begin
    aProperties.LoadFromXML(l_XML.ChildNodes.FindNode('Properties'), aLoadStruct);
   finally
     l_XML:= nil;
+  end;
+end;
+
+
+procedure SaveToFile(const aFileName: String; aProperties: TProperties);
+var
+  FileStream: TFileStream;
+  MemStream: TMemoryStream;
+begin
+  FileStream := TFileStream.Create(aFileName, fmCreate);
+  try
+    MemStream := TMemoryStream.Create;
+    try
+      MemStream.WriteComponent(aProperties);
+      MemStream.Position := 0;
+      ObjectBinaryToText(MemStream, FileStream);
+    finally
+      MemStream.Free;
+    end;
+  finally
+    FileStream.Free;
+  end;
+end;
+
+procedure LoadFromFile(const aFileName: String; aProperties: TProperties);
+var
+  FileStream: TFileStream;
+  MemStream: TMemoryStream;
+begin
+  FileStream := TFileStream.Create(aFileName, 0);
+  MemStream := TMemoryStream.Create;
+  try
+    ObjectTextToBinary(FileStream, MemStream);
+    MemStream.Position := 0;
+    MemStream.ReadComponent(aProperties);
+  finally
+    MemStream.Free;
+    FileStream.Free;
   end;
 end;
 

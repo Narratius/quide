@@ -291,6 +291,8 @@ begin
   Chapters[i].SaveToXML(l_Node.AddChild('Chapter'));
  // Переменные
  l_Doc.SaveToFile(aFileName);
+ // Сериализация
+ PropertyUtils.SaveToFile(ChangeFileExt(aFileName, '.dat'), Self)
 end;
 
 procedure TquideScenario.UpdateChapters;

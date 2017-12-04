@@ -109,8 +109,12 @@ begin
   Define('GraphObject', 'Визуальный элемент', ptInteger, False);
   l_A:= TquideActions.Create;
   try
+<<<<<<< HEAD
    //l_A.Scenario:=
    DefineProperties('Actions', '', l_A);
+=======
+   DefineProps('Actions', '', l_A);
+>>>>>>> ac0925feb1c76a9e0b4781d8ab66a4d4ec276492
   finally
    FreeAndNil(l_A);
   end;

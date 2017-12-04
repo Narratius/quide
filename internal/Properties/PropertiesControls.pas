@@ -137,14 +137,14 @@ var
 
  procedure lp_SetFirstCtrl;
  begin
-   l_FirstCtrl:= ControlByTag(f_Properties.Items[l_CurCtrlIdx].ID);
-   if f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline then
+   l_FirstCtrl:= ControlByTag(f_Properties.Items[l_CurCtrlIdx].UID);
+   if f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].UID)].LabelPosition = cpInline then
    begin
      // Подгонка отступа и ширины по левому краю
      l_FirstCtrl.Left:= l_LeftIndent + cIndent;
      if f_Controls[lf_CtrlByTag(l_FirstCtrl.Tag)].Size = csAutoSize then
       l_FirstCtrl.Width:= ClientWidth - l_FirstCtrl.Left - cIndent;
-     l_LblWidth:= l_FirstCtrl.Left-2*cIndent;//LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width;
+     l_LblWidth:= l_FirstCtrl.Left-2*cIndent;//LabelByTag(f_Properties.Items[l_CurCtrlIdx].UID).Width;
    end;
  end;
 
@@ -194,9 +194,9 @@ begin
      begin
       if not f_Properties.Items[l_CurCtrlIdx].NewLine then
       begin
-       if (f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].ID)].LabelPosition = cpInline) then
+       if (f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].UID)].LabelPosition = cpInline) then
        begin
-        Inc(l_LblWidth, LabelByTag(f_Properties.Items[l_CurCtrlIdx].ID).Width+cIndent);
+        Inc(l_LblWidth, LabelByTag(f_Properties.Items[l_CurCtrlIdx].UID).Width+cIndent);
         Inc(l_LblCount);
        end;
        Inc(l_CurCtrlIdx);
@@ -217,7 +217,7 @@ begin
       l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left;
       for i := l_Cur to l_Cur + l_Count-1 do
       begin
-       j:= lf_CtrlByTag(f_Properties.Items[i].ID);
+       j:= lf_CtrlByTag(f_Properties.Items[i].UID);
        if f_Controls[j].LabelPosition = cpInline then
        begin
         with LabelByTag(f_Controls[j].Tag) do
@@ -332,7 +332,7 @@ function TPropertiesPanel.GetOneValue(aProperty: TddProperty): Boolean;
 var
  l_C: TControl;
 begin
- l_C:= ControlByTag(aProperty.ID);
+ l_C:= ControlByTag(aProperty.UID);
  if l_C <> nil then
     case aProperty.PropertyType of
       ptChar,
@@ -533,7 +533,7 @@ begin
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
    f_Controls[i].ReadOnly:= aProperty.ReadOnly;
-   f_Controls[i].Tag:= aProperty.ID;
+   f_Controls[i].Tag:= aProperty.UID;
    f_Controls[i].Event:= aProperty.Event;
    f_Controls[i].Hint:= aProperty.Hint;
    f_Controls[i].OnChange:= aProperty.OnChange;
@@ -708,7 +708,7 @@ function TPropertiesPanel.SetOneValue(aProperty: TddProperty): Boolean;
 var
  l_C: TControl;
 begin
- l_C:= ControlByTag(aProperty.ID);
+ l_C:= ControlByTag(aProperty.UID);
  if l_C <> nil then
     case aProperty.PropertyType of
       ptChar,

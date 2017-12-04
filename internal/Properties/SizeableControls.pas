@@ -116,6 +116,8 @@ begin
  begin
   l_Top:= cIndent;
   l_Left:= cIndent;
+  l_PrevTop:= cIndent;
+  l_PrevLeft:= cIndent;
  end;
   // CtrlPosition  - расположение контролов относительно друг друга
  if aCtrlPosition = cpNewLine then
