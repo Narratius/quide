@@ -97,7 +97,7 @@ var
  l_Item: TddPropertyLink;
  l_Next: TddPropertyLink;
 begin
- Result:= TProperties.Create;
+ Result:= TProperties.Create(nil);
  l_Next:= aLink;
  while l_Next <> nil do
  begin
@@ -131,7 +131,7 @@ var
  l_P: TddProperty;
 begin
  { TODO : Нужно клонировать aProperty }
- l_Prop:= TProperties.Create;
+ l_Prop:= TProperties.Create(nil);
  try
   l_Prop.AddProp(aProperty);
   with TPropDialog.Create(Application) do
@@ -188,6 +188,14 @@ var
   FileStream: TFileStream;
   MemStream: TMemoryStream;
 begin
+  // test
+  FileStream := TFileStream.Create(ChangeFileExt(aFileName, '.bin'), fmCreate);
+  try
+   FileStream.WriteComponent(aProperties);
+  finally
+    FileStream.Free;
+  end;
+  // test
   FileStream := TFileStream.Create(aFileName, fmCreate);
   try
     MemStream := TMemoryStream.Create;
