@@ -1268,7 +1268,10 @@ begin
  begin
   if f_ListItem <> nil then
    FreeAndNil(f_ListItem);
-  f_ListItem:= Value.Clone;
+  if csLoading in Value.ComponentState then
+   f_ListItem:= Value
+  else
+   f_ListItem:= Value.Clone;
   f_ListItem.Name:= 'ListItem'+IntToStr(UID);
   //InsertComponent(f_ListItem);
 //  f_ListItem.SetSubComponent(True);
