@@ -3,7 +3,7 @@ unit quideSteps;
 interface
 
 uses
- Generics.Collections, XML.XMLIntf,
+ Classes, Generics.Collections, XML.XMLIntf,
  quideObject, quideLocations;
 
 type
@@ -14,7 +14,7 @@ type
     function pm_GetLocations(Index: Integer): TquideLocation;
     function pm_GetLocationsCount: Integer;
   public
-    constructor Create; override;
+    constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     function AddLocation: TquideLocation;
     procedure Delete(Index: Integer); overload;
@@ -41,7 +41,7 @@ Uses
 }
 constructor TquideChapter.Create;
 begin
-  inherited Create;
+  inherited Create(aOwner);
   f_Locations := TObjectList<TquideLocation>.Create();
   Define('Start', 'Начало игры', ptString)
 end;
@@ -72,7 +72,7 @@ end;
 
 function TquideChapter.AddLocation: TquideLocation;
 begin
- Result:= TquideLocation.Create;
+ Result:= TquideLocation.Create(nil);
  f_Locations.Add(Result);
 end;
 

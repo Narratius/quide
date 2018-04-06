@@ -5,12 +5,13 @@ unit quideConfig;
 interface
 
 Uses
+ Classes,
  Propertys;
 
 type
  TquideConfig = class(TProperties)
  public
-   constructor Create;
+   constructor Create(aOwner: TComponent); override;
    procedure LoadFromFile;
    procedure SaveToFile;
  end;
@@ -25,7 +26,7 @@ Uses
 
 constructor TquideConfig.Create;
 begin
-  inherited;
+  inherited Create(aOwner);
   DefineList('Generators', 'Генераторы', True,
         NewProperty('Caption', 'Название', ptString,
         NewProperty('Path', 'Файл генератора', ptString,

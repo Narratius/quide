@@ -863,14 +863,17 @@ end;
 
 procedure TMainForm.CreateConfig;
 begin
-  f_AppConfig:= TquideConfig.Create;
+  f_AppConfig:= TquideConfig.Create(nil);
   f_AppConfig.LoadFromFile;
 end;
 
 procedure TMainForm.DestroyConfig;
 begin
-  f_AppConfig.SaveToFile;
-  FreeAndNil(f_AppConfig);
+  if f_AppConfig <> nil then
+  begin
+   f_AppConfig.SaveToFile;
+   FreeAndNil(f_AppConfig);
+  end;
 end;
 
 procedure TMainForm.DestroyScript;
@@ -1158,7 +1161,7 @@ end;
 
 procedure TMainForm.MakeScript;
 begin
- f_Scenario:= TquideScenario.Create;
+ f_Scenario:= TquideScenario.Create(nil);
  f_Scenario.AddChapter;
 end;
 

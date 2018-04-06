@@ -18,7 +18,7 @@ type
     procedure pm_SetHint(const Value: string);
   protected
   public
-    constructor Create; override;
+    constructor Create(aOwner: TComponent); override;
     constructor Make(const aCaption, aHint: string);
     //1 Сбрасывает в начальное состояние
     procedure Clear; virtual;
@@ -50,7 +50,7 @@ var
 }
 constructor TquideObject.Create;
 begin
-  inherited Create;
+  inherited Create(aOwner);
   Define('ID', 'Идентификатор', ptInteger, False);
   Define('Caption', 'Название', ptString);
   Define('Hint', 'Описание', ptString);
@@ -58,7 +58,7 @@ end;
 
 constructor TquideObject.Make(const aCaption, aHint: string);
 begin
-  Create;
+  Create (nil);
   Caption:= aCaption;
   Hint:= aHint;
 end;

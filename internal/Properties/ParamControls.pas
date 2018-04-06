@@ -9,6 +9,7 @@ uses
 type
   { TODO : ѕочему бы не хранить здесь само свойство? »ли хот€ бы описание вложенного }
   TControlRec = record
+    PropType: TddPropertyType;
     Caption: string;
     ChoiceStyle: TddChoiceStyle;
     ControlClass: TControlClass;
@@ -40,27 +41,30 @@ type
   end;
 
 const
- cDefControlRec : TControlRec = (Caption: '';
-                                 ChoiceStyle: csReadOnlyList;
-                                 ControlClass: TSizeableMemo;
-                                 CtrlPosition: cpNewLine;
-                                 LabelPosition: cpNewLine;
-                                 Size: csAutoSize;
-                                 Height: 0;
-                                 Width: 0;
-                                 Hint: '';
-                                 Tag: 0;
-                                 ReadOnly: False;
-                                 Menu: nil;
-                                 Event: nil;
-                                 OnChange: nil;
-                                 SubItem: nil
-                                 );
+ cDefControlRec : TControlRec = (
+        PropType: ptNothing;
+        Caption: '';
+        ChoiceStyle: csReadOnlyList;
+        ControlClass: TSizeableMemo;
+        CtrlPosition: cpNewLine;
+        LabelPosition: cpNewLine;
+        Size: csAutoSize;
+        Height: 0;
+        Width: 0;
+        Hint: '';
+        Tag: 0;
+        ReadOnly: False;
+        Menu: nil;
+        Event: nil;
+        OnChange: nil;
+        SubItem: nil
+        );
 
 implementation
 
 uses
- SysUtils, StdCtrls, Math, PropertiesControls
+ SysUtils, StdCtrls, ComCtrls, Math, ExtCtrls, Graphics,
+ PropertiesControls
  {$IFDEF Debug}, ddLogFile{$ENDIF};
 
 {
@@ -79,9 +83,6 @@ var
   l_C: TControl;
   i: Integer;
 begin
- {$IFDEF Debug}
- Msg2Log('CreateControls');
- {$ENDIF}
  Lock;
  try
   for i:= 0 to Length(aControls)-1 do
@@ -99,7 +100,11 @@ begin
 
    //AddControl(l_C, aControls[i].Size, aControls[i].Position);
    if l_C is TLabel then
-    TLabel(l_C).Caption:= aControls[i].Caption
+   begin
+    TLabel(l_C).Caption:= aControls[i].Caption;
+    if aControls[i].PropType = ptDivider then
+     TLabel(l_C).Font.Style:= [fsBold];
+   end
    else
    if l_C is TButton then
    begin
@@ -149,7 +154,16 @@ begin
     if l_C is TPropertiesPanel then
     begin
      TPropertiesPanel(l_C).Caption:= '';
-     TPropertiesPanel(l_C).PopupMenu:= aControls[i].SubItem.Menu;
+     if aControls[i].SubItem <> nil then
+      TPropertiesPanel(l_C).PopupMenu:= aControls[i].SubItem.Menu;
+    end
+    else
+    if l_C is TDateTimePicker then
+    begin
+     if aControls[i].PropType = ptDate then
+      TDateTimePicker(l_C).Kind := dtkDate
+     else
+      TDateTimePicker(l_C).Kind := dtkTime;
     end;
     // Ёто зачем?
     if Assigned(aControls[i].Event) then
@@ -159,7 +173,8 @@ begin
    if l_C is TPropertiesPanel then
    begin
      // √де вз€ть вложенные свойства?
-     TPropertiesPanel(l_C).Properties:= aControls[i].SubItem;
+     if aControls[i].SubItem <> nil then // ??
+       TPropertiesPanel(l_C).Properties:= aControls[i].SubItem;
    end;
    { TODO : ѕодгонкой высоты нужно заниматьс€ после того, как все контролы вставлены }
    f_LeftIndent:= Max(f_LeftIndent, l_C.Left);

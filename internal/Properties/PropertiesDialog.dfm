@@ -11,6 +11,7 @@ object PropDialog: TPropDialog
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -22,9 +23,6 @@ object PropDialog: TPropDialog
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 437
-    ExplicitTop = 8
-    ExplicitHeight = 121
     object Button2: TButton
       Left = 6
       Top = 40

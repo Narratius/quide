@@ -16,6 +16,10 @@ type
     procedure pm_SetProperties(const Value: TProperties);
     procedure SetLabelTop(const Value: Boolean);
     function pm_GetCtrlCount: Integer;
+    {$IFDEF Debug}
+    procedure AddToPopup;
+    procedure CopyProperties(Sender: TObject);
+    {$ENDIF}
   protected
     f_Controls: TControlsArray;
     procedure AddDefControl;
@@ -37,6 +41,8 @@ type
     procedure MakeTextControl(aProperty: TddProperty); virtual;
     procedure MakeStaticText(aProperty: TddProperty); virtual;
     procedure MakeDivider(aProperty: TddProperty); virtual;
+    procedure MakeDateControl(aProperty: TddProperty); virtual;
+    procedure MakeTimeControl(aProperty: TddProperty); virtual;
     // Установка значений в контролы
     procedure SetActionValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetBooleanValue(aProperty: TddProperty; aControl: TControl); virtual;
@@ -47,6 +53,8 @@ type
     procedure SetStringValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetTextValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure SetPasswordValue(aProperty: TddProperty; aControl: TControl); virtual;
+    procedure SetDateValue(aProperty: TddProperty; aControl: TControl); virtual;
+    procedure SetTimeValue(aProperty: TddProperty; aControl: TControl); virtual;
     // Чтение значений из контролов
     procedure GetActionValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure GetBooleanValue(aProperty: TddProperty; aControl: TControl); virtual;
@@ -56,6 +64,8 @@ type
     procedure GetPropertiesValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure GetStringValue(aProperty: TddProperty; aControl: TControl); virtual;
     procedure GetTextValue(aProperty: TddProperty; aControl: TControl); virtual;
+    procedure GetDateValue(aProperty: TddProperty; aControl: TControl); virtual;
+    procedure GetTimeValue(aProperty: TddProperty; aControl: TControl); virtual;
     // Вспомогательные функции
     procedure TuneupControl(aControl: TControl); override;
     function SetOneValue(aProperty: TddProperty): Boolean;
@@ -84,7 +94,7 @@ implementation
 uses
  Variants, Vcl.ComCtrls, SySutils, Math, Dialogs,
  SizeableTypes, PropertiesListControl
- {$IFDEF Debug}, ddLogFile{$ENDIF};
+ {$IFDEF Debug}, Windows, Menus, Clipbrd, ddLogFile{$ENDIF};
 
 {
 ******************************* TPropertiesPanel *******************************
@@ -93,6 +103,25 @@ procedure TPropertiesPanel.AddDefControl;
 begin
  SetLength(f_Controls, Length(f_Controls)+1);
  f_Controls[Length(f_Controls)-1]:= cDefControlRec;
+end;
+
+procedure TPropertiesPanel.AddToPopup;
+var
+  l_Item: TMenuItem;
+  index: Integer;
+begin
+  if PopupMenu = nil then
+  begin
+   PopupMenu:= TPopupMenu.Create(Self);
+   PopupMenu.AutoPopup:= True;
+  end;
+  l_Item := TMenuItem.Create(Self); // Create the new item.
+  l_Item.Name:= 'CopyToClbrd';
+  index := PopupMenu.Items.Count;
+  PopupMenu.Items.Add(l_Item);// Add it to the pop-up menu.
+  l_Item.Caption := 'Копировать в Буфер обмена';
+  l_Item.Tag := index;
+  l_Item.OnClick := CopyProperties; // Assign it an event handler.
 end;
 
 procedure TPropertiesPanel.AdjustControls;
@@ -151,104 +180,97 @@ var
 begin
  {$IFDEF Debug}
  Msg2Log('AdjustControls');
- Msg2Log('>>>>>');
  {$ENDIF}
  { Выравнивание контролов относительно меток
   Следующий контрол может располагаться на этой же строке
   Нужно подсчитать, сколько контролов после текущего расположено на одной строке
   Подсчитать ширины и выровнять пропорционально, если AutoSize или друг за другом, если нет
  }
- l_LeftIndent:= 0;
- {$IFDEF Debug}
- Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
- Msg2Log('Before:');
- for j := 0 to ControlCount-1 do
-  with Controls[j] do
-   Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
- {$ENDIF}
-
- lp_SetMaxLeftIndent;
-
- // Масштабирование и выравнивание контролов в строке
- l_FirstCtrl:= nil;
- l_LblWidth:= 0;
- l_Count:= 0;
- l_CurCtrlIdx:= 0;
- l_LblCount:= 0;
- while l_CurCtrlIdx < f_Properties.Count do // цикл по свойствам
+ if f_Properties.Count > 0 then
  begin
-  // каждый контрол с новой строки считается первым в строке
-  if (f_Properties.Items[l_CurCtrlIdx].NewLine) then
-   lp_SetFirstCtrl
-  else
-  if not f_Properties.Items[l_CurCtrlIdx].NewLine then
-  begin
-   // Считаем количество контролов в одной строке и ширину их меток
-   if l_FirstCtrl = nil then
-     lp_SetFirstCtrl
-   else // l_FirstCtrl <> nil
+   l_LeftIndent:= 0;
+   {$IFDEF Debug}
+   Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
+   {$ENDIF}
+
+   lp_SetMaxLeftIndent;
+   // Высоту контрола считать по макс(Метка, Контрол)
+   // Масштабирование и выравнивание контролов в строке
+   l_FirstCtrl:= nil;
+   l_LblWidth:= 0;
+   l_Count:= 0;
+   l_CurCtrlIdx:= 0;
+   l_LblCount:= 0;
+   while l_CurCtrlIdx < f_Properties.Count do // цикл по свойствам
    begin
-     l_Cur:= l_CurCtrlIdx;
-     // Поиск контролов
-     while l_CurCtrlIdx < f_Properties.Count do
+    // каждый контрол с новой строки считается первым в строке
+    if (f_Properties.Items[l_CurCtrlIdx].NewLine) then
+     lp_SetFirstCtrl
+    else
+    if not f_Properties.Items[l_CurCtrlIdx].NewLine then
+    begin
+     // Считаем количество контролов в одной строке и ширину их меток
+     if l_FirstCtrl = nil then
+       lp_SetFirstCtrl
+     else // l_FirstCtrl <> nil
      begin
-      if not f_Properties.Items[l_CurCtrlIdx].NewLine then
-      begin
-       if (f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].UID)].LabelPosition = cpInline) then
+       l_Cur:= l_CurCtrlIdx;
+       // Поиск контролов
+       while l_CurCtrlIdx < f_Properties.Count do
        begin
-        Inc(l_LblWidth, LabelByTag(f_Properties.Items[l_CurCtrlIdx].UID).Width+cIndent);
-        Inc(l_LblCount);
-       end;
-       Inc(l_CurCtrlIdx);
-       Inc(l_Count);
-      end
-      else
-       break
-     end; // while
-     // Выравнивание
-     if l_Count > 0 then
-     begin
-      if l_LblCount > 0 then
-       Inc(l_LblWidth, cIndent);
-      { TODO : Ширина не учитывает один отступ }
-      l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+l_lblCount+1{метка первого контрола}+2{последний отступ})) div (l_Count+1);
-      l_FirstCtrl.Width:= l_Width;
-      l_FirstCtrl.Anchors:= [akLeft, akTop];
-      l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left;
-      for i := l_Cur to l_Cur + l_Count-1 do
-      begin
-       j:= lf_CtrlByTag(f_Properties.Items[i].UID);
-       if f_Controls[j].LabelPosition = cpInline then
-       begin
-        with LabelByTag(f_Controls[j].Tag) do
+        if not f_Properties.Items[l_CurCtrlIdx].NewLine then
         begin
-         Left:= l_Left + cIndent;
-         Inc(l_Left, Width+cIndent);
-        end;
-       end; // f_Controls[j].LabelPosition = cpInline
-       with ControlByTag(f_Controls[j].Tag) do
+         if (f_Controls[lf_CtrlByTag(f_Properties.Items[l_CurCtrlIdx].UID)].LabelPosition = cpInline) then
+         begin
+          Inc(l_LblWidth, LabelByTag(f_Properties.Items[l_CurCtrlIdx].UID).Width+cIndent);
+          Inc(l_LblCount);
+         end;
+         Inc(l_CurCtrlIdx);
+         Inc(l_Count);
+        end
+        else
+         break
+       end; // while
+       // Выравнивание
+       if l_Count > 0 then
        begin
-        Anchors:= [akLeft, akTop];
-        Width:= l_Width; // - (LeftIndent - l_CurCtrl.Left);
-        Left:= l_Left + cIndent; //LeftIndent;
-        Inc(l_Left, Width+cIndent);
-       end; // l_CurCtrl.Left <> LeftIndent
-      end; // for j
-     end; // l_Count > 0
-   end; // l_FirstCtrl <> nil
-  end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
-  Inc(l_CurCtrlIdx);
- end; //while i
- if CtrlCount > 0 then
-  Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent
- else
-  Height:= 2*cIndent;
+        if l_LblCount > 0 then
+         Inc(l_LblWidth, cIndent);
+        { TODO : Ширина не учитывает один отступ }
+        l_Width:= (ClientWidth - l_LblWidth-cIndent*(l_Count+l_lblCount+1{метка первого контрола}+2{последний отступ})) div (l_Count+1);
+        l_FirstCtrl.Width:= l_Width;
+        l_FirstCtrl.Anchors:= [akLeft, akTop];
+        l_Left:= l_FirstCtrl.Width + l_FirstCtrl.Left;
+        for i := l_Cur to l_Cur + l_Count-1 do
+        begin
+         j:= lf_CtrlByTag(f_Properties.Items[i].UID);
+         if f_Controls[j].LabelPosition = cpInline then
+         begin
+          with LabelByTag(f_Controls[j].Tag) do
+          begin
+           Left:= l_Left + cIndent;
+           Inc(l_Left, Width+cIndent);
+          end;
+         end; // f_Controls[j].LabelPosition = cpInline
+         with ControlByTag(f_Controls[j].Tag) do
+         begin
+          Anchors:= [akLeft, akTop];
+          Width:= l_Width; // - (LeftIndent - l_CurCtrl.Left);
+          Left:= l_Left + cIndent; //LeftIndent;
+          Inc(l_Left, Width+cIndent);
+         end; // l_CurCtrl.Left <> LeftIndent
+        end; // for j
+       end; // l_Count > 0
+     end; // l_FirstCtrl <> nil
+    end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
+    Inc(l_CurCtrlIdx);
+   end; //while i
+   Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent;
+ end;
  {$IFDEF Debug}
- Msg2Log('After:');
  for j := 0 to ControlCount-1 do
   with Controls[j] do
    Msg2Log('%s.%d: Left: %d Top: %d Width: %d Height: %d', [ClassName, Tag, Left, Top, Width, Height]);
- Msg2Log('<<<<<<');
  {$ENDIF}
 end;
 
@@ -264,6 +286,61 @@ begin
    Result:= Controls[i];
    break;
   end;
+end;
+
+procedure TPropertiesPanel.CopyProperties;
+Procedure lp_CopyStreamToClipboard( fmt: Cardinal; S: TStream );
+Var
+   hMem: THandle;
+   pMem: Pointer;
+Begin
+   S.Position := 0;
+   hMem := GlobalAlloc( GHND or GMEM_DDESHARE, S.Size );
+   If hMem <> 0 Then Begin
+      pMem := GlobalLock( hMem );
+      If pMem <> Nil Then Begin
+        try
+           S.Read( pMem^, S.Size );
+           S.Position := 0;
+        finally
+           GlobalUnlock( hMem );
+        end;
+        Clipboard.Open;
+        try
+           Clipboard.SetAsHandle( fmt, hMem );
+        finally
+           Clipboard.Close;
+        end;
+     End Else Begin
+        GlobalFree( hMem );
+        OutOfMemoryError;
+     End;
+   End Else
+      OutOfMemoryError;
+End; { CopyStreamToClipboard }
+
+
+var
+ l_MemStream,
+ l_MemStreamTxt: TMemoryStream;
+begin
+ if Properties <> nil then
+ begin
+   l_MemStreamTxt := TMemoryStream.Create;
+   try
+    l_MemStream := TMemoryStream.Create;
+    try
+      l_MemStream.WriteComponent(Properties);
+      l_MemStream.Position := 0;
+      ObjectBinaryToText(l_MemStream, l_MemStreamTxt);
+    finally
+      l_MemStream.Free;
+    end;
+    lp_CopyStreamToClipboard(cf_Text, l_memStreamTxt);
+   finally
+    l_memStreamTxt.Free;
+   end;
+ end;
 end;
 
 procedure TPropertiesPanel.CorrectControl(aControlRec: TControlRec);
@@ -310,6 +387,13 @@ begin
  end;
 end;
 
+procedure TPropertiesPanel.GetDateValue(aProperty: TddProperty;
+  aControl: TControl);
+begin
+ if (aControl is TDateTimePicker) and (aProperty.PropertyType = ptDate) then
+  aProperty.Value:= TDateTimePicker(aControl).Date;
+end;
+
 procedure TPropertiesPanel.GetIntegerValue(aProperty: TddProperty;
   aControl: TControl);
 begin
@@ -345,6 +429,8 @@ begin
       ptAction: GetActionValue(aProperty, l_C);
       ptList: GetListValue(aProperty, l_C);
       ptProperties: GetPropertiesValue(aProperty, l_C);
+      ptDate: GetDateValue(aProperty, l_C);
+      ptTime: GetTimeValue(aProperty, l_C);
     end;
  Result:= True;
 end;
@@ -352,7 +438,8 @@ end;
 procedure TPropertiesPanel.GetPropertiesValue(aProperty: TddProperty;
   aControl: TControl);
 begin
-
+ if aControl is TPropertiesPanel then
+  TPropertiesPanel(aControl).GetValues;
 end;
 
 procedure TPropertiesPanel.GetStringValue(aProperty: TddProperty;
@@ -367,6 +454,13 @@ procedure TPropertiesPanel.GetTextValue(aProperty: TddProperty;
 begin
  if aControl is TRichEdit then
   aProperty.Value:= TRichEdit(aControl).Text;
+end;
+
+procedure TPropertiesPanel.GetTimeValue(aProperty: TddProperty;
+  aControl: TControl);
+begin
+ if (aControl is TDateTimePicker) and (aProperty.PropertyType = ptTime) then
+  aProperty.Value:= TDateTimePicker(aControl).Time;
 end;
 
 procedure TPropertiesPanel.GetValues;
@@ -433,6 +527,9 @@ begin
  ClearControls;
  CreateControls(FillControls);
  SetValues;
+ {$IFDEF Debug}
+ AddToPopup;
+ {$ENDIF}
 end;
 
 procedure TPropertiesPanel.MakeCustomControl(aControlClass: TControlClass;
@@ -453,9 +550,31 @@ begin
  end; // with
 end;
 
+procedure TPropertiesPanel.MakeDateControl(aProperty: TddProperty);
+begin
+ MakeCustomControl(TLabel, aProperty.NewLine);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TDateTimePicker, aProperty.NewLine);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   LabelPosition:= cpInline;
+end;
+
 procedure TPropertiesPanel.MakeDivider(aProperty: TddProperty);
 begin
-
+ MakeCustomControl(TLabel, True);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  Caption:= aProperty.Caption;
+ end;
+ MakeCustomControl(TBevel, False);
+ with f_Controls[Length(f_Controls)-1] do
+ begin
+  Caption:= '';
+  Height:= 2;
+  Size:= csFixed;
+ end;
 end;
 
 procedure TPropertiesPanel.MakeIntegerControl(aProperty: TddProperty);
@@ -529,9 +648,12 @@ begin
     ptPassword: MakePasswordControl(aProperty);
     ptStaticText: MakeStaticText(aProperty);
     ptDivider: MakeDivider(aProperty);
+    ptDate: MakeDateControl(aProperty);
+    ptTime: MakeTimeControl(aProperty);
   end;
   for i:= l_Count to Pred(Length(f_Controls)) do
   begin
+   f_Controls[i].PropType:= aProperty.PropertyType;
    f_Controls[i].ReadOnly:= aProperty.ReadOnly;
    f_Controls[i].Tag:= aProperty.UID;
    f_Controls[i].Event:= aProperty.Event;
@@ -565,7 +687,6 @@ begin
  begin
   Caption:= aProperty.Caption;
   LabelPosition:= cpNone;
-  Size:= csFixed;
  end;
 end;
 
@@ -611,6 +732,18 @@ begin
 
 end;
 
+procedure TPropertiesPanel.MakeTimeControl(aProperty: TddProperty);
+begin
+ MakeCustomControl(TLabel, aProperty.NewLine);
+ with f_Controls[Length(f_Controls)-1] do
+  Caption:= aProperty.Caption;
+ MakeCustomControl(TDateTimePicker, aProperty.NewLine);
+ if not LabelTop then
+  with f_Controls[Length(f_Controls)-1] do
+   LabelPosition:= cpInline;
+
+end;
+
 function TPropertiesPanel.pm_GetCtrlCount: Integer;
 begin
   Result:= Length(f_Controls);
@@ -627,8 +760,10 @@ end;
 
 procedure TPropertiesPanel.PropChanged(Sender: TObject);
 begin
+ GetValues;
  MakeControls;
  AdjustControls;
+ SetValues;
 end;
 
 procedure TPropertiesPanel.PropertyByTag(aTag: Integer; aCtrlRec: TControlRec);
@@ -685,6 +820,14 @@ begin
  end;
 end;
 
+procedure TPropertiesPanel.SetDateValue(aProperty: TddProperty;
+  aControl: TControl);
+begin
+ if (aControl is TDateTimePicker) and (aProperty.PropertyType = ptDate) then
+  TDateTimePicker(aControl).Date:= aProperty.Value;
+
+end;
+
 procedure TPropertiesPanel.SetIntegerValue(aProperty: TddProperty; aControl: TControl);
 begin
  // Пока Строка ввода
@@ -721,6 +864,8 @@ begin
       ptList: SetListValue(aProperty, l_C);
       ptProperties: SetPropertiesValue(aProperty, l_C);
       ptPassword: SetPasswordValue(aProperty, l_C);
+      ptDate: SetDateValue(aProperty, l_C);
+      ptTime: SetTimeValue(aProperty, l_C);
     end;
  Result:= True;
 end;
@@ -736,7 +881,8 @@ end;
 
 procedure TPropertiesPanel.SetPropertiesValue(aProperty: TddProperty; aControl: TControl);
 begin
- // Панель
+ if aControl is TPropertiesPanel then
+  TPropertiesPanel(aControl).SetValues;
 end;
 
 procedure TPropertiesPanel.SetStringValue(aProperty: TddProperty; aControl: TControl);
@@ -751,6 +897,14 @@ begin
  // Мемо
  if aControl is TRichEdit then
   TRichEdit(aControl).Text:= VarToStr(aProperty.Value);
+end;
+
+procedure TPropertiesPanel.SetTimeValue(aProperty: TddProperty;
+  aControl: TControl);
+begin
+ if (aControl is TDateTimePicker) and (aProperty.PropertyType = ptTime) then
+  TDateTimePicker(aControl).Time:= aProperty.Value;
+
 end;
 
 procedure TPropertiesPanel.SetValues;

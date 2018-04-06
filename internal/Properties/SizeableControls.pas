@@ -103,14 +103,28 @@ var
   l_Top, l_Left, l_PrevTop, l_PrevLeft: Integer;
   l_PrevisLabel: Boolean;
 begin
+ {$IFDEF Debug}
+ with aParent do
+   Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
+ {$ENDIF}
  if aControls.Count > 0 then
  begin
   l_PrevControl:= TControl(aControls[aControls.Count-1]);
   l_PrevIsLabel:= l_PrevControl is TLabel;
-  l_Top:= cIndent + l_PrevControl.Top + l_PrevControl.Height;
+
   l_Left:= cIndent;
-  l_PrevTop:= l_PrevControl.Top;
-  l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width{  + cIndent};
+  if l_PrevControl is TBevel then
+  begin
+   l_Top:= cIndent + TControl(aControls[aControls.Count-2]).Top + TControl(aControls[aControls.Count-2]).Height;
+   l_PrevTop:= TControl(aControls[aControls.Count-2]).Top;
+   l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width{  + cIndent};
+  end
+  else
+  begin
+    l_Top:= cIndent + l_PrevControl.Top + l_PrevControl.Height;
+    l_PrevTop:= l_PrevControl.Top;
+    l_PrevLeft:= l_PrevControl.Left + l_PrevControl.Width{  + cIndent};
+  end;
  end
  else // первый контрол на форме
  begin
@@ -163,8 +177,16 @@ begin
  else
  if aCtrlPosition = cpInline then
  begin
-  aControl.Top:= l_PrevTop;
-  aControl.Left:= l_PrevLeft;
+  if aControl is TBevel then
+  begin
+   aControl.Top:= l_PrevTop + l_PrevControl.Height div 2;
+   aControl.Left:= l_PrevLeft + cIndent;
+  end
+  else
+  begin
+   aControl.Top:= l_PrevTop;
+   aControl.Left:= l_PrevLeft;
+  end;
   case aLabelPosition of
     cpNone:
       begin
@@ -206,6 +228,11 @@ begin
  if aControl.GetInterface(ISizeableControl, l_IC) then
   l_IC.OnSizeChanged:= aMyControlResized;
  aControls.Add(aControl);
+ {$IFDEF Debug}
+ with aControl do
+   Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
+ Msg2Log('Parent.Height After: %d', [aParent.Height]);
+ {$ENDIF}
 end;
 
 procedure InnerControlResized(aParent: TWinControl; aControl: TControl; aControlsList: TList);

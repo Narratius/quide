@@ -11,9 +11,7 @@ type
   private
     //1 Список глав сценария
     f_Chapters: TObjectList<TquideChapter>;
-    f_Inventory: TObjectList<TquideInventoryItem>;
     f_LocationsNames: TStrings;
-    f_Variables: TObjectList<TquideVariable>;
     f_VariablesNames: TStrings;
     function pm_GetChapters(Index: Integer): TquideChapter;
     function pm_GetChaptersCount: Integer;
@@ -25,7 +23,7 @@ type
     function pm_GetVariablesNames: TStrings;
     procedure UpdateChapters;
   public
-    constructor Create; override;
+    constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure Clear; override;
     //1 Создает Главу и добавляет в список
@@ -66,15 +64,16 @@ Uses
 }
 function TquideScenario.AddVariable: TquideVariable;
 begin
- Result:= TquideVariable.Create;
+ Assert(False, 'Нужно восстановить создание переменной')
+ (*
+ Result:= TquideVariable.Create(nil);
  f_Variables.Add(Result);
+ *)
 end;
 
 procedure TquideScenario.Clear;
 begin
   inherited;
-  f_Chapters.Clear;
-  f_Inventory.Clear;
   // переменные теперь в свойствах...
   f_Chapters.Clear;
   f_LocationsNames.Clear;
@@ -83,9 +82,7 @@ end;
 
 constructor TquideScenario.Create;
 begin
-  inherited Create;
-  f_Inventory := TObjectList<TquideInventoryItem>.Create();
-  f_VariablesNames := TStringList.Create;
+  inherited Create(aOwner);
   f_LocationsNames := TStringList.Create;
   f_Chapters := TObjectList<TquideChapter>.Create();
   Define('Author', 'Автор', ptString);
@@ -114,8 +111,6 @@ end;
 destructor TquideScenario.Destroy;
 begin
   FreeAndNil(f_Chapters);
-  FreeAndNil(f_Inventory);
-  FreeAndNil(f_Chapters);
   FreeAndNil(f_LocationsNames);
   FreeAndNil(f_VariablesNames);
   inherited Destroy;
@@ -123,7 +118,7 @@ end;
 
 function TquideScenario.AddChapter: TquideChapter;
 begin
-  Result := TquideChapter.Create();
+  Result := TquideChapter.Create(nil);
   f_Chapters.Add(Result);
   UpdateChapters;
   Changed:= False;
@@ -194,8 +189,6 @@ var
 begin
  // Очистка текущего состояния
  f_Chapters.Clear;
- f_Inventory.Clear;
- //f_Variables.Clear;
  // Загрузка из файла
  l_Doc:= TXMLDocument.Create(nil);
  l_Doc.Options:= l_Doc.Options + [doNodeAutoIndent];
@@ -232,12 +225,14 @@ end;
 
 function TquideScenario.pm_GetInventory(Index: Integer): TquideInventoryItem;
 begin
- Result:= TquideInventoryItem(f_Inventory[Index]);
+ Assert(False, 'Восстановить работу с инвентарем');
+ //Result:= TquideInventoryItem(f_Inventory[Index]);
 end;
 
 function TquideScenario.pm_GetInventoryItemsCount: Integer;
 begin
- Result:= f_Inventory.Count;
+  Assert(False, 'Восстановить работу с инвентарем');
+ //Result:= f_Inventory.Count;
 end;
 
 function TquideScenario.pm_GetLocationsNames: TStrings;
@@ -257,12 +252,14 @@ end;
 
 function TquideScenario.pm_GetVariables(Index: Integer): TquideVariable;
 begin
- Result:= TquideVariable(f_Variables[index]);
+  Assert(False, 'Восстановить работу с переменными');
+ //Result:= TquideVariable(f_Variables[index]);
 end;
 
 function TquideScenario.pm_GetVariablesCount: Integer;
 begin
- Result:= f_Variables.Count;
+  Assert(False, 'Восстановить работу с переменными');
+ //Result:= f_Variables.Count;
 end;
 
 function TquideScenario.pm_GetVariablesNames: TStrings;

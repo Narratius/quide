@@ -3,7 +3,7 @@ unit quideLocations;
 interface
 
 uses
- Generics.Collections, Xml.XMLIntf,
+ Classes, Generics.Collections, Xml.XMLIntf,
  quideObject, quideActions, Propertys;
 
 type
@@ -18,9 +18,9 @@ type
     function pm_GetLinks(Index: Integer): String;
     function pm_GetLinksCount: Integer;
   public
-    constructor Create; override;
+    constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    function AddAction(aActType: TquideActionType): TquideAction; overload;
+    procedure AddAction(aActType: TquideActionType); overload;
     procedure LoadFromXML(Element: IXMLNode);
     procedure SaveToXML(Element: IXMLNode);
     procedure AddAction(aAction: TquideAction); overload;
@@ -52,6 +52,7 @@ begin
   Result:= nil;
   f_ID:= aActionID;
   f_Found:= False;
+  //AliasItems['Actions']
   for I := 0 to Pred(ActionsCount) do
   begin
     Actions[i].IterateAll(FindAction);
@@ -65,23 +66,24 @@ end;
 
 procedure TquideLocation.AddAction(aAction: TquideAction);
 begin
- aAction.Index:= f_Actions.Add(aAction);
+ AliasItems['Actions'].AddPropsContent(aAction);
+ DoStructChange;
 end;
 
-function TquideLocation.AddAction(aActType: TquideActionType): TquideAction;
+procedure TquideLocation.AddAction(aActType: TquideActionType);
+var
+ l_A: TquideAction;
 begin
- Result:= nil;
  case aActType of
-   atNone: Result:= nil;
-   atGoto: Result:= TquideJumpAction.Create;
-   atInventory: Result:= TquideInventoryAction.Create;
-   atLogic: Result:= TquideLogicalAction.Create;
-   atText: Result:= TquideTextAction.Create;
-   atVariable: Result:= TquideVariableAction.Create;
-   atButton: Result:= TquideButtonAction.Create;
+   atGoto: l_A:= TquideJumpAction.Create(nil);
+   atInventory: l_A:= TquideInventoryAction.Create(nil);
+   atLogic: l_A:= TquideLogicalAction.Create(nil);
+   atText: l_A:= TquideTextAction.Create(nil);
+   atVariable: l_A:= TquideVariableAction.Create(nil);
+   atButton: l_A:= TquideButtonAction.Create(nil);
  end;
- if Result <> nil then
-  AddAction(Result);
+ if l_A <> nil then
+  AddAction(l_A);
 end;
 
 procedure TquideLocation.CheckTargets(const OldCaption, NewCaption: String);
@@ -105,16 +107,11 @@ constructor TquideLocation.Create;
 var
  l_A: TquideActions;
 begin
-  inherited Create;
+  inherited;
   Define('GraphObject', 'Визуальный элемент', ptInteger, False);
-  l_A:= TquideActions.Create;
+  l_A:= TquideActions.Create(nil);
   try
-<<<<<<< HEAD
-   //l_A.Scenario:=
-   DefineProperties('Actions', '', l_A);
-=======
    DefineProps('Actions', '', l_A);
->>>>>>> ac0925feb1c76a9e0b4781d8ab66a4d4ec276492
   finally
    FreeAndNil(l_A);
   end;
@@ -130,7 +127,7 @@ end;
 function TquideLocation.FindAction(aItem: TddProperty): Boolean;
 begin
   Result:= True;
-  if aItem.ID = f_ID  then
+  if aItem.UID = f_ID  then
   begin
     f_Found:= True;
     Result:= False;

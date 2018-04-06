@@ -170,15 +170,24 @@ var
  l_XML: IXMLDocument;
  l_Node: IXMLNode;
 begin
-  l_XML:= TXMLDocument.Create(nil);
-  try
-   l_XML.Options:= l_XML.Options + [doNodeAutoIndent];
-   l_XML.Active:= True;
-   l_XML.Encoding:= 'UTF-8';//'Windows-1251';
-   l_XML.LoadFromFile(aFileName);
-   aProperties.LoadFromXML(l_XML.ChildNodes.FindNode('Properties'), aLoadStruct);
-  finally
-    l_XML:= nil;
+  if FileExists(aFileName) then
+  begin
+    l_XML:= TXMLDocument.Create(nil);
+    try
+     l_XML.Options:= l_XML.Options + [doNodeAutoIndent];
+     l_XML.Active:= True;
+     l_XML.Encoding:= 'UTF-8';//'Windows-1251';
+     l_XML.LoadFromFile(aFileName);
+     try
+      aProperties.LoadFromXML(l_XML.ChildNodes.FindNode('Properties'), aLoadStruct);
+     except
+      {$IFDEF Debug}
+      // вывести в лог
+      {$ENDIF}
+     end;
+    finally
+      l_XML:= nil;
+    end;
   end;
 end;
 
@@ -189,14 +198,14 @@ var
   MemStream: TMemoryStream;
 begin
   // test
-  FileStream := TFileStream.Create(ChangeFileExt(aFileName, '.bin'), fmCreate);
+  FileStream := TFileStream.Create(ChangeFileExt(aFileName, '.bin'), fmCreate or fmShareDenyWrite);
   try
    FileStream.WriteComponent(aProperties);
   finally
     FileStream.Free;
   end;
   // test
-  FileStream := TFileStream.Create(aFileName, fmCreate);
+  FileStream := TFileStream.Create(aFileName, fmCreate or fmShareDenyWrite);
   try
     MemStream := TMemoryStream.Create;
     try

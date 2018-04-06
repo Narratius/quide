@@ -76,11 +76,13 @@ begin
  { TODO : Подтянуть список существующих локаций или создать новую }
   if ButtonEditDlg(l_Cap, l_Loc, f_Scenario.LocationsNames) then
   begin
-   l_Act:= fLocation.AddAction(atButton);
+   l_Act:=  TquideButtonAction.Create(nil); // fLocation.AddAction(atButton);
    TquideButtonAction(l_Act).Values['Button']:= l_Cap; // Текст на кнопке
    TquideButtonAction(l_Act).Values['Target']:= l_Loc; // Название локации для перехода
    TquideButtonAction(l_Act).OnClick:= actEditButtonExecute;
-   AddAction(l_Act);
+   fLocation.AddAction(l_Act);
+   FreeAndNil(l_Act);
+   //AddAction(l_Act);
   end;
 end;
 
@@ -103,23 +105,23 @@ end;
 
 procedure TquideLocationDialog.actInventoryExecute(Sender: TObject);
 begin
- AddAction(fLocation.AddAction(atInventory));
+ fLocation.AddAction(atInventory);
 end;
 
 procedure TquideLocationDialog.actLogicalExecute(Sender: TObject);
 begin
- AddAction(fLocation.AddAction(atLogic));
+ fLocation.AddAction(atLogic);
 end;
 
 procedure TquideLocationDialog.actNewTextExecute(Sender: TObject);
 begin
  // Добавляем текст
- AddAction(fLocation.AddAction(atText));
+ fLocation.AddAction(atText);
 end;
 
 procedure TquideLocationDialog.actVariableExecute(Sender: TObject);
 begin
-  AddAction(fLocation.AddAction(atVariable));
+ fLocation.AddAction(atVariable);
 end;
 
 procedure TquideLocationDialog.AddAction(aAction: TquideAction);
@@ -127,6 +129,7 @@ var
  l_Actions: TPropertiesPanel;
  l_Top: Integer;
 begin
+ Exit;
  if f_Actions.ControlCount > 0 then
   l_Top:= f_Actions.Controls[f_Actions.ControlCount-1].Top + f_Actions.Controls[f_Actions.ControlCount-1].Height
  else
