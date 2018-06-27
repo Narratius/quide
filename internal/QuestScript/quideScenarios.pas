@@ -87,6 +87,7 @@ begin
   f_Chapters := TObjectList<TquideChapter>.Create();
   Define('Author', 'Автор', ptString);
   DefineChoice('Start', 'Начальная локация');
+
   DefineList('Variables', 'Переменные', True,
     NewProperty('Caption', 'Название', ptString,
     {$IFDEF VarType}

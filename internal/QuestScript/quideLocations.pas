@@ -9,7 +9,7 @@ uses
 type
   TquideLocation = class(TquideObject)
   private
-    f_Actions: TObjectList<TquideAction>;
+    //f_Actions: TObjectList<TquideAction>;
     f_ID: Integer;
     f_Found: Boolean;
     function pm_GetActions(Index: Integer): TquideAction;
@@ -74,16 +74,21 @@ procedure TquideLocation.AddAction(aActType: TquideActionType);
 var
  l_A: TquideAction;
 begin
- case aActType of
-   atGoto: l_A:= TquideJumpAction.Create(nil);
-   atInventory: l_A:= TquideInventoryAction.Create(nil);
-   atLogic: l_A:= TquideLogicalAction.Create(nil);
-   atText: l_A:= TquideTextAction.Create(nil);
-   atVariable: l_A:= TquideVariableAction.Create(nil);
-   atButton: l_A:= TquideButtonAction.Create(nil);
- end;
- if l_A <> nil then
-  AddAction(l_A);
+ l_A:= nil;
+ try
+   case aActType of
+     atGoto: l_A:= TquideJumpAction.Create(nil);
+     atInventory: l_A:= TquideInventoryAction.Create(nil);
+     atLogic: l_A:= TquideLogicalAction.Create(nil);
+     atText: l_A:= TquideTextAction.Create(nil);
+     atVariable: l_A:= TquideVariableAction.Create(nil);
+     atButton: l_A:= TquideButtonAction.Create(nil);
+   end;
+   if l_A <> nil then
+    AddAction(l_A);
+  finally
+    FreeAndNil(l_A);
+  end;
 end;
 
 procedure TquideLocation.CheckTargets(const OldCaption, NewCaption: String);
@@ -115,12 +120,12 @@ begin
   finally
    FreeAndNil(l_A);
   end;
-  f_Actions := TObjectList<TquideAction>.Create();
+  //f_Actions := TObjectList<TquideAction>.Create();
 end;
 
 destructor TquideLocation.Destroy;
 begin
-  FreeAndNil(f_Actions);
+  //FreeAndNil(f_Actions);
   inherited Destroy;
 end;
 
@@ -144,17 +149,25 @@ begin
  l_Node:= Element.ChildNodes.FindNode('Actions');
  if l_Node <> nil then
   for I := 0 to l_Node.ChildNodes.Count-1 do
-   AddAction(TquideAction.Make(l_Node.ChildNodes.Get(i)));
+  begin
+   l_Action:= TquideAction.Make(l_Node.ChildNodes.Get(i));
+   try
+    AddAction(l_Action);
+   finally
+    FreeAndNil(l_Action);
+   end;
+  end;
+
 end;
 
 function TquideLocation.pm_GetActions(Index: Integer): TquideAction;
 begin
- Result:= f_Actions[index]
+ Result:= AliasItems['Actions'].ListItem.Items[index].ListItem as TquideAction;
 end;
 
 function TquideLocation.pm_GetActionsCount: Integer;
 begin
- Result:= f_Actions.Count;
+ Result:= AliasItems['Actions'].ListItem.Count;
 end;
 
 

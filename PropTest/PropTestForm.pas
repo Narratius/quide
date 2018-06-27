@@ -18,11 +18,13 @@ type
     SerializeButton: TButton;
     RestoreButton: TButton;
     Bevel1: TBevel;
+    InsertButton: TButton;
     procedure ShowButtonClick(Sender: TObject);
     procedure SerializeButtonClick(Sender: TObject);
     procedure RestoreButtonClick(Sender: TObject);
   private
     procedure FillProp(aProp: TProperties);
+    procedure FillIf(aProp: TProperties);
     procedure FillList(aProp: TProperties);
   public
     { Public declarations }
@@ -66,14 +68,15 @@ begin
   try
    l_P:= TProperties.Create(nil);
    try
-    (* *)
+    (*
     FillProp(l_P);
     l_P.Values['p1']:= 'Very long text';
     l_P.Values['Date']:= date;
     l_Prop.DefineProps('InnerProps', 'Вложенные свойства', l_P);
-    (* *)
     ShowMessage(l_Prop.Values['p1']);
     //FillList(l_Prop);
+     *)
+    FillIf(l_prop);
    finally
     l_P.Free;
    end;
@@ -138,6 +141,31 @@ begin
   finally
    FreeAndNil(l_Prop);
   end;
+end;
+
+procedure TMainForm.FillIf(aProp: TProperties);
+begin
+ with aProp do
+ begin
+  (* *)
+  DefineChoice('What', 'Если');
+  ChoiceStyles['What']:= csEditableList;
+  DefineChoice('Condition', '',
+    NewChoice(0, 'равно',
+    NewChoice(1, 'не равно',
+    NewChoice(2, 'больше',
+    NewChoice(3, 'меньше',
+    NewChoice(4, 'больше или равно',
+    NewChoice(5, 'меньше или равно',
+    nil)))))));
+  DefineString('Value', '');
+  NewLines['Condition']:= False;
+  NewLines['Value']:= False;
+  (* *)
+  DefineProps('True', '');
+  DefineStaticText('Иначе');
+  DefineProps('False', ''); (* *)
+ end;
 end;
 
 end.

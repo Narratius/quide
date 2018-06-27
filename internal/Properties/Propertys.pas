@@ -177,7 +177,7 @@ type
   private
     procedure ReadChoiceItems(Reader: TReader);
     procedure WriteChoiceItems(Writer: TWriter);
-    function FindProperty(aAlias: String): TddProperty;
+    function FindProperty(aAlias: String; aQuite: Boolean = False): TddProperty;
     function pm_GetAliasItems(Alias: String): TddProperty;
     function pm_GetItems(Index: Integer): TddProperty;
     function pm_GetValues(Alias: String): Variant;
@@ -217,8 +217,8 @@ type
         aVisible: Boolean = True): TddProperty;
     procedure Assign(Source: TProperties);
     function Clone: Pointer;
-    procedure Define(const aAlias, aCaption: String; aType: TddPropertyType;
-        aVisible: Boolean = True);
+    function Define(const aAlias, aCaption: String; aType: TddPropertyType;
+        aVisible: Boolean = True): TddProperty;
 
     procedure DefineBoolean(const aAlias, aCaption: String);
     procedure DefineButton(const aAlias, aCaption: String; aEvent: TNotifyEvent);
@@ -398,7 +398,9 @@ begin
  if ListItem = nil then
   ListItem:= aContent
  else
-  aContent.IterateAll(AddOneProp);
+ // Из-за того, что теряется контейнер, получается фигня...
+  //aContent.IterateAll(AddOneProp);
+  ListItem.DefineProps('Alias'+IntToStr(ListItem.Count+1), '', aContent);
 end;
 
 procedure TddProperty.Define(const aAlias, aCaption: String;
@@ -562,9 +564,9 @@ function TProperties.Add(const aAlias, aCaption: String; aType: TddPropertyType;
 begin
  Result:= TddProperty.Create(self);
  AddProp(Result);
-// Result.OnChange:= InnerOnChange;
  Result.Define(aAlias, aCaption, aType, aVisible);
- DoStructChange;
+ //if aType <> ptProperties then
+ // DoStructChange;
 end;
 
 procedure TProperties.Assign(Source: TProperties);
@@ -605,10 +607,10 @@ begin
   Result:= DecryptText(aText);
 end;
 
-procedure TProperties.Define(const aAlias, aCaption: String; aType:
-    TddPropertyType; aVisible: Boolean = True);
+function TProperties.Define(const aAlias, aCaption: String; aType:
+    TddPropertyType; aVisible: Boolean = True): TddProperty;
 begin
- Add(aAlias, aCaption, aType, aVisible);
+ Result:= Add(aAlias, aCaption, aType, aVisible);
 end;
 
 procedure TProperties.DefineBoolean(const aAlias, aCaption: String);
@@ -684,9 +686,12 @@ end;
 
 procedure TProperties.DefineProps(const aAlias, aCaption: String;
   Items: TProperties);
+var
+ l_P: TddProperty;
 begin
- Define(aAlias, aCaption, ptProperties);
- with FindProperty(aAlias) do
+ Assert(Self <> nil, 'Self = nil');
+ l_P:= Define(aAlias, aCaption, ptProperties);
+ with l_P do
  begin
   ListItem:= Items;
   ListItem.OnOwnerStructureChange:= InnerStructChange;
@@ -757,7 +762,7 @@ begin
   *)
 end;
 
-function TProperties.FindProperty(aAlias: String): TddProperty;
+function TProperties.FindProperty(aAlias: String; aQuite: Boolean = False): TddProperty;
 var
   i: Integer;
 begin
@@ -771,9 +776,13 @@ begin
    end
    else
    if Items[i].PropertyType = ptProperties then
-    Result:= Items[i].ListItem.FindProperty(aAlias);
+   begin
+    Result:= Items[i].ListItem.FindProperty(aAlias, True);
+    if Result <> nil then
+     break
+   end;
  end;
- if Result = nil then
+ if (Result = nil) and not aQuite then
   raise Exception.CreateFmt('Отсутствует указанное свойство %s', [aAlias]);
 end;
 

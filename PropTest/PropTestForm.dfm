@@ -54,6 +54,14 @@ object MainForm: TMainForm
     TabOrder = 3
     OnClick = RestoreButtonClick
   end
+  object InsertButton: TButton
+    Left = 256
+    Top = 16
+    Width = 75
+    Height = 25
+    Caption = #1042#1089#1090#1072#1074#1080#1090#1100
+    TabOrder = 4
+  end
   object ActionList2: TActionList
     Left = 32
     Top = 128
