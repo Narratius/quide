@@ -10,4 +10,5 @@ TJclNullStream
 TJclRandomStream
 TJclStream
 TJclStreamDecorator
-TSeekOriginTStreamNotifyEvent
+TSeekOrigin
+TStreamNotifyEvent

@@ -1,8 +1,8 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                           $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                        $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -19,7 +19,7 @@ unit mscoree_TLB;
 // manual modifications will be lost.                                         
 // ************************************************************************ //
 
-// PASTLWTR : $Revision: 3599 $
+// PASTLWTR : $Revision$
 // File generated on 14.12.2003 01:39:55 from Type Library described below.
 
 // ************************************************************************  //
@@ -144,6 +144,9 @@ type
   _ULARGE_INTEGER = packed record
     QuadPart: Largeuint;
   end;
+  {$IFDEF RTL320_UP}
+  {$EXTERNALSYM _ULARGE_INTEGER}
+  {$ENDIF RTL320_UP}
 
   _FILETIME = packed record
     dwLowDateTime: LongWord;
@@ -445,9 +448,9 @@ type
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/mscoree_TLB.pas $';
-    Revision: '$Revision: 3599 $';
-    Date: '$Date: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil

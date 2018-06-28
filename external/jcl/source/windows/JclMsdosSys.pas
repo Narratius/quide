@@ -19,15 +19,15 @@
 { Contributor(s): Robert Rossmair (IJclMsdosSys interface)                                         }
 {                                                                                                  }
 { You may retrieve the latest version of this file at the Project JEDI's Code Library home page,   }
-{ located at http://sourceforge.net/projects/jcl/                                                  }
+{ located at https://github.com/project-jedi/jcl                                                   }
 {                                                                                                  }
 { Known Issues: None                                                                               }
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                            $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -230,9 +230,9 @@ function GetMsdosSys: IJclMsdosSys;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/JclMsdosSys.pas $';
-    Revision: '$Revision: 3599 $';
-    Date: '$Date: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil

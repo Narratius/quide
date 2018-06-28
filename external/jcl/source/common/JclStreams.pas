@@ -27,9 +27,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3861                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -342,7 +342,7 @@ type
   end;
 
   // ancestor classes for streams with checksums and encrypted streams
-  // data are stored in sectors: each BufferSize-d buffer is followed by FBlockOverHeader bytes
+  // data are stored in sectors: each BufferSize-d buffer is followed by FSectorOverHead bytes
   // containing the checksum. In case of an encrypted stream, there is no byte
   // but sector is encrypted
 
@@ -586,9 +586,9 @@ function CompareFiles(const FileA, FileB: TFileName; BufferSize: Longint = Strea
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/JclStreams.pas $';
-    Revision: '$Revision: 3861 $';
-    Date: '$Date: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil
@@ -2061,7 +2061,6 @@ end;
 function TJclSplitStream.InternalLoadVolume(Index: Integer): Boolean;
 var
   OldVolumeIndex: Integer;
-  OldVolumeMaxSize: Int64;
   OldVolumePosition: Int64;
   OldVolume: TStream;
 begin
@@ -2071,22 +2070,21 @@ begin
   begin
     // save current pointers
     OldVolumeIndex := FVolumeIndex;
-    OldVolumeMaxSize := FVolumeMaxSize;
     OldVolumePosition := FVolumePosition;
     OldVolume := FVolume;
 
     FVolumeIndex := Index;
     FVolumePosition := 0;
     FVolume := GetVolume(Index);
-    FVolumeMaxSize := GetVolumeMaxSize(Index);
     Result := Assigned(FVolume);
-    if Result then
+    if Result then begin
+      FVolumeMaxSize := GetVolumeMaxSize(Index);
       FVolume.Seek(0, soBeginning)
+    end
     else
     begin
       // restore old pointers if volume load failed
       FVolumeIndex := OldVolumeIndex;
-      FVolumeMaxSize := OldVolumeMaxSize;
       FVolumePosition := OldVolumePosition;
       FVolume := OldVolume;
     end;
@@ -2122,8 +2120,8 @@ begin
       Break;
 
     // with next volume
-    Dec(Count, Result);
-    Inc(Data, Result);
+    Dec(Count, LoopRead);
+    Inc(Data, LoopRead);
     if not InternalLoadVolume(FVolumeIndex + 1) then
       Break;
   until False;
@@ -2196,8 +2194,10 @@ begin
         RemainingOffset := RemainingOffset - FVolumeMaxSize + FVolumePosition;
         Result := Result + FVolumeMaxSize - FVolumePosition;
         FPosition := Result;
-        if not InternalLoadVolume(FVolumeIndex + 1) then
+        if not InternalLoadVolume(FVolumeIndex + 1) then begin
+          FVolumePosition := FVolumeMaxSize;
           Break;
+        end;
       end;
     end;
   until RemainingOffset = 0;
@@ -2353,6 +2353,11 @@ begin
   FStream := AStream;
   FOwnStream := AOwnsStream;
   FBufferSize := StreamDefaultBufferSize;
+
+  // Must call this method so that buffer initial values are properly set.
+  // This is most useful when AStream is not located at position zero
+  // before being used by us.
+  InvalidateBuffers;
 end;
 
 destructor TJclStringStream.Destroy;

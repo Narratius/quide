@@ -24,9 +24,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                            $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -233,9 +233,9 @@ procedure CoMallocFree(P: Pointer);
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/JclStructStorage.pas $';
-    Revision: '$Revision: 3599 $';
-    Date: '$Date: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil
@@ -730,7 +730,7 @@ end;
 function TJclStructStorageStream.CopyTo(Stream: TJclStructStorageStream;
   Size: Int64): Boolean;
 var
-  DidRead, DidWrite: Int64;
+  DidRead, DidWrite: {$IFDEF RTL290_UP}LargeUInt{$ELSE}Largeint{$ENDIF RTL290_UP};
 begin
   DidRead := 0;
   DidWrite := 0;
@@ -774,7 +774,7 @@ end;
 
 function TJclStructStorageStream.Seek(Offset: Integer; Origin: Word): Longint;
 var
-  N: Int64;
+  N: {$IFDEF RTL290_UP}LargeUInt{$ELSE}Largeint{$ENDIF RTL290_UP};
 begin
   Check;
   if not Succeeded(FStream.Seek(Offset, Ord(Origin), N)) then

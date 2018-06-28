@@ -1,8 +1,8 @@
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-08-14 14:35:41 +0200 (Tue, 14 Aug 2012)                            $ }
-{ Revision:      $Rev:: 3824                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -31,5 +31,9 @@ uses
 {$R ..\source\windows\JclCommCtrlAsInvoker.res}
 
 begin
+  // By default, indicate an error.
+  // If (un)installation goes succesfully to completion, it will be set to 0, indicating success
+  ExitCode := 1;
+
   InstallCore.Execute;
 end.

@@ -1,2 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject/>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2018.06.28 10:16:14.494,=D:\#My Work\quide\Quide 2014\Unit1.pas</Transaction>
+    <Transaction>2018.06.28 10:18:45.134,D:\#My Work\quide\Quide 2014\quideVersionInfo.pas=D:\#My Work\quide\Quide 2014\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

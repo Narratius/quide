@@ -19,9 +19,9 @@
 { }
 { ************************************************************************************************** }
 { }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                            $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 { }
 { ************************************************************************************************** }
 
@@ -64,8 +64,8 @@ type
 
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/vcl/JclVersionCtrlGITImpl.pas $';
-    Revision: '$Revision: 3599 $'; Date: '$Date: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$'; Date: '$Date$';
     LogPath: 'JCL\source\vcl'; Extra: ''; Data: nil);
 {$ENDIF UNITVERSIONING}
 
@@ -99,6 +99,7 @@ const
   JclVersionCtrlGITDirectory1 = '.git\';
   JclVersionCtrlGITIndexFile = 'index';
   JclVersionCtrlGITIgnoreFile = '.gitignore';
+  JclVersionCtrlGITLinkFile = '.git';
 
   JclVersionCtrlGITDirectories: array [0 .. 0] of string = (JclVersionCtrlGITDirectory1);
 
@@ -251,7 +252,14 @@ begin
             Result := DirectoryName;
             Exit;
           end;
+
+        //Account for submodules and multiple worktree's
+        if FileExists(DirectoryName + JclVersionCtrlGITLinkFile) then
+        begin
+          Result := DirectoryName;
+          Exit;
         end;
+      end;
 end;
 
 function TJclVersionControlGIT.GetName: string;
@@ -290,6 +298,14 @@ begin
               Found := True;
               break;
             end;
+
+          if FileExists(DirectoryName + DirDelimiter + JclVersionCtrlGITLinkFile) then
+          begin
+            // When the first .git file is found stop searching
+            Found := True;
+            Break;
+          end;
+
         end;
         if not Found then // if no direcory is found delete the list
           SdBxNames.Clear;

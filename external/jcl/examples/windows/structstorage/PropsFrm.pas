@@ -16,10 +16,10 @@ All Rights Reserved.
 
 Contributor(s):
 
-Last Modified: $Date: 2006-05-30 00:02:45 +0200 (Tue, 30 May 2006) $
+Last Modified: $Date$
 
 You may retrieve the latest version of this file at the Project JEDI's Code Library home page,
-located at http://jcl.sourceforge.net
+located at https://github.com/project-jedi/jcl
 
 Description:
 Displays statistics for a TStatStg record
@@ -86,7 +86,7 @@ resourcestring
     'Note that all changes made to files with this program will be committed'#13#10 +
     'directly (unless running in Transacted mode) and cannot be undone'#13#10 +
     ' - use backup data for testing!'#13#10#13#10 +
-    'The latest version of JCL is always available at http://jcl.sourceforge.net';
+    'The latest version of JCL is always available at https://github.com/project-jedi/jcl';
   SAboutCaption = 'About Compound Document Editor...';
   SStorage = 'Storage';
   SStream = 'Stream';

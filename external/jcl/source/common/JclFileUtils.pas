@@ -51,9 +51,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3861                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -877,7 +877,7 @@ type
   TJclMappedTextReaderIndex = (tiNoIndex, tiFull);
 
   PPAnsiCharArray = ^TPAnsiCharArray;
-  TPAnsiCharArray = array [0..0] of PAnsiChar;
+  TPAnsiCharArray = array [0..MaxInt div SizeOf(PAnsiChar) - 1] of PAnsiChar;
 
   TJclAnsiMappedTextReader = class(TPersistent)
   private
@@ -928,7 +928,7 @@ type
   end;
 
   PPWideCharArray = ^TPWideCharArray;
-  TPWideCharArray = array [0..0] of PWideChar;
+  TPWideCharArray = array [0..MaxInt div SizeOf(PWideChar) - 1] of PWideChar;
 
   TJclWideMappedTextReader = class(TPersistent)
   private
@@ -1068,9 +1068,9 @@ function ParamPos (const SearchName : string; const Separator : string = '=';
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/JclFileUtils.pas $';
-    Revision: '$Revision: 3861 $';
-    Date: '$Date: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil
@@ -2663,8 +2663,8 @@ begin
     try
       // NOTE: DO NOT USE DELIMITER AND DELIMITEDTEXT FROM
       // TSTRINGS, THEY WILL SPLIT PATHS WITH SPACES !!!!
-      StrToStrings(Origin, DirDelimiter, OrigList);
-      StrToStrings(Destination, DirDelimiter, DestList);
+      StrToStrings(Origin, DirDelimiter, OrigList, False);
+      StrToStrings(Destination, DirDelimiter, DestList, False);
       begin
         // find the first directory that is not the same
         DiffIndex := OrigList.Count;
@@ -2787,7 +2787,7 @@ function PathIsDiskDevice(const Path: string): Boolean;
 var
   FullPath: string;
   F: PIOFile;
-  Buffer: array [0..255] of Char;
+  Buffer: array [0..255] of AnsiChar;
   MountEntry: TMountEntry;
   FsTypes: TStringList;
 
@@ -4117,7 +4117,7 @@ var
 begin
   Result := GetFileInformation(FileName, FileInfo);
   if Result then
-    LocalTime := FileTimeToLocalDateTime(GetFileInformation(FileName).FindData.ftLastWriteTime);
+    LocalTime := FileTimeToLocalDateTime(FileInfo.FindData.ftLastWriteTime);
 end;
 
 {$ENDIF MSWINDOWS}
@@ -4834,10 +4834,10 @@ function WindowToModuleFileName(const Window: HWND): string;
 type
   {$IFDEF SUPPORTS_UNICODE}
   TGetModuleFileNameEx = function(hProcess: THandle; hModule: HMODULE; FileName: PWideChar; nSize: DWORD): DWORD; stdcall;
-  TQueryFullProcessImageName = function(HProcess: THandle; dwFlags: DWORD; lpExeName: PWideChar; lpdwSize: PDWORD): integer; stdcall;
+  TQueryFullProcessImageName = function(HProcess: THandle; dwFlags: DWORD; lpExeName: PWideChar; lpdwSize: PDWORD): BOOL; stdcall;
   {$ELSE ~SUPPORTS_UNICODE}
   TGetModuleFileNameEx = function(hProcess: THandle; hModule: HMODULE; FileName: PAnsiChar; nSize: DWORD): DWORD; stdcall;
-  TQueryFullProcessImageName = function(HProcess: THandle; dwFlags: DWORD; lpExeName: PAnsiChar; lpdwSize: PDWORD): integer; stdcall;
+  TQueryFullProcessImageName = function(HProcess: THandle; dwFlags: DWORD; lpExeName: PAnsiChar; lpdwSize: PDWORD): BOOL; stdcall;
   {$ENDIF ~SUPPORTS_UNICODE}
 var
   FileName: array[0..300] of Char;
@@ -4846,69 +4846,77 @@ var
   HProcess: THandle;
   GetModuleFileNameExAddress: TGetModuleFileNameEx;
   QueryFullProcessImageNameAddress: TQueryFullProcessImageName;
+  Len: DWORD;
 begin
   Result := '';
   if Window <> 0 then
   begin
+    if not JclCheckWinVersion(5, 0) then // Win2k or newer required
+      raise EJclWin32Error.CreateRes(@RsEWindowsVersionNotSupported);
+
     {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.GetWindowThreadProcessId(Window, @ProcessID);
     hProcess := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ, false, ProcessID);
     if hProcess <> 0 then
     begin
-      if GetWindowsVersion() < WVWin2000 then
-        raise EJclWin32Error.CreateRes(@RsEWindowsVersionNotSupported)
-      else if GetWindowsVersion >=WvWinVista then
-      begin
-        DllHinst := LoadLibrary('Kernel32.dll');
-        if DllHinst < HINSTANCE_ERROR then
+      try
+        if JclCheckWinVersion(6, 0) then // WinVista or newer
         begin
-          try
-            {$IFDEF SUPPORTS_UNICODE}
-            QueryFullProcessImageNameAddress := GetProcAddress(DllHinst, 'QueryFullProcessImageNameW');
-            {$ELSE ~SUPPORTS_UNICODE}
-            QueryFullProcessImageNameAddress := GetProcAddress(DllHinst, 'QueryFullProcessImageNameA');
-            {$ENDIF ~SUPPORTS_UNICODE}
-            if Assigned(QueryFullProcessImageNameAddress) then
-            begin
-              QueryFullProcessImageNameAddress(hProcess, 0, FileName, PDWORD(sizeof(FileName)));
-              Result := FileName;
-            end
-            else
-            begin
-              raise EJclError.CreateResFmt(@RsEFunctionNotFound, ['Kernel32.dll', 'QueryFullProcessImageName']);
-            end
-          finally
-            FreeLibrary(DllHinst);
-          end;
+          DllHinst := LoadLibrary('Kernel32.dll');
+          if DllHinst < HINSTANCE_ERROR then
+          begin
+            try
+              {$IFDEF SUPPORTS_UNICODE}
+              QueryFullProcessImageNameAddress := GetProcAddress(DllHinst, 'QueryFullProcessImageNameW');
+              {$ELSE ~SUPPORTS_UNICODE}
+              QueryFullProcessImageNameAddress := GetProcAddress(DllHinst, 'QueryFullProcessImageNameA');
+              {$ENDIF ~SUPPORTS_UNICODE}
+              if Assigned(QueryFullProcessImageNameAddress) then
+              begin
+                Len := Length(FileName);
+                if QueryFullProcessImageNameAddress(hProcess, 0, FileName, PDWORD(@Len)) then
+                  Result := FileName;
+                //else
+                //  RaiseLastOSError   would be nice, but it didn't raise an exception before the return value was checked
+              end
+              else
+                raise EJclError.CreateResFmt(@RsEFunctionNotFound, ['Kernel32.dll', 'QueryFullProcessImageName']);
+            finally
+              FreeLibrary(DllHinst);
+            end;
+          end
+          else
+            raise EJclError.CreateResFmt(@RsELibraryNotFound, ['Kernel32.dll']);
         end
         else
-          raise EJclError.CreateResFmt(@RsELibraryNotFound, ['Kernel32.dll']);
-      end
-      else
-      begin
-        DllHinst := LoadLibrary('Psapi.dll');
-        if DllHinst < HINSTANCE_ERROR then
         begin
-          try
-            {$IFDEF SUPPORTS_UNICODE}
-            GetModuleFileNameExAddress := GetProcAddress(DllHinst, 'GetModuleFileNameExW');
-            {$ELSE ~SUPPORTS_UNICODE}
-            GetModuleFileNameExAddress := GetProcAddress(DllHinst, 'GetModuleFileNameExA');
-            {$ENDIF ~SUPPORTS_UNICODE}
-            if Assigned(GetModuleFileNameExAddress) then
-            begin
-              GetModuleFileNameExAddress(hProcess, 0, FileName, sizeof(FileName));
-              Result := FileName;
-            end
-            else
-            begin
-              raise EJclError.CreateResFmt(@RsEFunctionNotFound, ['Psapi.dll', 'GetModuleFileNameEx']);
-            end
-          finally
-            FreeLibrary(DllHinst);
-          end;
-        end
-        else
-          raise EJclError.CreateResFmt(@RsELibraryNotFound, ['Psapi.dll']);
+          DllHinst := LoadLibrary('Psapi.dll');
+          if DllHinst < HINSTANCE_ERROR then
+          begin
+            try
+              {$IFDEF SUPPORTS_UNICODE}
+              GetModuleFileNameExAddress := GetProcAddress(DllHinst, 'GetModuleFileNameExW');
+              {$ELSE ~SUPPORTS_UNICODE}
+              GetModuleFileNameExAddress := GetProcAddress(DllHinst, 'GetModuleFileNameExA');
+              {$ENDIF ~SUPPORTS_UNICODE}
+              if Assigned(GetModuleFileNameExAddress) then
+              begin
+                Len := GetModuleFileNameExAddress(hProcess, 0, FileName, Length(FileName));
+                if Len > 0 then
+                  Result := FileName;
+                //else
+                //  RaiseLastOSError;   would be nice, but it didn't raise an exception before the return value was checked
+              end
+              else
+                raise EJclError.CreateResFmt(@RsEFunctionNotFound, ['Psapi.dll', 'GetModuleFileNameEx']);
+            finally
+              FreeLibrary(DllHinst);
+            end;
+          end
+          else
+            raise EJclError.CreateResFmt(@RsELibraryNotFound, ['Psapi.dll']);
+        end;
+      finally
+        CloseHandle(hProcess);
       end;
     end
     else

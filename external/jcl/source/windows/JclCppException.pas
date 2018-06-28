@@ -25,9 +25,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-03-04 19:12:39 +0100 (Sun, 04 Mar 2012)                            $ }
-{ Revision:      $Rev:: 3757                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -87,8 +87,10 @@ type
 
     {$IFDEF COMPILER15_UP}
     { These are only accessible from C++ }
+    {$IFNDEF WIN64}
     function IsCppClass<TCppClass: TInaccessibleType>: Boolean; overload;
     function AsCppClass<TCppClass: TInaccessibleType>: TPointerType<TCppClass>.TPointer; overload;
+    {$ENDIF ~WIN64}
     {$ENDIF COMPILER15_UP}
 
     destructor Destroy; override;
@@ -118,6 +120,7 @@ type
   (*$HPPEMIT '} /* namespace Jclcppexception */'*)
 
   {$IFDEF COMPILER15_UP}
+  {$IFNDEF WIN64}
   (*$HPPEMIT END 'namespace Jclcppexception'*)
   (*$HPPEMIT END '{'*)
   (*$HPPEMIT END ''*)
@@ -133,6 +136,7 @@ type
   (*$HPPEMIT END '}'*)
   (*$HPPEMIT END ''*)
   (*$HPPEMIT END '} /* namespace Jclcppexception */'*)
+  {$ENDIF ~WIN64}
   {$ENDIF COMPILER15_UP}
 
 
@@ -151,9 +155,9 @@ function JclCppExceptionFilterInstalled: Boolean;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/JclCppException.pas $';
-    Revision: '$Revision: 3757 $';
-    Date: '$Date: 2012-03-04 19:12:39 +0100 (Sun, 04 Mar 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil
@@ -165,6 +169,9 @@ implementation
 {$IFDEF BORLAND}
 
 uses
+  {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}
+  System.AnsiStrings,
+  {$ENDIF DEPRECATED_SYSUTILS_ANSISTRINGS}
   JclResources, JclHookExcept;
 
 
@@ -304,6 +311,7 @@ function CppGetBase(var Obj: Pointer; TypeDesc: PCppTypeId;
   BaseName: PAnsiChar): Boolean; forward;
 
 {$IFDEF COMPILER15_UP}
+{$IFNDEF WIN64}
 function EJclCppException.AsCppClass<TCppClass>: TPointerType<TCppClass>.TPointer;
 begin
   Assert(False);
@@ -312,6 +320,7 @@ function EJclCppException.IsCppClass<TCppClass>: Boolean;
 begin
   Assert(False);
 end;
+{$ENDIF ~WIN64}
 {$ENDIF COMPILER15_UP}
 
 constructor EJclCppException.CreateTypeNamed(ATypeName: PAnsiChar; ExcDesc: Pointer);
@@ -598,7 +607,7 @@ begin
       Ptr := Pointer((PCardinal(Ptr))^); { dereference }
 
     { Is this the right base class? }
-    if StrComp(PAnsiChar(PByte(BaseType) + BaseType.tpName), BaseName) = 0 then
+    if {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrComp(PAnsiChar(PByte(BaseType) + BaseType.tpName), BaseName) = 0 then
     begin
       Addr := Ptr;    { Match --> return the adjusted pointer to the caller }
       Result := True;
@@ -632,7 +641,7 @@ function CppGetBase(var Obj: Pointer; TypeDesc: PCppTypeId;
 var
   BaseList, VBaseList: PCppBaseList;
 begin
-  if StrComp(PAnsiChar(PByte(TypeDesc) + TypeDesc.tpName), BaseName) = 0 then
+  if {$IFDEF DEPRECATED_SYSUTILS_ANSISTRINGS}System.AnsiStrings.{$ENDIF}StrComp(PAnsiChar(PByte(TypeDesc) + TypeDesc.tpName), BaseName) = 0 then
     { a class can be considered its own base }
     Result := True
   else if (TypeDesc.tpMask and TM_IS_CLASS) <> 0 then
@@ -646,6 +655,9 @@ begin
   else
     Result := False; { Don't be surprised. C++ permits to throw every type. }
 end;
+
+type
+  EOpenException = class(Exception);
 
 function CppExceptObjProc(P: PExceptionRecord): Exception;
 type
@@ -692,6 +704,10 @@ begin
         Result := EJclCppException.CreateTypeNamed(PAnsiChar(ExcTypeName), Pointer(ExcDesc));
     end;
   end;
+  {$IFDEF COMPILER12_UP}
+  if Result <> nil then
+    EOpenException(Result).RaisingException(P);
+  {$ENDIF COMPILER12_UP}
 end;
 
 var

@@ -20,9 +20,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-05-05 14:43:34 +0200 (Sat, 05 May 2012)                            $ }
-{ Revision:      $Rev:: 3787                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 unit JclOtaUtils;
@@ -330,9 +330,9 @@ function JCLWizardInit(const BorlandIDEServices: IBorlandIDEServices;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/experts/common/JclOtaUtils.pas $';
-    Revision: '$Revision: 3787 $';
-    Date: '$Date: 2012-05-05 14:43:34 +0200 (Sat, 05 May 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\experts\common';
     Extra: '';
     Data: nil
@@ -596,8 +596,8 @@ begin
     end;
     Inc(Position);
   until (BufferCount = 0) or (PropMatches = PropCount);
-  if InsideLineComment or InsideComment or InsideBrace then
-    raise EJclExpertException.CreateRes(@RsEUnterminatedComment);
+//  if InsideLineComment or InsideComment or InsideBrace then
+//    raise EJclExpertException.CreateRes(@RsEUnterminatedComment);  Don't throw an exception if the source isn't correct (Mantis #6425)
   for PropIndex := 0 to PropCount - 1 do
     if Result[PropIndex] = -1 then
       Result[PropIndex] := -Position;
@@ -631,16 +631,16 @@ begin
           PropLocations := InternalLocateProperties(AReader, PropIDs);
           for PropIndex := 0 to PropCount - 1 do
             if PropLocations[PropIndex] > 0 then
-          begin
-            SetLength(Result[PropIndex], BufferSize);
-            SetLength(Result[PropIndex], AReader.GetText(PropLocations[PropIndex], PAnsiChar(Result[PropIndex]), BufferSize));
-            for BufferIndex := 1 to Length(Result[PropIndex]) do
-              if CharIsWhiteSpace(Char(Result[PropIndex][BufferIndex])) then
             begin
-              SetLength(Result[PropIndex], BufferIndex - 1);
-              Break;
+              SetLength(Result[PropIndex], BufferSize);
+              SetLength(Result[PropIndex], AReader.GetText(PropLocations[PropIndex], PAnsiChar(Result[PropIndex]), BufferSize));
+              for BufferIndex := 1 to Length(Result[PropIndex]) do
+                if CharIsWhiteSpace(Char(Result[PropIndex][BufferIndex])) then
+                begin
+                  SetLength(Result[PropIndex], BufferIndex - 1);
+                  Break;
+                end;
             end;
-          end;
         finally
           AReader := nil;
         end;
@@ -691,10 +691,10 @@ begin
               SetLength(Buffer, AReader.GetText(PropLocations[0], PAnsiChar(Buffer), BufferSize));
               for BufferIndex := 1 to Length(Buffer) do
                 if CharIsWhiteSpace(Char(Buffer[BufferIndex])) then
-              begin
-                PropSize := BufferIndex - 1;
-                Break;
-              end;
+                begin
+                  PropSize := BufferIndex - 1;
+                  Break;
+                end;
             end;
           finally
             // release the reader before allocating the writer

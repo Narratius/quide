@@ -29,9 +29,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-02-23 21:46:07 +0100 (Thu, 23 Feb 2012)                            $ }
-{ Revision:      $Rev:: 3740                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -1233,12 +1233,26 @@ type
   //DOM-IGNORE-END
   {$ENDIF SUPPORTS_GENERICS}
 
+{$IFDEF BCB}
+{$IFDEF WIN64}
+  {$HPPEMIT '#ifdef MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT ' #undef MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT ' #define JclHashSets_MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT '#endif'}
+
+  {$HPPEMIT END '#ifdef JclHashSets_MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT END ' #define MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT END ' #undef JclHashSets_MANAGED_INTERFACE_OPERATORS'}
+  {$HPPEMIT END '#endif'}
+{$ENDIF WIN64}
+{$ENDIF BCB}
+
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/JclHashSets.pas $';
-    Revision: '$Revision: 3740 $';
-    Date: '$Date: 2012-02-23 21:46:07 +0100 (Thu, 23 Feb 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil

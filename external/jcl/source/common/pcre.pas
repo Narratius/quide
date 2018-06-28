@@ -32,9 +32,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-03 00:25:26 +0200 (Mon, 03 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3855                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -63,7 +63,12 @@ uses
   {$IFDEF UNITVERSIONING}
     {$WEAKPACKAGEUNIT OFF}
   {$ELSE ~UNITVERSIONING}
-    {$WEAKPACKAGEUNIT ON}
+    // d6 and d7 consider initialized variables to be initialization parts which goes against the "weakpackageunit" requirement
+    {$IF Defined(PCRE_LINKONREQUEST) and not Defined(COMPILER8_UP)}
+      {$WEAKPACKAGEUNIT OFF}
+    {$ELSE}
+      {$WEAKPACKAGEUNIT ON}
+    {$IFEND}
   {$ENDIF ~UNITVERSIONING}
 {$ENDIF SUPPORTS_WEAKPACKAGEUNIT}
 
@@ -1675,9 +1680,9 @@ procedure UnloadPCRE;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/pcre.pas $';
-    Revision: '$Revision: 3855 $';
-    Date: '$Date: 2012-09-03 00:25:26 +0200 (Mon, 03 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil

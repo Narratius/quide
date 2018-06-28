@@ -30,9 +30,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3861                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -316,9 +316,9 @@ function GetCDAudioTrackList(TrackList: TStrings; IncludeTrackType: Boolean = Fa
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/JclMultimedia.pas $';
-    Revision: '$Revision: 3861 $';
-    Date: '$Date: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil
@@ -1164,7 +1164,7 @@ function GetMciErrorMessage(const MciErrNo: MCIERROR): string;
 var
   Buffer: array [0..{$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}MMSystem.MAXERRORLENGTH - 1] of Char;
 begin
-  if mciGetErrorString(MciErrNo, Buffer, SizeOf(Buffer)) then
+  if mciGetErrorString(MciErrNo, Buffer, Length(Buffer)) then
     Result := Buffer
   else
     Result := Format(LoadResString(@RsMmUnknownError), [MciErrNo]);
@@ -1250,7 +1250,7 @@ begin
     ResetMemory(Buffer, SizeOf(Buffer));
     InfoParams.dwCallback := 0;
     InfoParams.lpstrReturn := Buffer;
-    InfoParams.dwRetSize := SizeOf(Buffer) - 1;
+    InfoParams.dwRetSize := Length(Buffer) - 1;
     if mciSendCommand(Mci.wDeviceID, MCI_INFO, InfoConsts[InfoType], TJclAddr(@InfoParams)) = MMSYSERR_NOERROR then
       Result := Buffer;
   finally

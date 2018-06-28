@@ -26,9 +26,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3861                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -97,9 +97,9 @@ function JclBelongsHookedCode(Address: Pointer): Boolean;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/windows/JclHookExcept.pas $';
-    Revision: '$Revision: 3861 $';
-    Date: '$Date: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\windows';
     Extra: '';
     Data: nil
@@ -366,7 +366,7 @@ const
 begin
   if ((ExceptionFlags = cNonContinuable) or (ExceptionFlags = cNonContinuableException)) and
     (ExceptionCode = cDelphiException) and
-    (NumberOfArguments in [DelphiNumberOfArguments,CBuilderNumberOfArguments])
+    (NumberOfArguments in [DelphiNumberOfArguments, CBuilderNumberOfArguments])
     //TODO: The difference for Win64 is bigger than 100 Byte and the comment of JVCS revision 0.3 of
     //  JclDebug.pas, where HookedRaiseException has been added by Petr, isn't very informative
     {$IFDEF CPU32}

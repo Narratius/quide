@@ -36,9 +36,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                            $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -336,9 +336,15 @@ const
   NegInfinity = -Infinity;
   {$EXTERNALSYM NegInfinity}
 
+{$IFDEF WIN64}
+{$HPPEMIT 'static const double Infinity    =  1.0 / 0.0;'}
+{$HPPEMIT 'static const double NaN         =  0.0 / 0.0;'}
+{$HPPEMIT 'static const double NegInfinity = -1.0 / 0.0;'}
+{$ELSE}
 {$HPPEMIT 'static const Infinity    =  1.0 / 0.0;'}
 {$HPPEMIT 'static const NaN         =  0.0 / 0.0;'}
 {$HPPEMIT 'static const NegInfinity = -1.0 / 0.0;'}
+{$ENDIF WIN64}
 
 {$IFDEF CPU32}
 
@@ -830,9 +836,9 @@ function CscH(const Z: TRectComplex): TRectComplex; overload;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/JclMath.pas $';
-    Revision: '$Revision: 3599 $';
-    Date: '$Date: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil
@@ -3295,11 +3301,11 @@ procedure InitExceptObjProc;
 begin
   if LockedExchange(ExceptObjProcInitialized, 1) = 0 then
     if Win32Platform = VER_PLATFORM_WIN32_NT then
-      {$IFDEF FPC}
-      PrevExceptObjProc := Pointer(InterlockedExchange(TJclAddr(ExceptObjProc), TJclAddr(@GetExceptionObject)));
-      {$ELSE ~FPC}
+      {$IFDEF RTL200_UP} // Delphi 2009+
+      PrevExceptObjProc := InterlockedExchangePointer(ExceptObjProc, @GetExceptionObject);
+      {$ELSE}
       PrevExceptObjProc := Pointer(InterlockedExchange(Integer(ExceptObjProc), Integer(@GetExceptionObject)));
-      {$ENDIF ~FPC}
+      {$ENDIF RTL200_UP}
 end;
 {$ENDIF ~FPC}
 {$ENDIF MSWINDOWS}

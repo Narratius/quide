@@ -18,15 +18,15 @@
 { Contributor(s):                                                                                  }
 {                                                                                                  }
 { You may retrieve the latest version of this file at the Project JEDI's JCL / JVCL                }
-{ home page, located at http://jcl.sourceforge.net / http://jvcl.sourceforge.net                   }
+{ home page, located at https://github.com/project-jedi/jcl / https://github.com/project-jedi/jvcl }
 {                                                                                                  }
 { Known Issues:                                                                                    }
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2011-09-03 00:07:50 +0200 (Sat, 03 Sep 2011)                            $ }
-{ Revision:      $Rev:: 3599                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 

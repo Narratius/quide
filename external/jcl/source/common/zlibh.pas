@@ -29,9 +29,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-08-27 20:50:24 +0200 (Mon, 27 Aug 2012)                            $ }
-{ Revision:      $Rev:: 3845                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -53,7 +53,11 @@ unit zlibh;
 
 {$HPPEMIT '#define __MACTYPES__'}
 {$IFDEF COMPILER10_UP}
+{$IFDEF RTL310_UP}
+{$HPPEMIT '#include <System.ZLib.hpp>'}
+{$ELSE ~RTL310_UP}
 {$HPPEMIT '#include <ZLib.hpp>'}
+{$ENDIF ~RTL310_UP}
 {$ELSE ~COMPILER10_UP}
 {$HPPEMIT '#include <zlib.h>'}
 {$ENDIF ~COMPILER10_UP}
@@ -2148,9 +2152,9 @@ procedure UnloadZLib;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/zlibh.pas $';
-    Revision: '$Revision: 3845 $';
-    Date: '$Date: 2012-08-27 20:50:24 +0200 (Mon, 27 Aug 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil

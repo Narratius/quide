@@ -24,9 +24,9 @@
 {                                                                                                  }
 {**************************************************************************************************}
 {                                                                                                  }
-{ Last modified: $Date:: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012)                            $ }
-{ Revision:      $Rev:: 3861                                                                     $ }
-{ Author:        $Author:: outchy                                                                $ }
+{ Last modified: $Date::                                                                         $ }
+{ Revision:      $Rev::                                                                          $ }
+{ Author:        $Author::                                                                       $ }
 {                                                                                                  }
 {**************************************************************************************************}
 
@@ -72,7 +72,6 @@ type
     FOutput: string;
     FOnAfterExecute: TJclBorlandCommandLineToolEvent;
     FOnBeforeExecute: TJclBorlandCommandLineToolEvent;
-    procedure OemTextHandler(const Text: string);
   protected
     procedure CheckOutputValid;
     function GetFileName: string;
@@ -132,15 +131,16 @@ type
     FLibrarySearchPath: string;
     FLibraryDebugSearchPath: string;
     FCppSearchPath: string;
+    FOnEnvironmentVariables: TJclStringsGetterFunction;
     FSupportsNoConfig: Boolean;
     FSupportsPlatform: Boolean;
-    FOnEnvironmentVariables: TJclStringsGetterFunction;
+    FDCCVersion: Single;
   protected
     procedure AddProjectOptions(const ProjectFileName, DCPPath: string);
     function Compile(const ProjectFileName: string): Boolean;
   public
     class function GetPlatform: string; virtual;
-    constructor Create(const ABinDirectory: string; ALongPathBug: Boolean;
+    constructor Create(const ABinDirectory: string; ALongPathBug: Boolean; ADCCVersion: Single;
       ACompilerSettingsFormat: TJclCompilerSettingsFormat; ASupportsNoConfig, ASupportsPlatform: Boolean;
       const ADCPSearchPath, ALibrarySearchPath, ALibraryDebugSearchPath, ACppSearchPath: string);
     function GetExeName: string; override;
@@ -160,6 +160,7 @@ type
     property OnEnvironmentVariables: TJclStringsGetterFunction read FOnEnvironmentVariables write FOnEnvironmentVariables;
     property SupportsNoConfig: Boolean read FSupportsNoConfig;
     property SupportsPlatform: Boolean read FSupportsPlatform;
+    property DCCVersion: Single read FDCCVersion;
   end;
 
   TJclDCC64 = class(TJclDCC32)
@@ -241,9 +242,9 @@ procedure GetBPKFileInfo(const BPKFileName: string; out RunOnly: Boolean;
 {$IFDEF UNITVERSIONING}
 const
   UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jcl.svn.sourceforge.net/svnroot/jcl/tags/JCL-2.4-Build4571/jcl/source/common/JclCompilerUtils.pas $';
-    Revision: '$Revision: 3861 $';
-    Date: '$Date: 2012-09-04 16:08:04 +0200 (Tue, 04 Sep 2012) $';
+    RCSfile: '$URL$';
+    Revision: '$Revision$';
+    Date: '$Date$';
     LogPath: 'JCL\source\common';
     Extra: '';
     Data: nil
@@ -773,46 +774,28 @@ begin
   Result := FOutputCallback;
 end;
 
-function TJclBorlandCommandLineTool.InternalExecute(
-  const CommandLine: string): Boolean;
+function TJclBorlandCommandLineTool.InternalExecute(const CommandLine: string): Boolean;
 var
   LaunchCommand: string;
+  Options: TJclExecuteCmdProcessOptions;
 begin
-  LaunchCommand := Format('%s %s', [FileName, StrAnsiToOem(AnsiString(CommandLine))]);
-  if Assigned(FOutputCallback) then
-  begin
-    FOutputCallback(LaunchCommand);
-    Result := JclSysUtils.Execute(LaunchCommand, OemTextHandler) = 0;
-  end
-  else
-  begin
-    Result := JclSysUtils.Execute(LaunchCommand, FOutput) = 0;
-    {$IFDEF MSWINDOWS}
-    FOutput := string(StrOemToAnsi(AnsiString(FOutput)));
-    {$ENDIF MSWINDOWS}
-  end;
-end;
+  LaunchCommand := Format('%s %s', [FileName, CommandLine]);
 
-procedure TJclBorlandCommandLineTool.OemTextHandler(const Text: string);
-var
-  AnsiText: string;
-begin
-  if Assigned(FOutputCallback) then
-  begin
-    {$IFDEF MSWINDOWS}
-    // Text is OEM under Windows
-    // Code below seems to crash older compilers at times, so we only do
-    // the casts when it's absolutely necessary, that is when compiling
-    // with a unicode compiler.
-    {$IFDEF UNICODE}
-    AnsiText := string(StrOemToAnsi(AnsiString(Text)));
-    {$ELSE}
-    AnsiText := StrOemToAnsi(Text);
-    {$ENDIF UNICODE}
-    {$ELSE ~MSWINDOWS}
-    AnsiText := Text;
-    {$ENDIF ~MSWINDOWS}
-    FOutputCallback(AnsiText);
+  Options := TJclExecuteCmdProcessOptions.Create(LaunchCommand);
+  try
+    if Assigned(FOutputCallback) then
+    begin
+      Options.OutputLineCallback := FOutputCallback;
+      FOutputCallback(LaunchCommand);
+      Result := ExecuteCmdProcess(Options) and (Options.ExitCode = 0);
+    end
+    else
+    begin
+      Result := ExecuteCmdProcess(Options) and (Options.ExitCode = 0);
+      FOutput := FOutput + Options.Output;
+    end;
+  finally
+    Options.Free;
   end;
 end;
 
@@ -1009,7 +992,12 @@ begin
      AddDOFOptions(ProjectFileName, ProjectOptions) then
   begin
     if ProjectOptions.UnitOutputDir <> '' then
-      AddPathOption('N', ProjectOptions.UnitOutputDir);
+    begin
+      if DCCVersion >= 24.0 then // XE3+
+        AddPathOption('NU', ProjectOptions.UnitOutputDir)
+      else
+        AddPathOption('N', ProjectOptions.UnitOutputDir);
+    end;
     if ProjectOptions.SearchPath <> '' then
     begin
       AddPathOption('I', ProjectOptions.SearchPath);
@@ -1037,11 +1025,12 @@ begin
   Result := Execute(StrDoubleQuote(StrTrimQuotes(ProjectFileName)));
 end;
 
-constructor TJclDCC32.Create(const ABinDirectory: string; ALongPathBug: Boolean;
+constructor TJclDCC32.Create(const ABinDirectory: string; ALongPathBug: Boolean; ADCCVersion: Single;
   ACompilerSettingsFormat: TJclCompilerSettingsFormat; ASupportsNoConfig, ASupportsPlatform: Boolean;
   const ADCPSearchPath, ALibrarySearchPath, ALibraryDebugSearchPath, ACppSearchPath: string);
 begin
   inherited Create(ABinDirectory, ALongPathBug, ACompilerSettingsFormat);
+  FDCCVersion := ADCCVersion;
   FSupportsNoConfig := ASupportsNoConfig;
   FSupportsPlatform := ASupportsPlatform;
   FDCPSearchPath := ADCPSearchPath;
@@ -1052,6 +1041,7 @@ begin
 end;
 
 function TJclDCC32.Execute(const CommandLine: string): Boolean;
+
   function IsPathOption(const S: string; out Len: Integer): Boolean;
   begin
     Result := False;
@@ -1077,12 +1067,22 @@ function TJclDCC32.Execute(const CommandLine: string): Boolean;
         'N':
           begin
             Result := True;
-            if (Length(S) >= 3) then
+            if Length(S) >= 3 then
             begin
               case Upcase(S[3]) of
+                'U', 'X': // -NU<dcupath> -NX<xmlpath>
+                  if DCCVersion >= 24.0 then // XE3+
+                    Len := 3
+                  else
+                    Len := 2;
                 '0'..'9',
                 'H', 'O', 'B':
                   Len := 3;
+                'S': // -NS<namespace>
+                  if DCCVersion >= 23.0 then // XE2+
+                    Len := 3
+                  else
+                    Len := 2;
               else
                 Len := 2;
               end;
@@ -1090,6 +1090,7 @@ function TJclDCC32.Execute(const CommandLine: string): Boolean;
           end;
       end;
   end;
+
 var
   OptionIndex, PathIndex, SwitchLen: Integer;
   PathList: TStrings;
@@ -1100,7 +1101,7 @@ begin
 
   FOutput := '';
   Arguments := '';
-  CurrentFolder := GetCurrentFolder;
+  CurrentFolder := PathGetShortName(GetCurrentFolder); // used if LongPathBug is True
 
   PathList := TStringList.Create;
   try
