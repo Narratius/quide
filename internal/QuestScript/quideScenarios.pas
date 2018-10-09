@@ -77,7 +77,7 @@ begin
   // переменные теперь в свойствах...
   f_Chapters.Clear;
   f_LocationsNames.Clear;
-  f_VariablesNames.Clear;
+//  f_VariablesNames.Clear;
 end;
 
 constructor TquideScenario.Create;

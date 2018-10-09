@@ -278,6 +278,23 @@ const
                   ptBoolean,
                   ptPassword];   // TRadioGroup (TCombobox)
 
+ propAdjustable : set of TddPropertyType = [
+                    ptChar,       // TEdit
+                    ptString,     // TEdit
+                    ptInteger,    // TEdit
+                    ptText,       // TMemo
+                    ptBoolean,    // TRadioGroup (TCombobox)
+                    ptChoice,     // TComboBox
+                    ptAction,     // TButton
+                    ptList,       // TListBox
+                    ptProperties, // TScrollBox (Вложенные свойства)
+                    ptPassword,   // TEdit с PasswordChar
+                    ptDate,       // TDateTimePicker
+                    ptTime        // TDateTimePicker
+                    ];
+
+
+
 function PropertyType2String(aType: TddPropertyType): String;
 
 function String2PropertyType(const aText: String): TddPropertyType;
@@ -451,6 +468,7 @@ begin
    //f_UID:= TddProperty(Source).UID; // ?
    f_Event:= TddProperty(Source).Event;
    f_ReadOnly:= TddProperty(Source).ReadOnly;
+   fNewLine:= TddProperty(Source).NewLine;
    if PropertyType in [ptList, ptChoice] then
    begin
     ListItem:= TddProperty(Source).ListItem.Clone;
@@ -824,12 +842,22 @@ var
  l_Item: TddProperty;
 begin
  if Assigned(aFunc) then
+ try
   for i:= 0 to Pred(Count) do
   begin
    l_Item:= Items[i];
    if not aFunc(l_Item) then
     break;
   end;
+ except
+  for i:= 0 to Pred(Count) do
+  begin
+   l_Item:= Items[i];
+   if not aFunc(l_Item) then
+    break;
+  end;
+
+ end;
 end;
 
 procedure TProperties.LoadFromXML(Element: IXMLNode; LoadStruct: Boolean);

@@ -144,8 +144,11 @@ begin
 end;
 
 procedure TMainForm.FillIf(aProp: TProperties);
+var
+  l_P: TProperties;
 begin
- with aProp do
+ l_P:= TProperties.Create(nil);
+ with l_P do
  begin
   (* *)
   DefineChoice('What', 'Если');
@@ -166,6 +169,10 @@ begin
   DefineStaticText('Иначе');
   DefineProps('False', ''); (* *)
  end;
+ aProp.DefineProps('Props', 'Условия', l_P);
 end;
 
 end.
+
+
+

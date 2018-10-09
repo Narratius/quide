@@ -104,8 +104,8 @@ var
   l_PrevisLabel: Boolean;
 begin
  {$IFDEF Debug}
- with aParent do
-   Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
+ //with aParent do
+ //  Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
  {$ENDIF}
  if aControls.Count > 0 then
  begin
@@ -229,9 +229,9 @@ begin
   l_IC.OnSizeChanged:= aMyControlResized;
  aControls.Add(aControl);
  {$IFDEF Debug}
- with aControl do
-   Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
- Msg2Log('Parent.Height After: %d', [aParent.Height]);
+ //with aControl do
+ //  Msg2Log('Add Control: %s (Left: %d, Top: %d, Width: %d, Height: %d)', [Name, Left, Top, Width, Height]);
+ //Msg2Log('Parent.Height After: %d', [aParent.Height]);
  {$ENDIF}
 end;
 
