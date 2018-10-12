@@ -9,7 +9,7 @@ Uses
  Propertys;
 
 type
- TquideConfig = class(TProperties)
+ TquideConfig = class(TddProperties)
  public
    constructor Create(aOwner: TComponent); override;
    procedure LoadFromFile;

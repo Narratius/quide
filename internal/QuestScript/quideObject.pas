@@ -9,7 +9,7 @@ uses
 
 type
   //1 Базовый объект
-  TquideObject = class(TProperties)
+  TquideObject = class(TddProperties)
   private
     //f_GraphID: DWord;
     function pm_GetCaption: string;

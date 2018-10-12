@@ -10,7 +10,7 @@ uses
 type
  TquideActionType = (atNone, atGoto, atInventory, atLogic, atText, atVariable, atButton);
 
- TquideActions = class(TProperties)
+ TquideActions = class(TddProperties)
  private
   f_Menu: TPopupMenu;
   procedure AddGotoAction(Sender: TObject);

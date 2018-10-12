@@ -23,9 +23,9 @@ type
     procedure SerializeButtonClick(Sender: TObject);
     procedure RestoreButtonClick(Sender: TObject);
   private
-    procedure FillProp(aProp: TProperties);
-    procedure FillIf(aProp: TProperties);
-    procedure FillList(aProp: TProperties);
+    procedure FillProp(aProp: TddProperties);
+    procedure FillIf(aProp: TddProperties);
+    procedure FillList(aProp: TddProperties);
   public
     { Public declarations }
   end;
@@ -60,26 +60,13 @@ var
 
 procedure TMainForm.ShowButtonClick(Sender: TObject);
 var
-  l_Prop, l_P: TProperties;
+  l_Prop, l_P: TddProperties;
   l_FileName: String;
   l_List: TStrings;
 begin
-  l_Prop:= TProperties.Create(nil);
+  l_Prop:= TddProperties.Create(nil);
   try
-   l_P:= TProperties.Create(nil);
-   try
-    (*
-    FillProp(l_P);
-    l_P.Values['p1']:= 'Very long text';
-    l_P.Values['Date']:= date;
-    l_Prop.DefineProps('InnerProps', 'Вложенные свойства', l_P);
-    ShowMessage(l_Prop.Values['p1']);
-    //FillList(l_Prop);
-     *)
-    FillIf(l_prop);
-   finally
-    l_P.Free;
-   end;
+   FillIf(l_prop);
    ShowPropDialog('Test Properties', l_Prop, CheckBox1.Checked);
   finally
    FreeAndNil(l_Prop);
@@ -87,7 +74,7 @@ begin
 end;
 
 
-procedure TMainForm.FillList(aProp: TProperties);
+procedure TMainForm.FillList(aProp: TddProperties);
 begin
  aProp.DefineList('Generators', 'Генераторы', True,
         NewProperty('Caption', 'Название', ptString,
@@ -95,7 +82,7 @@ begin
         nil)));
 end;
 
-procedure TMainForm.FillProp(aProp: TProperties);
+procedure TMainForm.FillProp(aProp: TddProperties);
 begin
   with aProp do
   begin
@@ -112,9 +99,9 @@ end;
 
 procedure TMainForm.RestoreButtonClick(Sender: TObject);
 var
- l_Prop: TProperties;
+ l_Prop: TddProperties;
 begin
-  l_Prop:= TProperties.Create(nil);
+  l_Prop:= TddProperties.Create(nil);
   try
    LoadFromFile(ChangeFileExt(Application.ExeName, '.data'), l_Prop);
    SaveToFile(ChangeFileExt(Application.ExeName, '.data2'), l_Prop);
@@ -126,11 +113,11 @@ end;
 
 procedure TMainForm.SerializeButtonClick(Sender: TObject);
 var
- l_Prop, l_P: TProperties;
+ l_Prop, l_P: TddProperties;
 begin
-  l_Prop:= TProperties.Create(nil);
+  l_Prop:= TddProperties.Create(nil);
   try
-   l_P:= TProperties.Create(nil);
+   l_P:= TddProperties.Create(nil);
    try
     FillProp(l_P);
     l_Prop.DefineProps('InnerProps', 'Вложенные свойства', l_P);
@@ -143,33 +130,37 @@ begin
   end;
 end;
 
-procedure TMainForm.FillIf(aProp: TProperties);
+procedure TMainForm.FillIf(aProp: TddProperties);
 var
-  l_P: TProperties;
+  l_P: TddProperties;
 begin
- l_P:= TProperties.Create(nil);
- with l_P do
- begin
-  (* *)
-  DefineChoice('What', 'Если');
-  ChoiceStyles['What']:= csEditableList;
-  DefineChoice('Condition', '',
-    NewChoice(0, 'равно',
-    NewChoice(1, 'не равно',
-    NewChoice(2, 'больше',
-    NewChoice(3, 'меньше',
-    NewChoice(4, 'больше или равно',
-    NewChoice(5, 'меньше или равно',
-    nil)))))));
-  DefineString('Value', '');
-  NewLines['Condition']:= False;
-  NewLines['Value']:= False;
-  (* *)
-  DefineProps('True', '');
-  DefineStaticText('Иначе');
-  DefineProps('False', ''); (* *)
+ l_P:= TddProperties.Create(nil);
+ try
+   with l_P do
+   begin
+    DefineChoice('What', 'Если');
+    (*
+    ChoiceStyles['What']:= csEditableList;
+    DefineChoice('Condition', '',
+      NewChoice(0, 'равно',
+      NewChoice(1, 'не равно',
+      NewChoice(2, 'больше',
+      NewChoice(3, 'меньше',
+      NewChoice(4, 'больше или равно',
+      NewChoice(5, 'меньше или равно',
+      nil)))))));
+    NewLines['Condition']:= False;
+    *)
+    DefineString('Value', '');
+    NewLines['Value']:= False;
+    DefineProps('True', '');
+    DefineStaticText('Иначе');
+    DefineProps('False', '');
+   end;
+   aProp.DefineProps('Props', 'Условия', l_P);
+ finally
+   FreeAndNil(l_P);
  end;
- aProp.DefineProps('Props', 'Условия', l_P);
 end;
 
 end.

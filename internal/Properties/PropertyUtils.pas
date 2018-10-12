@@ -19,21 +19,21 @@ function NewChoiceProperty(const aAlias, aCaption: String; aChoiceDef: TddChoice
 
 function NewChoice(aID: Integer; aCaption: String; aNext: TddChoiceLink = nil): TddChoiceLink;
 
-function LinkToProperties(aLink: TddPropertyLink): TProperties;
+function LinkToProperties(aLink: TddPropertyLink): TddProperties;
 
-function ShowPropDialog(const aCaption: String; aProperties: TProperties;
+function ShowPropDialog(const aCaption: String; aProperties: TddProperties;
     aLabelTop: Boolean = False): Boolean; overload;
 
 function ShowPropDialog(const aCaption: String; aProperty: TddProperty;
     aLabelTop: Boolean = False): Boolean; overload;
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean); overload;
+procedure SaveToFile(const aFileName: String; aProperties: TddProperties; aSaveStruct: Boolean); overload;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean); overload;
+procedure LoadFromFile(const aFileName: String; aProperties: TddProperties; aLoadStruct: Boolean); overload;
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties); overload;
+procedure SaveToFile(const aFileName: String; aProperties: TddProperties); overload;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties); overload;
+procedure LoadFromFile(const aFileName: String; aProperties: TddProperties); overload;
 
 
 implementation
@@ -92,12 +92,12 @@ begin
  Result:= TddPropertyLink.Create(l_I, aNext);
 end;
 
-function LinkToProperties(aLink: TddPropertyLink): TProperties;
+function LinkToProperties(aLink: TddPropertyLink): TddProperties;
 var
  l_Item: TddPropertyLink;
  l_Next: TddPropertyLink;
 begin
- Result:= TProperties.Create(nil);
+ Result:= TddProperties.Create(nil);
  l_Next:= aLink;
  while l_Next <> nil do
  begin
@@ -111,7 +111,7 @@ end;
 
 
 
-function ShowPropDialog(const aCaption: String; aProperties: TProperties;
+function ShowPropDialog(const aCaption: String; aProperties: TddProperties;
     aLabelTop: Boolean = False): Boolean;
 begin
  with TPropDialog.Create(Application) do
@@ -127,11 +127,11 @@ end;
 
 function ShowPropDialog(const aCaption: String; aProperty: TddProperty; aLabelTop: Boolean = False): Boolean;
 var
- l_Prop: TProperties;
+ l_Prop: TddProperties;
  l_P: TddProperty;
 begin
  { TODO : Нужно клонировать aProperty }
- l_Prop:= TProperties.Create(nil);
+ l_Prop:= TddProperties.Create(nil);
  try
   l_Prop.AddProp(aProperty);
   with TPropDialog.Create(Application) do
@@ -149,7 +149,7 @@ end;
 
 
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties; aSaveStruct: Boolean);
+procedure SaveToFile(const aFileName: String; aProperties: TddProperties; aSaveStruct: Boolean);
 var
  l_XML: IXMLDocument;
 begin
@@ -165,7 +165,7 @@ begin
   end;
 end;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties; aLoadStruct: Boolean);
+procedure LoadFromFile(const aFileName: String; aProperties: TddProperties; aLoadStruct: Boolean);
 var
  l_XML: IXMLDocument;
  l_Node: IXMLNode;
@@ -192,7 +192,7 @@ begin
 end;
 
 
-procedure SaveToFile(const aFileName: String; aProperties: TProperties);
+procedure SaveToFile(const aFileName: String; aProperties: TddProperties);
 var
   FileStream: TFileStream;
   MemStream: TMemoryStream;
@@ -220,7 +220,7 @@ begin
   end;
 end;
 
-procedure LoadFromFile(const aFileName: String; aProperties: TProperties);
+procedure LoadFromFile(const aFileName: String; aProperties: TddProperties);
 var
   FileStream: TFileStream;
   MemStream: TMemoryStream;

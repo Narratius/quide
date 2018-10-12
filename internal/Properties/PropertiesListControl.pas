@@ -84,7 +84,7 @@ end;
 
 procedure TPropertiesListControl.EditItem(aNew: Boolean);
 var
- l_Item: TProperties;
+ l_Item: TddProperties;
  l_Cap: String;
  l_Index: Integer;
 begin

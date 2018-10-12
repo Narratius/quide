@@ -24,7 +24,7 @@ type
     Menu: TPopupmenu;
     Event: TNotifyEvent;
     OnChange: TNotifyEvent;
-    SubItem: TProperties;
+    SubItem: TddProperties;
   end;
 
   TControlsArray = array of TControlRec;

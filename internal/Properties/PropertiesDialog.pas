@@ -15,18 +15,18 @@ type
     procedure FormCreate(Sender: TObject);
   private
     f_WorkPanel: TPropertiesPanel;
-    procedure SetProperties(const Value: TProperties);
+    procedure SetProperties(const Value: TddProperties);
     procedure ResizePanel;
-    function GetProperties: TProperties;
+    function GetProperties: TddProperties;
     function pm_GetLabelTop: Boolean;
     procedure pm_Setf_LabelTop(const Value: Boolean);
     { Private declarations }
   public
     { Public declarations }
-    function Execute(var aProp: TProperties): Boolean;
+    function Execute(var aProp: TddProperties): Boolean;
     property LabelTop: Boolean read pm_GetLabelTop write pm_Setf_LabelTop;
     property WorkPanel: TPropertiesPanel read f_WorkPanel;
-    property Properties: TProperties read GetProperties write SetProperties;
+    property Properties: TddProperties read GetProperties write SetProperties;
   end;
 
 var
@@ -39,7 +39,7 @@ Uses
 
 {$R *.dfm}
 
-function TPropDialog.Execute(var aProp: TProperties): Boolean;
+function TPropDialog.Execute(var aProp: TddProperties): Boolean;
 begin
  Result:= False;
  Properties:= aProp;
@@ -63,7 +63,7 @@ begin
   f_WorkPanel.Align:= alClient;
 end;
 
-function TPropDialog.GetProperties: TProperties;
+function TPropDialog.GetProperties: TddProperties;
 begin
  f_WorkPanel.GetValues;
  Result:= f_WorkPanel.Properties;
@@ -83,10 +83,10 @@ procedure TPropDialog.ResizePanel;
 begin
  // Подогнать панель и диалог под контролы
  { TODO : Нужно реализовать, иначе фигня, а не диалог }
-   Height:= Max(f_WorkPanel.Height, Height);
+   ClientHeight:= Max(f_WorkPanel.ActualHeight, ClientHeight);
 end;
 
-procedure TPropDialog.SetProperties(const Value: TProperties);
+procedure TPropDialog.SetProperties(const Value: TddProperties);
 begin
   F_WorkPanel.Properties := Value;
   ResizePanel;

@@ -170,10 +170,6 @@ type
     ViewWholeGraph: TAction;
     FullGraph1: TMenuItem;
     ExportBitmap: TAction;
-    Export1: TMenuItem;
-    AsMetafile1: TMenuItem;
-    AsBitmap1: TMenuItem;
-    Merge1: TMenuItem;
     ViewPan: TAction;
     N20: TMenuItem;
     PanMode1: TMenuItem;

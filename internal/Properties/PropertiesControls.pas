@@ -10,10 +10,11 @@ type
   //1 Панель для редактирования одного объекта
   TPropertiesPanel = class(TControlPanel)
   private
-    f_Properties: TProperties;
+    f_Properties: TddProperties;
     FLabelTop: Boolean;
+    f_ActualHeight: Integer;
     function MakePropertyControl(aProperty: TddProperty): Boolean;
-    procedure pm_SetProperties(const Value: TProperties);
+    procedure pm_SetProperties(const Value: TddProperties);
     procedure SetLabelTop(const Value: Boolean);
     function pm_GetCtrlCount: Integer;
     {$IFDEF Debug}
@@ -81,8 +82,9 @@ type
     procedure GetValues;
     procedure MakeControls;
     procedure SetValues;
-    property Properties: TProperties read f_Properties write pm_SetProperties;
+    property Properties: TddProperties read f_Properties write pm_SetProperties;
     property LabelTop: Boolean read FLabelTop write SetLabelTop;
+    property ActualHeight: Integer read f_ActualHeight;
   end;
 
 
@@ -277,7 +279,7 @@ begin
     end; // (f_Controls[l_CurCtrlIdx].CtrlPosition = cpInline)
     Inc(l_CurCtrlIdx);
    end; //while i
-   Height:= ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Top + ControlByTag(f_Controls[Pred(CtrlCount)].Tag).Height + cIndent;
+   f_ActualHeight:= Controls[Pred(ControlCount)].Top + Controls[Pred(ControlCount)].Height + cIndent;
  end;
  {$IFDEF Debug}
  Msg2Log('Adjusted:');
@@ -767,7 +769,7 @@ begin
   Result:= Length(f_Controls);
 end;
 
-procedure TPropertiesPanel.pm_SetProperties(const Value: TProperties);
+procedure TPropertiesPanel.pm_SetProperties(const Value: TddProperties);
 begin
  f_Properties := Value;
  PopUpMenu:= f_Properties.Menu;
@@ -834,7 +836,7 @@ begin
   if VarIsEmpty(aProperty.Value) then
     TComboBox(aControl).ItemIndex:= -1
   else
-   TComboBox(aControl).ItemIndex:= StrToInt(VarToStrDef(aProperty.Value, '-1'));
+   TComboBox(aControl).ItemIndex:= StrToIntDef(VarToStrDef(aProperty.Value, '-1'), -1);
  end;
 end;
 
@@ -871,6 +873,7 @@ var
 begin
  l_C:= ControlByTag(aProperty.UID);
  if l_C <> nil then
+ try
     case aProperty.PropertyType of
       ptChar,
       ptString: SetStringValue(aProperty, l_C);
@@ -885,6 +888,23 @@ begin
       ptDate: SetDateValue(aProperty, l_C);
       ptTime: SetTimeValue(aProperty, l_C);
     end;
+ except
+    case aProperty.PropertyType of
+      ptChar,
+      ptString: SetStringValue(aProperty, l_C);
+      ptInteger: SetIntegerValue(aProperty, l_C);
+      ptText: SetTextValue(aProperty, l_C);
+      ptBoolean: SetBooleanValue(aProperty, l_C);
+      ptChoice: SetChoiceValue(aProperty, l_C);
+      ptAction: SetActionValue(aProperty, l_C);
+      ptList: SetListValue(aProperty, l_C);
+      ptProperties: SetPropertiesValue(aProperty, l_C);
+      ptPassword: SetPasswordValue(aProperty, l_C);
+      ptDate: SetDateValue(aProperty, l_C);
+      ptTime: SetTimeValue(aProperty, l_C);
+    end;
+
+ end;
  Result:= True;
 end;
 
