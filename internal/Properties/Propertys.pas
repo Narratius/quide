@@ -471,7 +471,8 @@ begin
    fNewLine:= TddProperty(Source).NewLine;
    if PropertyType in [ptList, ptChoice] then
    begin
-    ListItem:= TddProperty(Source).ListItem.Clone;
+    if TddProperty(Source).ListItem <> nil then
+      ListItem:= TddProperty(Source).ListItem;
     // SubItems
     for i := 0 to TddProperty(Source).f_ListItems.Count-1 do
      f_ListItems.Add(TddProperty(Source).f_ListItems[i].Clone);
