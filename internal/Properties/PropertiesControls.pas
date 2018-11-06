@@ -117,6 +117,15 @@ begin
   begin
    PopupMenu:= TPopupMenu.Create(Self);
    PopupMenu.AutoPopup:= True;
+  end
+  else
+  begin
+    l_Item := TMenuItem.Create(Self); // Create the new item.
+    l_Item.Name:= 'DebugItem';
+    index := PopupMenu.Items.Count;
+    l_Item.Caption := '-';
+    l_Item.Tag := index;
+    PopupMenu.Items.Add(l_Item);// Add it to the pop-up menu.
   end;
   l_Item := TMenuItem.Create(Self); // Create the new item.
   l_Item.Name:= 'CopyToClbrd';

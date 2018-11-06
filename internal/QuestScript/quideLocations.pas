@@ -3,7 +3,7 @@ unit quideLocations;
 interface
 
 uses
- Classes, Generics.Collections, Xml.XMLIntf,
+ Classes, Generics.Collections, Xml.XMLIntf, Menus,
  quideObject, quideActions, Propertys;
 
 type
@@ -21,9 +21,10 @@ type
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddAction(aActType: TquideActionType); overload;
+    procedure AddAction(aAction: TquideAction); overload;
     procedure LoadFromXML(Element: IXMLNode);
     procedure SaveToXML(Element: IXMLNode);
-    procedure AddAction(aAction: TquideAction); overload;
+
     function ActionByID(aActionID: Integer): TquideAction;
     procedure CheckTargets(const OldCaption, NewCaption: String);
     property Actions[Index: Integer]: TquideAction read pm_GetActions; default;

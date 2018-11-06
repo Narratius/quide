@@ -154,8 +154,10 @@ begin
     if l_C is TPropertiesPanel then
     begin
      TPropertiesPanel(l_C).Caption:= '';
+     {!!!!!!!!!!!!!!!!
      if aControls[i].SubItem <> nil then
       TPropertiesPanel(l_C).PopupMenu:= aControls[i].SubItem.Menu;
+     }
     end
     else
     if l_C is TDateTimePicker then

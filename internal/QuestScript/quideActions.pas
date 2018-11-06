@@ -12,7 +12,6 @@ type
 
  TquideActions = class(TddProperties)
  private
-  f_Menu: TPopupMenu;
   procedure AddGotoAction(Sender: TObject);
   procedure AddInventoryAction(Sender: TObject);
   procedure AddLogicAction(Sender: TObject);
@@ -21,12 +20,12 @@ type
   procedure AddButtonAction(Sender: TObject);
   procedure AddAction(aType: TquideActionType);
  protected
-
+  procedure CreatePopupMenu; override;
  public
   constructor Create(aOwner: TComponent); override;
   destructor Destroy; override;
  public
-  property Menu: TPopupMenu read f_Menu;
+  //property Menu: TPopupMenu read f_Menu;
  end;
 
   //1 Базовый объект для действия в локации
@@ -110,6 +109,9 @@ type
 implementation
 
 Uses
+ {$IFDEF Debug}
+ Dialogs,
+ {$ENDIF}
  SysUtils,
  PropertyUtils;
 
@@ -333,55 +335,103 @@ end;
 { TquideActions }
 
 procedure TquideActions.AddAction(aType: TquideActionType);
+var
+ l_A: TquideAction;
 begin
-
+ l_A:= nil;
+ try
+   case aType of
+     atGoto: l_A:= TquideJumpAction.Create(nil);
+     atInventory: l_A:= TquideInventoryAction.Create(nil);
+     atLogic: l_A:= TquideLogicalAction.Create(nil);
+     atText: l_A:= TquideTextAction.Create(nil);
+     atVariable: l_A:= TquideVariableAction.Create(nil);
+     atButton: l_A:= TquideButtonAction.Create(nil);
+   end;
+   if l_A <> nil then
+   begin
+    DefineProps('Action'+IntToStr(Count+1), '', l_A);
+    DoStructChange;
+   end;
+  finally
+    FreeAndNil(l_A);
+  end;
 end;
 
 procedure TquideActions.AddButtonAction(Sender: TObject);
 begin
-
+ AddAction(atButton);
 end;
 
 procedure TquideActions.AddGotoAction(Sender: TObject);
 begin
-
+ AddAction(atGoto);
 end;
 
 procedure TquideActions.AddInventoryAction(Sender: TObject);
 begin
-
+ AddAction(atInventory);
 end;
 
 procedure TquideActions.AddLogicAction(Sender: TObject);
 begin
-
+ AddAction(atLogic);
 end;
 
 procedure TquideActions.AddTextAction(Sender: TObject);
 begin
-
+  AddAction(atText);
 end;
 
 procedure TquideActions.AddVariableAction(Sender: TObject);
 begin
-
+ AddAction(atVariable);
 end;
 
 constructor TquideActions.Create;
-var
- l_Item: TMenuItem;
 begin
   inherited;
-  f_Menu:= TPopupMenu.Create(nil);
-  l_Item:= TMenuItem.Create(nil);
-  l_Item.Caption:= 'Добавить переход...';
-  l_Item.OnClick:= AddButtonAction;
-  f_Menu.Items.Add(l_Item);
+end;
+
+procedure TquideActions.CreatePopupMenu;
+var
+ l_I: TMenuItem;
+begin
+ inherited;
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Текст';
+ l_I.OnClick:= AddTextAction;
+ Menu.Items.Add(l_I);
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Переход';
+ l_I.OnClick:= AddGotoAction;
+ Menu.Items.Add(l_I);
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Инвентарь';
+ l_I.OnClick:= AddInventoryAction;
+ Menu.Items.Add(l_I);
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Условие';
+ l_I.OnClick:= AddLogicAction;
+ Menu.Items.Add(l_I);
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Переменная';
+ l_I.OnClick:= AddVariableAction;
+ Menu.Items.Add(l_I);
+ l_I:= TMenuItem.Create(Menu);
+ l_I.Name:= 'MenuItem'+IntToStr(menu.Items.Count+1);
+ l_I.Caption:= 'Кнопка';
+ l_I.OnClick:= AddButtonAction;
+ Menu.Items.Add(l_I);
 end;
 
 destructor TquideActions.Destroy;
 begin
-  FreeAndNil(f_Menu);
   inherited;
 end;
 

@@ -40,7 +40,6 @@ object quideLocationDialog: TquideLocationDialog
     Width = 761
     Height = 474
     Align = alClient
-    PopupMenu = PopupMenu1
     TabOrder = 1
   end
   object Panel1: TPanel

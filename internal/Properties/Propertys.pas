@@ -204,7 +204,9 @@ type
     procedure pm_SetChoiceStyles(Alias: String; const Value: TddChoiceStyle);
     procedure pm_SetStructChanged(const Value: Boolean);
     procedure pm_SetOnStructChange(const Value: TNotifyEvent);
+    procedure pm_SetMenu(const Value: TPopupMenu);
   protected
+    procedure CreatePopupMenu; virtual;
     procedure DefineProperties(Filer: TFiler); override;
     procedure DoChange;
     procedure DoStructChange;
@@ -249,7 +251,7 @@ type
     property Count: Integer read pm_GetCount;
     property Hints[Alias: String]: String read GetHints write SetHints;
     property Items[Index: Integer]: TddProperty read pm_GetItems;
-    property Menu: TPopupMenu read f_Menu;
+    property Menu: TPopupMenu read f_Menu write pm_SetMenu;
     property NewLines[Alias: String]: Boolean read GetNewLines write setNewLines;
     property StructureChanged: Boolean read f_StructChanged write pm_SetStructChanged;
     property Values[Alias: String]: Variant read pm_GetValues write pm_SetValues;
@@ -567,6 +569,11 @@ constructor TddProperties.Create;
 begin
  inherited Create(aOwner);
  f_ChoiceItems:= TStringList.Create;
+ CreatePopupMenu;
+end;
+
+procedure TddProperties.CreatePopupMenu;
+begin
  f_Menu:= TPopupMenu.Create(nil);
 end;
 
@@ -713,6 +720,7 @@ begin
  with l_P do
  begin
   ListItem:= Items;
+  //!!!!!!!!! ListItem.Menu:= Items.Menu;
   ListItem.OnOwnerStructureChange:= InnerStructChange;
   OnOwnerStructureChange:= InnerStructChange;
  end;
@@ -1049,6 +1057,27 @@ procedure TddProperties.pm_SetChoiceStyles(Alias: String;
   const Value: TddChoiceStyle);
 begin
  FindProperty(Alias).ChoiceStyle:= Value;
+end;
+
+procedure TddProperties.pm_SetMenu(const Value: TPopupMenu);
+var
+ i: Integer;
+ l_I: TMenuItem;
+begin
+ (*  *)
+ if f_Menu <> nil then
+  if Value <> nil then
+   for i := 0 to Value.Items.Count-1 do
+   begin
+    l_I:= TMenuItem.Create(f_Menu);
+    l_I.Name:= 'MenuItem'+IntToStr(f_Menu.Items.Count+1);
+    l_I.Caption:= Value.Items.Items[i].Caption;
+    l_I.OnClick:= Value.Items.Items[i].OnClick;
+    f_Menu.Items.Add(l_I)
+   end
+ else
+ (* *)
+  f_Menu := Value;
 end;
 
 procedure TddProperties.pm_SetOnStructChange(const Value: TNotifyEvent);

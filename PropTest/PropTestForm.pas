@@ -66,7 +66,7 @@ var
 begin
   l_Prop:= TddProperties.Create(nil);
   try
-   FillIf(l_prop);
+   //FillIf(l_prop);
    ShowPropDialog('Test Properties', l_Prop, CheckBox1.Checked);
   finally
    FreeAndNil(l_Prop);
@@ -138,10 +138,8 @@ begin
  try
    with l_P do
    begin
-    (*
     DefineChoice('What', 'Если');
     ChoiceStyles['What']:= csEditableList;
-    *)
     DefineChoice('Condition', '',
       NewChoice(0, 'равно',
       NewChoice(1, 'не равно',
@@ -150,14 +148,12 @@ begin
       NewChoice(4, 'больше или равно',
       NewChoice(5, 'меньше или равно',
       nil)))))));
-    (*
     NewLines['Condition']:= False;
     DefineString('Value', '');
     NewLines['Value']:= False;
     DefineProps('True', '');
     DefineStaticText('Иначе');
     DefineProps('False', '');
-    *)
    end;
    aProp.DefineProps('Props', 'Условия', l_P);
  finally
