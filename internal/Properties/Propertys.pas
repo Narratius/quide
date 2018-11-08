@@ -79,7 +79,6 @@ type
     procedure ReadChoiceStyle(Reader: TReader);
     procedure WriteShoiceStyle(Writer: TWriter);
     procedure pm_SetUID(const Value: Integer);
-    procedure pm_SeTddProperties(const Value: TddProperties);
     procedure ReadNewLine(Reader: TReader);
     procedure WriteNewLine(Writer: TWriter);
     function AddOneProp(aItem: TddProperty): Boolean;
@@ -1297,23 +1296,6 @@ begin
  end
  else
   raise Exception.Create('Свойство не ptList'); // Добавить ошибку
-end;
-
-procedure TddProperty.pm_SeTddProperties(const Value: TddProperties);
-begin
-  (*
-  if Value <> Properties then
-  begin
-    //if Properties <> nil then
-    //  Properties.Remove(Self);
-    if Value <> nil then
-    begin
-     f_Properties:= Value;
-     f_Properties.AddProp(Self);
-     //Name:= ClassName + IntToStr(UID);
-    end;
-  end;
-  *)
 end;
 
 procedure TddProperty.pm_SetPropertyType(const Value: TddPropertyType);

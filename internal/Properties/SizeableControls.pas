@@ -85,7 +85,7 @@ procedure AddInnerControl(aParent: TWinControl; aControls: TList;
 
 const
  cDefaultHeight = -1;
- cIndent        = 4;
+ cIndent        = 8;
 
 implementation
 
@@ -103,10 +103,6 @@ var
   l_Top, l_Left, l_PrevTop, l_PrevLeft: Integer;
   l_PrevisLabel: Boolean;
 begin
- {$IFDEF Debug}
- //with aParent do
- //  Msg2Log('ParentBefore (%p) Left: %d, Top: %d, Width: %d, Height: %d', [Addr(aParent), Left, Top, Width, Height]);
- {$ENDIF}
  if aControls.Count > 0 then
  begin
   l_PrevControl:= TControl(aControls[aControls.Count-1]);

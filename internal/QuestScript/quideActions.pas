@@ -268,6 +268,8 @@ end;
 { TquideLogicalAction }
 
 constructor TquideLogicalAction.Create;
+var
+ l_Acts: TquideActions;
 begin
   inherited;
   ActionType:= atLogic;
@@ -284,9 +286,20 @@ begin
   DefineString('Value', '');
   NewLines['Condition']:= False;
   NewLines['Value']:= False;
-  DefineProps('True', '');
+  l_Acts:= TquideActions.Create(nil);
+  try
+   DefineProps('True', '', l_Acts);
+  finally
+   FreeAndNil(l_Acts);
+  end;
   DefineStaticText('Иначе');
-  DefineProps('False', ''); (* *)
+  l_Acts:= TquideActions.Create(nil);
+  try
+   DefineProps('False', '', l_Acts);
+  finally
+   FreeAndNil(l_Acts);
+  end;
+
 end;
 
 { TquideButtonAction }
@@ -375,6 +388,7 @@ end;
 
 procedure TquideActions.AddLogicAction(Sender: TObject);
 begin
+ // Мне кажется, условие проще добавлять через дополнительные окна
  AddAction(atLogic);
 end;
 
